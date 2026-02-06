@@ -1,6 +1,10 @@
 # Supabase
 .branches
 .temp
+.supabase
+
+# Local DBs
+*.db
 
 # dotenvx
 .env.keys
