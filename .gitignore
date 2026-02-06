@@ -6,6 +6,7 @@ node_modules/
 /.env
 .env.local
 .env.*.local
+/backend/.env
 
 /.vscode
 .DS_Store
@@ -26,7 +27,7 @@ node_modules/
 
 
 
-
+/.agents
 
 
 
