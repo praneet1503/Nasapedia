@@ -67,16 +67,21 @@ export default function HomePage() {
     }
   }
 
-  // Fetch a random sample of projects to show before the user performs a search
-  async function fetchRandom() {
+  // Fetch the entire projects dataset (paginated requests) to show before the user searches
+  async function fetchAllProjects() {
     setIsLoading(true)
     setError(null)
     try {
-      // fetch a larger page and sample from it to avoid extra backend work
-      const result = await fetchProjects({ limit: 100, offset: 0 })
-      const shuffled = result.sort(() => Math.random() - 0.5)
-      const sample = shuffled.slice(0, PAGE_SIZE)
-      setProjects(sample)
+      const all: Project[] = []
+      let nextOffset = 0
+      while (true) {
+        const page = await fetchProjects({ limit: PAGE_SIZE, offset: nextOffset })
+        if (page.length === 0) break
+        all.push(...page)
+        if (page.length < PAGE_SIZE) break
+        nextOffset += PAGE_SIZE
+      }
+      setProjects(all)
       setHasMore(false)
     } catch (e) {
       setError('Something went wrong while fetching projects.')
@@ -87,10 +92,10 @@ export default function HomePage() {
     }
   }
 
-  // Load random projects on mount, and whenever the user clears search results
+  // Load all projects on mount, and whenever the user clears search results
   useEffect(() => {
     if (!hasSearched) {
-      fetchRandom()
+      void fetchAllProjects()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hasSearched])
@@ -176,9 +181,9 @@ export default function HomePage() {
         {projects.length > 0 ? (
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-medium">{hasSearched ? 'Search results' : 'Random projects'}</h2>
+              <h2 className="text-lg font-medium">{hasSearched ? 'Search results' : 'All projects'}</h2>
               {!hasSearched ? (
-                <p className="text-sm text-slate-500">Showing random projects — press Enter or click Search to find specific projects.</p>
+                <p className="text-sm text-slate-500">Showing all projects from the connected database — use the search to filter.</p>
               ) : null}
             </div>
 
