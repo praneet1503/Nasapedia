@@ -8,6 +8,9 @@ node_modules/
 .env.*.local
 /backend/.env
 
+# Ignore entire backend folder (untracked files only; tracked files remain until removed)
+/backend/
+
 /.vscode
 .DS_Store
 *.log
