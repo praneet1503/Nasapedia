@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import Filters from '../components/Filters'
 import LoadingState from '../components/LoadingState'
 import ProjectList from '../components/ProjectList'
@@ -66,6 +66,34 @@ export default function HomePage() {
       setIsLoading(false)
     }
   }
+
+  // Fetch a random sample of projects to show before the user performs a search
+  async function fetchRandom() {
+    setIsLoading(true)
+    setError(null)
+    try {
+      // fetch a larger page and sample from it to avoid extra backend work
+      const result = await fetchProjects({ limit: 100, offset: 0 })
+      const shuffled = result.sort(() => Math.random() - 0.5)
+      const sample = shuffled.slice(0, PAGE_SIZE)
+      setProjects(sample)
+      setHasMore(false)
+    } catch (e) {
+      setError('Something went wrong while fetching projects.')
+      setProjects([])
+      setHasMore(false)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  // Load random projects on mount, and whenever the user clears search results
+  useEffect(() => {
+    if (!hasSearched) {
+      fetchRandom()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hasSearched])
 
   return (
     <main className="mx-auto w-full max-w-5xl px-4 py-10">
@@ -139,8 +167,21 @@ export default function HomePage() {
           </div>
         ) : null}
 
+        {!isLoading && !hasSearched && projects.length === 0 && !error ? (
+          <div className="rounded-lg border border-slate-200 bg-white p-4 text-sm text-slate-700">
+            No projects available.
+          </div>
+        ) : null}
+
         {projects.length > 0 ? (
           <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-medium">{hasSearched ? 'Search results' : 'Random projects'}</h2>
+              {!hasSearched ? (
+                <p className="text-sm text-slate-500">Showing random projects — press Enter or click Search to find specific projects.</p>
+              ) : null}
+            </div>
+
             <ProjectList projects={projects} />
 
             <div className="flex justify-center">

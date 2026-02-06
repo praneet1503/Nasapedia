@@ -23,3 +23,14 @@ node_modules/
 
 # Ignore IDE and editor files
 /.idea/
+
+
+
+
+
+
+
+
+
+backend/app/__pycache__/
+backend/app/__pycache__/db.cpython-312.pyc
