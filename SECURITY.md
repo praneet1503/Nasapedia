@@ -27,5 +27,18 @@ This document highlights recommended security checks to perform before deploying
 - `safety check` (from PyUp)
 - `npx snyk test` (requires Snyk account for some features)
 
+## Recent automated dependency updates
+A dependency fix tool detected and automatically updated vulnerable packages. Please review the changes and test the application.
+
+- Updated packages (automated fix):
+  - `next` -> patched to v15.5.12
+  - `react-server-dom-webpack` -> updated to secure version
+  - `react-server-dom-parcel` -> updated to secure version
+
+Recommended follow-ups:
+- Run the test/build pipeline locally (`npm run build`, `npm test` if available) to confirm compatibility.
+- Review `frontend/package-lock.json` diff and ensure no unexpected package changes.
+- Pin versions in `package.json` if necessary to avoid unexpected future upgrades.
+
 ## Reporting security issues
 If you find a high-severity security problem, create an issue titled `[security] <short description>` and do not include secrets or detailed exploit steps in the public issue. Use the `.github/ISSUE_TEMPLATE/security_issue.md` template where appropriate.
