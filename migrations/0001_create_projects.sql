@@ -1,5 +1,8 @@
+-- 0001_create_projects.sql
+-- Initial schema for projects table, for Neon/Postgres
+
 CREATE TABLE IF NOT EXISTS projects (
-    id INT PRIMARY KEY,
+    id BIGINT PRIMARY KEY,
     title TEXT NOT NULL,
     description TEXT,
     status TEXT,
@@ -11,6 +14,7 @@ CREATE TABLE IF NOT EXISTS projects (
     last_updated TIMESTAMP DEFAULT now()
 );
 
+-- Full text GIN index for search
 CREATE INDEX IF NOT EXISTS idx_projects_search
 ON projects
 USING GIN (to_tsvector('english', title || ' ' || coalesce(description, '')));

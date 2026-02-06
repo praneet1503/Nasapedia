@@ -26,6 +26,19 @@ app.add_middleware(
 )
 
 
+@app.on_event("startup")
+def startup_db_check():
+    """Verify DATABASE_URL connects successfully at startup."""
+    try:
+        with engine.connect() as conn:
+            conn.execute(text("SELECT 1"))
+        print("Database connection established successfully.")
+    except Exception as exc:  # pylint: disable=broad-except
+        print("Database connection failed at startup:", exc)
+        raise
+
+
+
 @app.get("/health")
 def health() -> dict:
     try:

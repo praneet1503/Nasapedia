@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 from sqlalchemy import create_engine
 
 # Load environment variables from a local .env file (development convenience)
-# .env is already ignored by git in backend/.gitignore
+# .env is ignored by git. For Neon, use the DATABASE_URL env var and don't commit secrets.
 env_path = Path(__file__).resolve().parent.parent / ".env"
 if env_path.exists():
     load_dotenv(env_path)

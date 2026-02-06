@@ -19,7 +19,7 @@ Describe the impact and severity:
 
 **Environment**
 - Version/branch:
-- Database: Supabase/Postgres
+- Database: PostgreSQL (Neon)
 - OS/Browser/etc:
 
 **Recommended mitigation**

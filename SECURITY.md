@@ -15,8 +15,9 @@ This document highlights recommended security checks to perform before deploying
   - Verify `backend/app/main.py` CORS allowlist only includes dev hostnames.
   - Consider adding CSP, HSTS, and other relevant production headers.
 - [ ] **Database & migrations**
-  - Review migrations in `supabase/migrations/*` before applying.
+  - Review SQL migrations in `migrations/*` before applying to Neon/Postgres.
   - Limit DB credentials scope and use separate accounts for dev and production.
+  - Verify extensions used are supported by Neon.
 - [ ] **Open-source & legal**
   - Review any AI-generated text for license and attribution issues.
 

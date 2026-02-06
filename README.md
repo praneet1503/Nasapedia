@@ -1,6 +1,6 @@
 # NASA TechPort Explorer
 
-A small web application to explore NASA TechPort projects. This repository includes a FastAPI backend, a Next.js frontend, and a local Supabase configuration for development.
+A small web application to explore NASA TechPort projects. This repository includes a FastAPI backend, a Next.js frontend, and is configured to use a Postgres database (Neon recommended) for development and production.
 
 
 ## 🚀 Quickstart
@@ -9,7 +9,7 @@ Prerequisites:
 - Node.js (recommended 18+)
 - Python 3.10+
 - `npx` / `npm`
-- Supabase CLI (optional for local Postgres) - `npm i -g supabase`
+- Neon PostgreSQL (recommended) — use the Neon Console to create a project and obtain `DATABASE_URL`
 
 Backend
 1. Create and activate a Python environment. Example:
@@ -23,8 +23,8 @@ Backend
    python3 -m pip install -r requirements.txt
    ```
 3. Configure a local database:
-   - For quick dev, use local Supabase: `npx supabase start` and then `npx supabase db push`.
-   - Or set `DATABASE_URL` to a Postgres instance:
+   - Use Neon Postgres for both local and cloud development. Create a Neon project and copy the connection string to `DATABASE_URL`.
+   - Or set `DATABASE_URL` to a Postgres instance (development example):
      ```bash
      export DATABASE_URL="postgresql://postgres:postgres@127.0.0.1:54322/postgres"
      ```
@@ -48,11 +48,26 @@ Frontend
 ```
 backend/        # FastAPI backend
 frontend/       # Next.js frontend (app router)
-supabase/       # Local supabase config, migrations, seeds
+migrations/     # SQL migrations for Neon/Postgres
+scripts/        # Helper scripts (migration, seed, smoke tests)
 LICENSE
 README.md
 ```
 
+## Neon (Postgres) setup
+- Create a Neon project and copy the connection string (DATABASE_URL).
+- Apply migrations:
+  ```bash
+  psql "$DATABASE_URL" -f migrations/0001_create_projects.sql
+  ```
+- Seed (optional):
+  ```bash
+  DATABASE_URL="$DATABASE_URL" python3 scripts/seed_db.py
+  ```
+- Smoke test (insert/read):
+  ```bash
+  DATABASE_URL="$DATABASE_URL" python3 scripts/smoke_test_db.py
+  ```
 
 ## Features
 - Full-text search and filters
