@@ -35,3 +35,4 @@ node_modules/
 
 backend/app/__pycache__/
 backend/app/__pycache__/db.cpython-312.pyc
+backend/app/__pycache__/db.cpython-312.pyc

@@ -4,12 +4,27 @@ import sys
 import time
 from datetime import date
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional
+from typing import Any, Dict, Iterable, List, Optional, cast
 import json
+import random
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import requests
+from requests.exceptions import RequestException
 from sqlalchemy import text
 from sqlalchemy.exc import OperationalError, SQLAlchemyError
+
+# Optional visual progress (Rich)
+from rich.progress import (
+    Progress,
+    SpinnerColumn,
+    TextColumn,
+    BarColumn,
+    TaskProgressColumn,
+    DownloadColumn,
+    TransferSpeedColumn,
+    TimeRemainingColumn,
+)
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 BACKEND_DIR = SCRIPT_DIR.parent
@@ -116,7 +131,7 @@ def fetch_project_ids(api_key: str) -> Iterable[int]:
         total_count = None
         if isinstance(data, dict) and "totalCount" in data:
             try:
-                total_count = int(data.get("totalCount"))
+                total_count = int(data.get("totalCount") or 0)
             except Exception:
                 total_count = None
 
@@ -169,33 +184,57 @@ def fetch_project_ids(api_key: str) -> Iterable[int]:
                 break
         offset += limit
 
-        for item in items:
-            project_id = item.get("id")
-            if project_id is not None:
-                yield int(project_id)
 
-        if len(items) < limit:
-            break
-        offset += limit
+def fetch_project_detail(api_key: str, project_id: int, session=None, timeout: int = 60, max_retries: int = 4) -> Dict[str, Any]:
+    """Fetch project details with retry/backoff for transient errors.
 
+    Uses `session` if provided (requests.Session recommended) for connection pooling.
+    Raises RuntimeError on persistent failures or unexpected payloads.
+    """
+    session = session or requests
 
-def fetch_project_detail(api_key: str, project_id: int) -> Dict[str, Any]:
-    response = requests.get(
-        f"{API_BASE_URL}/projects/{project_id}",
-        params={"api_key": api_key},
-        timeout=30,
-    )
-    if response.status_code != 200:
-        raise RuntimeError(
-            f"Failed to fetch project {project_id}: {response.status_code} {response.text}"
-        )
+    for attempt in range(0, max_retries + 1):
+        try:
+            response = session.get(
+                f"{API_BASE_URL}/projects/{project_id}",
+                params={"api_key": api_key},
+                timeout=timeout,
+            )
+        except RequestException as exc:
+            logging.warning("Network error fetching %s: %s", project_id, exc)
+            if attempt < max_retries:
+                wait = (2 ** attempt) + random.random()
+                time.sleep(wait)
+                continue
+            raise RuntimeError(f"Failed to fetch project {project_id}: network error {exc}") from exc
 
-    data = response.json()
-    project = data.get("project") or data.get("projects") or data
-    if not isinstance(project, dict):
-        raise RuntimeError(f"Unexpected project payload for {project_id}")
+        # Successful
+        if response.status_code == 200:
+            data = response.json()
+            project = data.get("project") or data.get("projects") or data
+            if not isinstance(project, dict):
+                raise RuntimeError(f"Unexpected project payload for {project_id}")
+            return project
 
-    return project
+        # Transient server errors; retry
+        if response.status_code in (502, 503, 504, 429):
+            if attempt < max_retries:
+                wait = (2 ** attempt) + random.random()
+                logging.warning("Transient %s for %s — retrying in %.1fs", response.status_code, project_id, wait)
+                time.sleep(wait)
+                continue
+            logging.error("Persistent %s for %s: %s", response.status_code, project_id, response.text)
+            raise RuntimeError(f"Failed to fetch project {project_id}: {response.status_code} {response.text}")
+
+        # Not found — skip
+        if response.status_code == 404:
+            raise RuntimeError(f"Project {project_id} not found (404)")
+
+        # Other client errors — treat as fatal for this ID
+        raise RuntimeError(f"Failed to fetch project {project_id}: {response.status_code} {response.text}")
+
+    # If we fall out of the retry loop without returning, raise a generic error
+    raise RuntimeError(f"Failed to fetch project {project_id}: unknown error after {max_retries} retries")
 
 
 def upsert_projects(records: List[Dict[str, Any]]) -> None:
@@ -203,6 +242,12 @@ def upsert_projects(records: List[Dict[str, Any]]) -> None:
         return
     with engine.begin() as conn:
         conn.execute(UPSERT_SQL, records)
+
+
+def _short_id(length: int = 5) -> str:
+    """Generate a small hex-like id for display in progress UI."""
+    alphabet = "0123456789abcdef"
+    return "".join(random.choice(alphabet) for _ in range(length))
 
 
 def main(argv: Optional[List[str]] = None) -> int:
@@ -221,6 +266,11 @@ def main(argv: Optional[List[str]] = None) -> int:
         action="store_true",
         help="Persist resume state to backend/.ingest_state and resume from it",
     )
+    parser.add_argument("--workers", type=int, default=5, help="Number of concurrent workers to fetch project details")
+    parser.add_argument("--page-size", type=int, default=100, help="Process project IDs in page-sized chunks for batch DB checks")
+    parser.add_argument("--timeout", type=int, default=60, help="HTTP timeout (seconds) for project detail fetches")
+    parser.add_argument("--max-retries", type=int, default=4, help="Number of retries for transient HTTP errors")
+    parser.add_argument("--progress-ui", action="store_true", help="Show a simulated Docker-style progress UI during fetching (requires 'rich')")
 
     def state_file_path() -> Path:
         return BACKEND_DIR / ".ingest_state"
@@ -391,61 +441,175 @@ def main(argv: Optional[List[str]] = None) -> int:
     start_time = time.time()
     last_log_time = start_time
     upserted_count = 0
+    processed = 0
+    failed_count = 0
 
-    for index, project_id in enumerate(project_ids, start=1):
-        # Optionally skip fetching details if project already exists in DB
+    # Helper to chunk a list into page-sized chunks
+    def chunk_list(lst: List[int], size: int):
+        for i in range(0, len(lst), size):
+            yield lst[i : i + size]
+
+    session = requests.Session()
+
+    # Process project ids in page-sized chunks and do a single DB check per page
+    for page_index, page_ids in enumerate(chunk_list(project_ids, args.page_size)):
+        page_start = page_index * args.page_size
+        logging.info("Processing page %d (ids %d..%d)", page_index + 1, page_start + 1, page_start + len(page_ids))
+
+        # Batch-check existing ids in DB
+        existing_ids = set()
         if args.skip_existing:
             try:
                 with engine.connect() as conn:
-                    exists = conn.execute(
-                        text("SELECT 1 FROM projects WHERE id = :id LIMIT 1"), {"id": project_id}
-                    ).first()
-                if exists:
-                    logging.debug("Skipping existing project %s", project_id)
-                    continue
+                    rows = conn.execute(text("SELECT id FROM projects WHERE id = ANY(:ids)"), {"ids": list(page_ids)}).all()
+                    existing_ids = {r[0] for r in rows}
             except OperationalError as exc:
-                logging.error("Database unavailable when checking existence: %s", exc)
+                logging.error("Database unavailable when checking existing ids: %s", exc)
                 return 1
 
-        try:
-            project = fetch_project_detail(api_key, project_id)
-            record = normalize_project(project)
-        except RuntimeError as exc:
-            logging.error("%s", exc)
-            return 1
-        except (TypeError, ValueError) as exc:
-            logging.error("Failed to normalize project %s: %s", project_id, exc)
-            continue
+        # IDs we need to fetch details for
+        to_fetch = [pid for pid in page_ids if pid not in existing_ids]
+        logging.info("Page %d: %d total, %d existing, %d to fetch", page_index + 1, len(page_ids), len(existing_ids), len(to_fetch))
 
-        batch.append(record)
+            # Concurrently fetch project details with a thread pool and robust retry
+        if to_fetch:
+            # If user requested a visual UI, create the Rich progress context
+            if args.progress_ui:
+                columns = [
+                    SpinnerColumn(spinner_name="dots"),
+                    TextColumn("[bold blue]{task.fields[id]}", justify="right"),
+                    TextColumn("[progress.description]{task.description}"),
+                    BarColumn(bar_width=40),
+                    TaskProgressColumn(),
+                    DownloadColumn(),
+                    TransferSpeedColumn(),
+                    TimeRemainingColumn(),
+                ]
 
-        # Frequent progress output (never too noisy unless verbose)
-        now = time.time()
-        if args.verbose:
-            logging.debug("Processing %d/%d project_id=%s", index, total, project_id)
-        elif now - last_log_time >= 5:
-            pct = (index / total) * 100 if total else 0
-            elapsed = now - start_time
-            rate = index / elapsed if elapsed > 0 else 0
-            remaining = (total - index) / rate if rate > 0 else 0
-            progress_line = (
-                f"Progress: {index}/{total} ({pct:.1f}%) — rate: {rate:.2f}/s — eta: {remaining:.0f}s"
-            )
-            print(progress_line, end="\r", flush=True)
-            last_log_time = now
+                with Progress(*columns, transient=True) as ui:
+                    overall_id = _short_id(4)
+                    overall = ui.add_task("Fetching", total=len(to_fetch), id=overall_id)
 
-        if len(batch) >= args.batch_size:
-            try:
-                upsert_projects(batch)
-            except (OperationalError, SQLAlchemyError) as exc:
-                logging.error("Database write failed: %s", exc)
-                return 1
-            upserted_count += len(batch)
-            logging.info("Upserted %d/%d projects", upserted_count, total)
-            if args.use_state_file:
-                save_state(index)
-            batch = []
+                    # Create a UI task per project (small total simulating bytes)
+                    pid_to_task: Dict[int, int] = {}
+                    for pid in to_fetch:
+                        tid = _short_id()
+                        # use small byte totals to make speeds meaningful in UI
+                        pid_to_task[pid] = ui.add_task(description=str(pid), total=1000, id=tid)
 
+                    with ThreadPoolExecutor(max_workers=args.workers) as executor:
+                        future_to_id = {
+                            executor.submit(fetch_project_detail, api_key, pid, session, args.timeout, args.max_retries): pid
+                            for pid in to_fetch
+                        }
+
+                        # While there are pending futures, update UI and handle completions
+                        pending = set(future_to_id.keys())
+                        tick = 0.1
+                        while pending:
+                            done_now = set()
+                            for fut in list(pending):
+                                if fut.done():
+                                    pid = future_to_id[fut]
+                                    processed += 1
+                                    try:
+                                        project = fut.result()
+                                        try:
+                                            record = normalize_project(project)
+                                        except (TypeError, ValueError) as exc:
+                                            logging.error("Failed to normalize project %s: %s", pid, exc)
+                                            failed_count += 1
+                                            # mark UI task complete
+                                            t = pid_to_task[pid]
+                                            ui.update(cast(Any, t), completed=1000)
+                                            ui.update(cast(Any, overall), advance=1)
+                                            done_now.add(fut)
+                                            continue
+                                        batch.append(record)
+                                        # mark UI task complete
+                                        t = pid_to_task[pid]
+                                        ui.update(cast(Any, t), completed=1000)
+                                        ui.update(cast(Any, overall), advance=1)
+                                    except Exception as exc:
+                                        logging.error("Failed to fetch project %s: %s", pid, exc)
+                                        failed_count += 1
+                                        t = pid_to_task[pid]
+                                        ui.update(cast(Any, t), completed=1000)
+                                        ui.update(cast(Any, overall), advance=1)
+                                    done_now.add(fut)
+
+                            # Remove completed futures
+                            pending -= done_now
+
+                            # Make UI tasks progress (simulate varying transfer speeds)
+                            for pid, t in pid_to_task.items():
+                                # Locate the task object by id
+                                task_obj = next((task for task in ui.tasks if task.id == t), None)
+                                if task_obj is None or task_obj.finished:
+                                    continue
+                                # Random per-tick progress to simulate network variability
+                                min_adv = 10
+                                max_adv = 200
+                                adv = random.randint(min_adv, max_adv)
+                                ui.update(cast(Any, t), advance=adv)
+
+                            # Flush batch if needed
+                            if len(batch) >= args.batch_size:
+                                try:
+                                    upsert_projects(batch)
+                                except (OperationalError, SQLAlchemyError) as exc:
+                                    logging.error("Database write failed: %s", exc)
+                                    return 1
+                                upserted_count += len(batch)
+                                logging.info("Upserted %d projects so far", upserted_count)
+                                if args.use_state_file:
+                                    save_state(processed + (args.start_index or 0))
+                                batch = []
+
+                            time.sleep(tick)
+
+            else:
+                # No UI: fall back to existing as_completed behavior
+                with ThreadPoolExecutor(max_workers=args.workers) as executor:
+                    future_to_id = {
+                        executor.submit(fetch_project_detail, api_key, pid, session, args.timeout, args.max_retries): pid
+                        for pid in to_fetch
+                    }
+                    for fut in as_completed(future_to_id):
+                        pid = future_to_id[fut]
+                        processed += 1
+                        try:
+                            project = fut.result()
+                            try:
+                                record = normalize_project(project)
+                            except (TypeError, ValueError) as exc:
+                                logging.error("Failed to normalize project %s: %s", pid, exc)
+                                failed_count += 1
+                                continue
+                            batch.append(record)
+                        except Exception as exc:
+                            logging.error("Failed to fetch project %s: %s", pid, exc)
+                            failed_count += 1
+                            continue
+
+                        # Flush batch if needed
+                        if len(batch) >= args.batch_size:
+                            try:
+                                upsert_projects(batch)
+                            except (OperationalError, SQLAlchemyError) as exc:
+                                logging.error("Database write failed: %s", exc)
+                                return 1
+                            upserted_count += len(batch)
+                            logging.info("Upserted %d projects so far", upserted_count)
+                            if args.use_state_file:
+                                save_state(processed + (args.start_index or 0))
+                            batch = []
+
+        # Optionally update state after each page
+        if args.use_state_file:
+            save_state(processed + (args.start_index or 0))
+
+    # Final flush of remaining batch
     if batch:
         try:
             upsert_projects(batch)
@@ -453,13 +617,19 @@ def main(argv: Optional[List[str]] = None) -> int:
             logging.error("Database write failed: %s", exc)
             return 1
         upserted_count += len(batch)
-        logging.info("Upserted %d/%d projects", upserted_count, total)
+        logging.info("Upserted final %d projects", len(batch))
         if args.use_state_file:
-            save_state(total)
+            save_state(processed + (args.start_index or 0))
 
     elapsed = time.time() - start_time
-    logging.info("Ingestion complete: %d projects in %.1fs (%.2f/s)", upserted_count, elapsed, upserted_count / elapsed if elapsed else 0)
+    logging.info("Ingestion complete: %d upserted, %d failed in %.1fs (%.2f/s)", upserted_count, failed_count, elapsed, (upserted_count / elapsed) if elapsed else 0)
     return 0
+
+# End of main()
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
 
 
 if __name__ == "__main__":
