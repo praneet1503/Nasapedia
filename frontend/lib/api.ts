@@ -6,8 +6,14 @@ export type FetchProjectsParams = {
   trl_max?: number
   organization?: string
   technology_area?: string
+  order?: string
   limit?: number
   offset?: number
+}
+
+export type FetchProjectsResult = {
+  projects: Project[]
+  total: number
 }
 
 function getApiBaseUrl(): string {
@@ -27,7 +33,7 @@ function buildSearchParams(params: Record<string, string | number | undefined>):
   return qs ? `?${qs}` : ''
 }
 
-export async function fetchProjects(params: FetchProjectsParams): Promise<Project[]> {
+export async function fetchProjects(params: FetchProjectsParams): Promise<FetchProjectsResult> {
   const baseUrl = getApiBaseUrl()
   const url = `${baseUrl}/api/projects${buildSearchParams({
     q: params.q,
@@ -35,6 +41,7 @@ export async function fetchProjects(params: FetchProjectsParams): Promise<Projec
     trl_max: params.trl_max,
     organization: params.organization,
     technology_area: params.technology_area,
+    order: params.order,
     limit: params.limit ?? 20,
     offset: params.offset ?? 0,
   })}`
@@ -49,15 +56,18 @@ export async function fetchProjects(params: FetchProjectsParams): Promise<Projec
     throw new Error('Network error while fetching projects')
   }
 
-  if (res.status === 404) return []
+  if (res.status === 404) return { projects: [], total: 0 }
   if (!res.ok) {
-    if (res.status >= 400 && res.status < 500) return []
+    if (res.status >= 400 && res.status < 500) return { projects: [], total: 0 }
     throw new Error(`Unexpected error (${res.status}) while fetching projects`)
   }
 
+  const totalHeader = res.headers.get('X-Total-Count')
+  const total = totalHeader ? Number(totalHeader) || 0 : 0
+
   const data = (await res.json()) as unknown
-  if (!Array.isArray(data)) return []
-  return data as Project[]
+  if (!Array.isArray(data)) return { projects: [], total }
+  return { projects: data as Project[], total }
 }
 
 export async function fetchProjectById(id: number): Promise<Project | null> {

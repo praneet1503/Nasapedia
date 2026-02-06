@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query, Response
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 from sqlalchemy.exc import OperationalError, SQLAlchemyError
@@ -43,8 +43,10 @@ def search_projects(
     trl_max: Optional[int] = Query(default=None),
     organization: Optional[str] = Query(default=None),
     technology_area: Optional[str] = Query(default=None),
+    order: Optional[str] = Query(default="title_asc"),
     limit: int = Query(default=20, ge=1, le=100),
     offset: int = Query(default=0, ge=0),
+    response: Response = None,
 ) -> List[ProjectOut]:
     where_clauses = []
     params = {"limit": limit, "offset": offset}
@@ -74,13 +76,28 @@ def search_projects(
 
     where_sql = " WHERE " + " AND ".join(where_clauses) if where_clauses else ""
 
-    if q:
+    # Validate order param
+    allowed_orders = {"relevance", "title_asc", "title_desc", "newest", "oldest", "id"}
+    if order not in allowed_orders:
+        raise HTTPException(status_code=400, detail="Invalid order parameter")
+
+    # Compute ORDER BY SQL
+    if order == "relevance" and q:
         order_sql = (
             " ORDER BY ts_rank(to_tsvector('english', title || ' ' "
             "|| coalesce(description, '')), plainto_tsquery('english', :q)) DESC, id"
         )
+    elif order == "title_asc":
+        order_sql = " ORDER BY lower(title) ASC, id"
+    elif order == "title_desc":
+        order_sql = " ORDER BY lower(title) DESC, id"
+    elif order == "newest":
+        order_sql = " ORDER BY last_updated DESC, id"
+    elif order == "oldest":
+        order_sql = " ORDER BY last_updated ASC, id"
     else:
-        order_sql = " ORDER BY id"
+        # Fallback to alphabetical when relevance isn't applicable
+        order_sql = " ORDER BY lower(title) ASC, id"
 
     sql = text(
         "SELECT id, title, description, status, start_date, end_date, trl, "
@@ -93,14 +110,22 @@ def search_projects(
 
     try:
         with engine.connect() as conn:
+            # Get total count for pagination
+            count_params = {k: v for k, v in params.items() if k not in ("limit", "offset")}
+            count_sql = text("SELECT COUNT(*) FROM projects" + where_sql)
+            total = conn.execute(count_sql, count_params).scalar_one()
+
             results = conn.execute(sql, params).mappings().all()
     except OperationalError:
         raise HTTPException(status_code=503, detail="Database unavailable")
     except SQLAlchemyError:
         raise HTTPException(status_code=500, detail="Database query failed")
 
-    return [ProjectOut(**row) for row in results]
+    # Set total count header for the frontend pagination UI
+    if response is not None:
+        response.headers["X-Total-Count"] = str(total)
 
+    return [ProjectOut(**row) for row in results]
 
 @app.get("/api/projects/{project_id}", response_model=ProjectOut)
 def get_project(project_id: int) -> ProjectOut:

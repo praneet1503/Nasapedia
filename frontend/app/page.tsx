@@ -30,11 +30,13 @@ export default function HomePage() {
   const [technologyArea, setTechnologyArea] = useState('')
 
   const [projects, setProjects] = useState<Project[]>([])
-  const [offset, setOffset] = useState(0)
+  const [currentPage, setCurrentPage] = useState(0)
+  const [totalCount, setTotalCount] = useState(0)
   const [isLoading, setIsLoading] = useState(false)
   const [hasSearched, setHasSearched] = useState(false)
   const [hasMore, setHasMore] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [order, setOrder] = useState<string>('title_asc')
 
   const effectiveParams = useMemo(
     () => ({
@@ -43,62 +45,101 @@ export default function HomePage() {
       trl_max: parseOptionalInt(trlMax),
       organization: organization.trim() || undefined,
       technology_area: technologyArea.trim() || undefined,
+      order: order,
       limit: PAGE_SIZE,
     }),
-    [q, trlMin, trlMax, organization, technologyArea]
+    [q, trlMin, trlMax, organization, technologyArea, order]
   )
 
-  async function runSearch(nextOffset: number, mode: 'replace' | 'append') {
+  async function runSearch(pageIndex: number) {
     setIsLoading(true)
     setError(null)
     try {
-      const result = await fetchProjects({ ...effectiveParams, offset: nextOffset })
+      const offset = pageIndex * PAGE_SIZE
+      const result = await fetchProjects({ ...effectiveParams, offset })
       setHasSearched(true)
-      setOffset(nextOffset)
-      setProjects((prev) => (mode === 'replace' ? result : [...prev, ...result]))
-      setHasMore(result.length === PAGE_SIZE)
+      setCurrentPage(pageIndex)
+      setProjects(result.projects)
+      setTotalCount(result.total)
+      setHasMore(result.projects.length === PAGE_SIZE)
     } catch (e) {
       setHasSearched(true)
-      setError('Something went wrong while fetching projects.')
-      setProjects((prev) => (mode === 'replace' ? [] : prev))
-      setHasMore(false)
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  // Fetch the entire projects dataset (paginated requests) to show before the user searches
-  async function fetchAllProjects() {
-    setIsLoading(true)
-    setError(null)
-    try {
-      const all: Project[] = []
-      let nextOffset = 0
-      while (true) {
-        const page = await fetchProjects({ limit: PAGE_SIZE, offset: nextOffset })
-        if (page.length === 0) break
-        all.push(...page)
-        if (page.length < PAGE_SIZE) break
-        nextOffset += PAGE_SIZE
-      }
-      setProjects(all)
-      setHasMore(false)
-    } catch (e) {
       setError('Something went wrong while fetching projects.')
       setProjects([])
+      setTotalCount(0)
       setHasMore(false)
     } finally {
       setIsLoading(false)
     }
   }
 
-  // Load all projects on mount, and whenever the user clears search results
+
+  // Helper: render compact Google-like pagination (centered small numbers + Next)
+  function renderPageButtons(total: number, pageSize: number, current: number, onClickPage: (p: number) => void, disabled?: boolean) {
+    const totalPages = Math.ceil(total / pageSize)
+    if (totalPages <= 1) return null
+
+    // Build a small window of pages similar to Google
+    const pages: (number | '...')[] = []
+    const addRange = (from: number, to: number) => {
+      for (let i = from; i <= to; i++) pages.push(i)
+    }
+
+    // If small number of pages, show them all
+    if (totalPages <= 9) {
+      addRange(0, totalPages - 1)
+    } else {
+      // show first 3, a window around current, and last 3 with ellipses
+      addRange(0, 2)
+      if (current > 4) pages.push('...')
+      const start = Math.max(3, current - 1)
+      const end = Math.min(totalPages - 4, current + 1)
+      addRange(start, end)
+      if (current < totalPages - 5) pages.push('...')
+      addRange(totalPages - 3, totalPages - 1)
+    }
+
+    return (
+      <div className="flex items-center gap-6">
+        <nav className="flex items-center gap-3" aria-label="Pagination">
+          {pages.map((p, idx) =>
+            p === '...' ? (
+              <span key={`e-${idx}`} className="text-sm text-slate-500">…</span>
+            ) : (
+              <button
+                key={p}
+                type="button"
+                onClick={() => onClickPage(p)}
+                disabled={disabled || p === current}
+                aria-current={p === current ? 'page' : undefined}
+                className={`text-sm ${p === current ? 'bg-blue-600 text-white font-medium rounded-full px-2 py-0.5' : 'text-blue-600 hover:underline'}`}
+              >
+                {p + 1}
+              </button>
+            )
+          )}
+        </nav>
+
+        <button
+          type="button"
+          onClick={() => onClickPage(Math.min(totalPages - 1, current + 1))}
+          disabled={disabled || current >= totalPages - 1}
+          aria-label="Next page"
+          className="text-sm text-blue-600 hover:underline"
+        >
+          Next
+        </button>
+      </div>
+    )
+  }
+
+  // Load first page (All projects) on mount, and whenever the user clears search results or changes sort
   useEffect(() => {
     if (!hasSearched) {
-      void fetchAllProjects()
+      void runSearch(0)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hasSearched])
+  }, [hasSearched, order])
 
   return (
     <main className="mx-auto w-full max-w-5xl px-4 py-10">
@@ -110,7 +151,7 @@ export default function HomePage() {
       </header>
 
       <div className="rounded-lg border border-slate-200 bg-white p-4">
-        <SearchBar value={q} onChange={setQ} onSubmit={() => runSearch(0, 'replace')} isLoading={isLoading} />
+        <SearchBar value={q} onChange={setQ} onSubmit={() => runSearch(0)} isLoading={isLoading} />
 
         <div className="mt-4">
           <Filters
@@ -128,34 +169,58 @@ export default function HomePage() {
         </div>
 
         <div className="mt-4 flex items-center justify-between">
-          <button
-            type="button"
-            onClick={() => runSearch(0, 'replace')}
-            disabled={isLoading}
-            className="rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            Search
-          </button>
+          <div className="flex gap-2 items-center">
+            <button
+              type="button"
+              onClick={() => runSearch(0)}
+              disabled={isLoading}
+              className="rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              Search
+            </button>
 
-          <button
-            type="button"
-            onClick={() => {
-              setQ('')
-              setTrlMin('')
-              setTrlMax('')
-              setOrganization('')
-              setTechnologyArea('')
-              setProjects([])
-              setOffset(0)
-              setHasMore(false)
-              setHasSearched(false)
-              setError(null)
-            }}
-            disabled={isLoading}
-            className="text-sm text-slate-700 hover:text-slate-900 disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            Clear
-          </button>
+            <label className="text-sm flex items-center gap-2">
+              <span className="text-sm text-slate-600">Sort:</span>
+              <select
+                value={order}
+                onChange={(e) => {
+                  setOrder(e.target.value)
+                  void runSearch(0)
+                }}
+                className="rounded-md border border-slate-300 bg-white px-2 py-1 text-sm"
+              >
+                <option value="title_asc">Alphabetical A→Z</option>
+                <option value="title_desc">Alphabetical Z→A</option>
+                <option value="relevance">Relevance (when searching)</option>
+                <option value="newest">Newest</option>
+                <option value="oldest">Oldest</option>
+              </select>
+            </label>
+          </div>
+
+          <div>
+            <button
+              type="button"
+              onClick={() => {
+                setQ('')
+                setTrlMin('')
+                setTrlMax('')
+                setOrganization('')
+                setTechnologyArea('')
+                setProjects([])
+                setCurrentPage(0)
+                setTotalCount(0)
+                setHasMore(false)
+                setHasSearched(false)
+                setError(null)
+                setOrder('title_asc')
+              }}
+              disabled={isLoading}
+              className="text-sm text-slate-700 hover:text-slate-900 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              Clear
+            </button>
+          </div>
         </div>
       </div>
 
@@ -189,19 +254,20 @@ export default function HomePage() {
 
             <ProjectList projects={projects} />
 
-            <div className="flex justify-center">
-              {hasMore ? (
-                <button
-                  type="button"
-                  onClick={() => runSearch(offset + PAGE_SIZE, 'append')}
-                  disabled={isLoading}
-                  className="rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  {isLoading ? 'Loading…' : 'Load more'}
-                </button>
-              ) : hasSearched ? (
-                <p className="text-sm text-slate-600">End of results.</p>
-              ) : null}
+            <div className="mt-6">
+              <div className="flex items-center justify-between mb-2">
+                <div className="text-sm text-slate-600">
+                  {totalCount > 0 ? (
+                    <>
+                      Showing {currentPage * PAGE_SIZE + 1}–{Math.min((currentPage + 1) * PAGE_SIZE, totalCount)} of {totalCount} • Page {currentPage + 1} of {Math.ceil(totalCount / PAGE_SIZE)}
+                    </>
+                  ) : null}
+                </div>
+              </div>
+
+              <div className="flex justify-center">
+                {renderPageButtons(totalCount, PAGE_SIZE, currentPage, (p) => runSearch(p), isLoading)}
+              </div>
             </div>
           </div>
         ) : null}
