@@ -19,6 +19,15 @@ export type FetchProjectsResult = {
 function getApiProjectUrl(): string {
   // Use explicit environment variable for the projects search endpoint
   const url = process.env.NEXT_PUBLIC_API_PROJECTS_URL
+  // Debug: log the resolved env var and the page origin so we can verify what the client will fetch
+  if (typeof window !== 'undefined') {
+    // eslint-disable-next-line no-console
+    console.debug('getApiProjectUrl:', { env: url, origin: window.location?.origin })
+  } else {
+    // eslint-disable-next-line no-console
+    console.debug('getApiProjectUrl: server-side; env=', url)
+  }
+
   if (!url) {
     throw new Error('NEXT_PUBLIC_API_PROJECTS_URL is not defined in environment variables')
   }
