@@ -5,7 +5,7 @@ V1 frontend for searching NASA TechPort projects.
 ## Requirements
 
 - Node.js 18+ (recommended: 20)
-- Backend API running locally at `http://localhost:8000`
+- Backend API running at the deployed Modal backend. Set `NEXT_PUBLIC_API_BASE_URL` to the Modal URL (for example, `https://praneetnrana--projects-dev.modal.run`)
 
 ## Setup
 
@@ -19,10 +19,10 @@ npm install
 2. Configure environment variables:
 
 - Copy `.env.local.example` to `.env.local`
-- Set the backend base URL:
+- Set the backend base URL to the Modal backend URL (use `backend/.env` `MODAL_BACKEND_URL` or the example below):
 
 ```bash
-NEXT_PUBLIC_API_BASE_URL=http://localhost:8000
+NEXT_PUBLIC_API_BASE_URL=https://praneetnrana--projects.modal.run
 ```
 
 3. Run the dev server:
