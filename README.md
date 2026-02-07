@@ -11,7 +11,7 @@ Prerequisites:
 - `npx` / `npm`
 - Neon PostgreSQL (recommended) — use the Neon Console to create a project and obtain `DATABASE_URL`
 
-Backend
+Backend (Modal)
 1. Create and activate a Python environment. Example:
    ```bash
    python3 -m venv .venv
@@ -22,16 +22,19 @@ Backend
    cd backend
    python3 -m pip install -r requirements.txt
    ```
-3. Configure a local database:
-   - Use Neon Postgres for both local and cloud development. Create a Neon project and copy the connection string to `DATABASE_URL`.
-   - Or set `DATABASE_URL` to a Postgres instance (development example):
-     ```bash
-     export DATABASE_URL="postgresql://postgres:postgres@127.0.0.1:54322/postgres"
-     ```
-4. Start the backend:
+3. Create Modal secrets for the backend:
+    ```bash
+    modal secret create nasa-techport-secrets \
+       DATABASE_URL="$DATABASE_URL"
+    ```
+4. Run the backend locally with Modal:
    ```bash
-   cd backend
-   python3 -m uvicorn app.main:app --reload --port 8000
+   modal serve backend/modal_app.py
+   ```
+   Expected output includes a web URL for the endpoints and a log line showing the app name `nasa-techport-backend`.
+5. Deploy to production:
+   ```bash
+   modal deploy backend/modal_app.py
    ```
 
 Frontend
@@ -47,6 +50,7 @@ Frontend
 ## Project structure
 ```
 backend/        # FastAPI backend
+backend/modal_app.py  # Modal entrypoints (HTTP endpoints)
 frontend/       # Next.js frontend (app router)
 migrations/     # SQL migrations for Neon/Postgres
 scripts/        # Helper scripts (migration, seed, smoke tests)
@@ -74,6 +78,11 @@ README.md
 - Pagination (20 projects per page) with numbered pages and compact pagination control
 - Sort by alphabetical, relevance, newest/oldest
 - CORS configured for local development
+
+## Modal endpoints
+- `GET /health` — https://praneetnrana--health.modal.run
+- `GET /api/projects` — https://praneetnrana--projects.modal.run (query params: `q`, `trl_min`, `trl_max`, `organization`, `technology_area`, `order`, `limit`, `offset`)
+- `GET /api/projects/{project_id}` — https://praneetnrana--projects-id.modal.run
 
 
 ## ⚠️ Note about content and audits
