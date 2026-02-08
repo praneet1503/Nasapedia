@@ -6,7 +6,18 @@ A small web application to explore NASA TechPort projects. This repository inclu
 - postgres (for database)
 - vercel (for web deployment)
 - modal (for scalable backend hosting)
-- 
+- Neon (for serverless Postgres hosting)
+- GitHub (for version control and collaboration)
+- Python (for backend development)
+- JavaScript/TypeScript (for frontend development)
+- FastAPI (for backend API framework)
+- Next.js (for frontend framework)
+- Tailwind CSS (for frontend styling)
+- psql (for database management)
+- pgcli (for enhanced Postgres CLI experience)
+- SQLAlchemy (for database ORM in Python)
+- Alembic (for database migrations)
+
 
 ## 🚀 Quickstart
 
@@ -90,6 +101,7 @@ README.md
 - `GET /api/projects` — https://praneetnrana--projects.modal.run (query params: `q`, `trl_min`, `trl_max`, `organization`, `technology_area`, `order`, `limit`, `offset`)
 - `GET /api/projects/{project_id}` — https://praneetnrana--projects-id.modal.run
 
+### Make note that the Postgres database is running on limited CPU power. After some days or time, I may have to shut down the database, and it may take some time to start again, so please be patient if you are not able to access the database for some time.
 
 ## ⚠️ Note about content and audits
 Some parts of this project's documentation and content may have been generated or assisted by AI. **Please review all generated content for accuracy and legal compliance.**
@@ -107,3 +119,15 @@ Some parts of this project's documentation and content may have been generated o
 
 ## License
 This project is licensed under the terms of the MIT LICENSE file in this repository.
+
+
+# Future improvements (not yet implemented):
+- Add user authentication and personalized features (e.g., save favorite projects)
+- **put on a countdown timer for artemis 2 launch and add a section for news and updates related to the launch**
+- Add more detailed project pages with images, videos, and related publications
+- Notification system (email, bots)
+- Analytics dashboards
+- Timeline visualizations
+- Expanded relational data model
+- Personalized project feeds
+- **Web frontend**
