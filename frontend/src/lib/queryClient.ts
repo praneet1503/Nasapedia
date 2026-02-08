@@ -17,7 +17,6 @@ export const queryClient = new QueryClient({
       // When true, stale queries refetch on every mount/route change; keep false to prevent loops.
       refetchOnMount: false,
       retry: 1,
-      suspense: false,
     },
   },
 })
