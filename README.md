@@ -2,6 +2,11 @@
 
 A small web application to explore NASA TechPort projects. This repository includes a FastAPI backend, a Next.js frontend, and is configured to use a Postgres database (Neon recommended) for development and production.
 
+## Apps/Tools/Websites used to make this project possible !
+- postgres (for database)
+- vercel (for web deployment)
+- modal (for scalable backend hosting)
+- 
 
 ## 🚀 Quickstart
 
@@ -13,33 +18,33 @@ Prerequisites:
 
 Backend (Modal)
 1. Create and activate a Python environment. Example:
-   ```bash
+   ```zsh
    python3 -m venv .venv
    source .venv/bin/activate
    ```
 2. Install dependencies:
-   ```bash
+   ```zsh
    cd backend
    python3 -m pip install -r requirements.txt
    ```
 3. Create Modal secrets for the backend:
-    ```bash
+    ```zsh
     modal secret create nasa-techport-secrets \
        DATABASE_URL="$DATABASE_URL"
     ```
 4. Run the backend locally with Modal:
-   ```bash
+   ```zsh
    modal serve backend/modal_app.py
    ```
    Expected output includes a web URL for the endpoints and a log line showing the app name `nasa-techport-backend`.
 5. Deploy to production:
-   ```bash
+   ```zsh
    modal deploy backend/modal_app.py
    ```
 
 Frontend
 1. Install dependencies and start dev server:
-   ```bash
+   ```zsh
    cd frontend
    npm install
    npm run dev
@@ -61,15 +66,15 @@ README.md
 ## Neon (Postgres) setup
 - Create a Neon project and copy the connection string (DATABASE_URL).
 - Apply migrations:
-  ```bash
+  ```zsh
   psql "$DATABASE_URL" -f migrations/0001_create_projects.sql
   ```
 - Seed (optional):
-  ```bash
+  ```zsh
   DATABASE_URL="$DATABASE_URL" python3 scripts/seed_db.py
   ```
 - Smoke test (insert/read):
-  ```bash
+  ```zsh
   DATABASE_URL="$DATABASE_URL" python3 scripts/smoke_test_db.py
   ```
 
@@ -79,7 +84,8 @@ README.md
 - Sort by alphabetical, relevance, newest/oldest
 - CORS configured for local development
 
-## Modal endpoints
+## Modal endpoints (deployed URLs will differ, see Modal dashboard):
+**these are modal keypoints of mine the developmental server if you don't have any modal deployment running, you can run this urls as api key to access the endpoints**
 - `GET /health` — https://praneetnrana--health.modal.run
 - `GET /api/projects` — https://praneetnrana--projects.modal.run (query params: `q`, `trl_min`, `trl_max`, `organization`, `technology_area`, `order`, `limit`, `offset`)
 - `GET /api/projects/{project_id}` — https://praneetnrana--projects-id.modal.run
@@ -95,7 +101,9 @@ Some parts of this project's documentation and content may have been generated o
 ## Contributing
 - Open issues for bugs or feature requests.
 - For security issues, use the security issue template or add `[security]` to the issue title.
+- Pull requests are welcome! Please ensure tests pass and follow the existing code style.
+- For major changes, open an issue first to discuss the proposed changes.
 
 
 ## License
-This project is licensed under the terms of the LICENSE file in this repository.
+This project is licensed under the terms of the MIT LICENSE file in this repository.

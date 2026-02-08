@@ -29,7 +29,7 @@ This document highlights recommended security checks to perform before deploying
 ## Helpful tools & commands
 - `npm audit` / `npm audit fix`
 - `pip-audit`
--
+- `npm run lint` (with ESLint configured for security rules)
 - `bandit -r backend/app`
 - `safety check` (from PyUp)
 - `npx snyk test` (requires Snyk account for some features)
@@ -42,7 +42,7 @@ A dependency fix tool detected and automatically updated vulnerable packages. Pl
   - `react-server-dom-webpack` -> updated to secure version
   - `react-server-dom-parcel` -> updated to secure version
 
-Recommended follow-ups:
+## Recommended follow-ups:
 - Run the test/build pipeline locally (`npm run build`, `npm test` if available) to confirm compatibility.
 - Review `frontend/package-lock.json` diff and ensure no unexpected package changes.
 - Pin versions in `package.json` if necessary to avoid unexpected future upgrades.
