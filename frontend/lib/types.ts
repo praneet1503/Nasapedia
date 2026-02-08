@@ -10,3 +10,11 @@ export type Project = {
   technology_area: string | null
   last_updated: string
 }
+
+export type PaginatedResponse<T> = {
+  data: T[]
+  page: number
+  pageSize: number
+  totalCount: number
+  totalPages: number
+}

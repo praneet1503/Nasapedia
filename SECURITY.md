@@ -18,12 +18,18 @@ This document highlights recommended security checks to perform before deploying
   - Review SQL migrations in `migrations/*` before applying to Neon/Postgres.
   - Limit DB credentials scope and use separate accounts for dev and production.
   - Verify extensions used are supported by Neon.
-- [ ] **Open-source & legal**
+- [x] **Open-source & legal**
   - Review any AI-generated text for license and attribution issues.
+- [ ] **Testing**
+  - Run unit and integration tests locally (`npm test`, `pytest`).
+  - Consider adding security-focused tests (e.g. SQL injection, XSS).
+- [ ]**Codebase Check**
+  - Please the codes in each and every file and make sure there are unknown and malicious codes in the codebase. If you find any, please report it immediately to the maintainers.
 
 ## Helpful tools & commands
 - `npm audit` / `npm audit fix`
 - `pip-audit`
+-
 - `bandit -r backend/app`
 - `safety check` (from PyUp)
 - `npx snyk test` (requires Snyk account for some features)

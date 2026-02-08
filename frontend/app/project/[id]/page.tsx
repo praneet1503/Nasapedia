@@ -1,10 +1,9 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import LoadingState from '../../../components/LoadingState'
-import { fetchProjectById } from '../../../lib/api'
-import type { Project } from '../../../lib/types'
+import { useProject } from '../../../src/hooks/useProject'
 
 function formatDate(d: string | null) {
   if (!d) return '—'
@@ -30,47 +29,7 @@ export default function ProjectDetailPage() {
     return Math.trunc(n)
   }, [params])
 
-  const [project, setProject] = useState<Project | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [notFound, setNotFound] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-
-  useEffect(() => {
-    let cancelled = false
-
-    async function run() {
-      if (projectId === null) {
-        setIsLoading(false)
-        setNotFound(true)
-        return
-      }
-
-      setIsLoading(true)
-      setError(null)
-      setNotFound(false)
-
-      try {
-        const p = await fetchProjectById(projectId)
-        if (cancelled) return
-        if (!p) {
-          setProject(null)
-          setNotFound(true)
-        } else {
-          setProject(p)
-        }
-      } catch (e) {
-        if (cancelled) return
-        setError('Something went wrong while fetching this project.')
-      } finally {
-        if (!cancelled) setIsLoading(false)
-      }
-    }
-
-    run()
-    return () => {
-      cancelled = true
-    }
-  }, [projectId])
+  const { data: project, isLoading, isError, error } = useProject(projectId)
 
   return (
     <main className="mx-auto w-full max-w-4xl px-4 py-10">
@@ -87,11 +46,13 @@ export default function ProjectDetailPage() {
 
       {isLoading ? <LoadingState label="Loading project…" /> : null}
 
-      {error ? (
-        <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800">{error}</div>
+      {isError ? (
+        <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800">
+          {error?.message || 'Something went wrong while fetching this project.'}
+        </div>
       ) : null}
 
-      {!isLoading && notFound && !error ? (
+      {!isLoading && !isError && !project ? (
         <div className="rounded-lg border border-slate-200 bg-white p-4">
           <h2 className="text-base font-semibold">Not found</h2>
           <p className="mt-1 text-sm text-slate-700">This project does not exist (or is unavailable).</p>
