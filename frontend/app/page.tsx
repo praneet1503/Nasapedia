@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import Filters from '../components/Filters'
 import LoadingState from '../components/LoadingState'
 import ProjectList from '../components/ProjectList'
@@ -86,11 +86,78 @@ export default function HomePage() {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
+  useEffect(() => {
+    const initCountdown = () => {
+      const countdownEl = document.getElementById('mission-countdown')
+      if (!countdownEl) return
+
+      // Temporary: show delayed state instead of running the timer
+      const showDelayed = true
+      if (showDelayed) {
+        countdownEl.textContent = 'T- Delayed'
+        return
+      }
+
+      const targetTime = new Date('March 6, 2026 20:29:00 GMT-0500').getTime()
+      if (!Number.isFinite(targetTime)) return
+
+      const formatCountdown = (ms: number) => {
+        const totalSeconds = Math.max(0, Math.floor(ms / 1000))
+        const days = Math.floor(totalSeconds / 86400)
+        const hours = Math.floor((totalSeconds % 86400) / 3600)
+        const minutes = Math.floor((totalSeconds % 3600) / 60)
+        const seconds = totalSeconds % 60
+
+        const pad = (value: number, size: number) => String(value).padStart(size, '0')
+        return `T-${pad(days, 3)}:${pad(hours, 2)}:${pad(minutes, 2)}:${pad(seconds, 2)}`
+      }
+
+      const tick = () => {
+        const now = Date.now()
+        const delta = targetTime - now
+        if (delta <= 0) {
+          countdownEl.textContent = 'T-000:00:00:00'
+          return false
+        }
+        countdownEl.textContent = formatCountdown(delta)
+        return true
+      }
+
+      tick()
+      const intervalId = window.setInterval(() => {
+        if (!tick()) {
+          window.clearInterval(intervalId)
+        }
+      }, 1000)
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initCountdown)
+      return () => document.removeEventListener('DOMContentLoaded', initCountdown)
+    }
+
+    initCountdown()
+    return undefined
+  }, [])
+
   return (
     <main className="mx-auto w-full max-w-5xl px-4 py-10">
-      <header className="mb-6">
+      <header
+        className="mb-6"
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: '0.75rem',
+        }}
+      >
         <h1 className="text-2xl font-semibold tracking-tight">NASA TechPort Explorer</h1>
-        <p className="mt-1 text-sm text-slate-600">
+        <div className="mission-clock">
+          <span className="mission-label">ARTEMIS II</span>
+          <span id="mission-countdown">T-000:00:00:00</span>
+        </div>
+        <p className="mt-1 text-sm text-slate-600" style={{ flexBasis: '100%' }}>
           Search NASA TechPort projects by keyword and filter by TRL, organization, and technology area.
         </p>
       </header>
