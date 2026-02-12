@@ -35,13 +35,39 @@ export default function ProjectDetailPage() {
     <main className="mx-auto w-full max-w-4xl px-4 py-10">
       <div className="mb-6 flex items-center justify-between gap-3">
         <h1 className="text-xl font-semibold tracking-tight">Project</h1>
-        <button
-          type="button"
-          onClick={() => router.push('/')}
-          className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-medium hover:bg-slate-50"
-        >
-          ← Back
-        </button>
+
+        <div className="flex gap-2">
+          {/* Prefer history.back() when possible, fall back to the feed route. */}
+          <button
+            type="button"
+            onClick={() => {
+              if (typeof window !== 'undefined' && window.history.length > 1) {
+                router.back()
+              } else {
+                router.push('/feed')
+              }
+            }}
+            className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-medium hover:bg-slate-50"
+          >
+            ← Back
+          </button>
+
+          <button
+            type="button"
+            onClick={() => router.push('/feed')}
+            className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-medium hover:bg-slate-50"
+          >
+            View feed
+          </button>
+
+          <button
+            type="button"
+            onClick={() => router.push('/')}
+            className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-medium hover:bg-slate-50"
+          >
+            All projects
+          </button>
+        </div>
       </div>
 
       {isLoading ? <LoadingState label="Loading project…" /> : null}

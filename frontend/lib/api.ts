@@ -11,6 +11,12 @@ export type FetchProjectsParams = {
   limit?: number
 }
 
+export type FetchFeedParams = {
+  page?: number
+  limit?: number
+  visitorUuid: string
+}
+
 function getApiProjectUrl(): string {
   // Use explicit environment variable for the projects search endpoint
   const url = process.env.NEXT_PUBLIC_API_PROJECTS_URL
@@ -36,6 +42,28 @@ function getApiProjectIdUrl(): string {
     throw new Error('NEXT_PUBLIC_API_PROJECTS_ID_URL is not defined in environment variables')
   }
   return url.replace(/\/+$/, '')
+}
+
+function getApiFeedUrl(): string {
+  const url = process.env.NEXT_PUBLIC_API_FEED_URL
+  if (!url) {
+    throw new Error('NEXT_PUBLIC_API_FEED_URL is not defined in environment variables')
+  }
+  return url.replace(/\/+$/, '')
+}
+
+function getApiProjectClickUrl(projectId: number): string {
+  const configured = process.env.NEXT_PUBLIC_API_PROJECT_CLICK_URL
+  if (configured) {
+    const normalized = configured.replace(/\/+$/, '')
+    if (normalized.includes('{id}')) {
+      return normalized.replace('{id}', String(projectId))
+    }
+    return `${normalized}?project_id=${projectId}`
+  }
+
+  const projectsBase = getApiProjectUrl()
+  return `${projectsBase}/${projectId}/click`
 }
 
 function buildSearchParams(params: Record<string, string | number | undefined>): string {
@@ -120,4 +148,57 @@ export async function fetchProjectById(id: number): Promise<Project | null> {
 
   const data = (await res.json()) as unknown
   return data as Project
+}
+
+export async function fetchAdaptiveFeed(
+  params: FetchFeedParams
+): Promise<PaginatedResponse<Project>> {
+  const baseUrl = getApiFeedUrl()
+  const page = params.page && params.page > 0 ? params.page : 1
+  const limit = params.limit ?? 20
+
+  const url = `${baseUrl}${buildSearchParams({ page, limit })}`
+  let res: Response
+  try {
+    res = await fetch(url, {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+        'X-Visitor-UUID': params.visitorUuid,
+      },
+    })
+  } catch (e) {
+    throw new Error('Network error while fetching adaptive feed')
+  }
+
+  if (!res.ok) {
+    if (res.status >= 400 && res.status < 500) {
+      return { data: [], page, pageSize: limit, totalCount: 0, totalPages: 0 }
+    }
+    throw new Error(`Unexpected error (${res.status}) while fetching feed`)
+  }
+
+  return (await res.json()) as PaginatedResponse<Project>
+}
+
+export async function recordProjectClick(projectId: number, visitorUuid: string): Promise<void> {
+  const url = getApiProjectClickUrl(projectId)
+  let res: Response
+  try {
+    res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        'X-Visitor-UUID': visitorUuid,
+      },
+      body: JSON.stringify({ visitor_uuid: visitorUuid }),
+    })
+  } catch (e) {
+    return
+  }
+
+  if (!res.ok) {
+    return
+  }
 }

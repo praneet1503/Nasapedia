@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import Filters from '../components/Filters'
 import LoadingState from '../components/LoadingState'
 import ProjectList from '../components/ProjectList'
@@ -8,7 +9,7 @@ import Pagination from '../components/Pagination'
 import SearchBar from '../components/SearchBar'
 import { useProjectsPaginated } from '../hooks/useProjectsPaginated'
 
-const DEFAULT_ORDER = 'title_asc'
+const DEFAULT_ORDER = 'popularity'
 const RESULTS_PER_PAGE = 10
 
 function parseOptionalInt(v: string): number | undefined {
@@ -24,6 +25,7 @@ function parseOptionalInt(v: string): number | undefined {
 }
 
 export default function HomePage() {
+  const router = useRouter()
   const [q, setQ] = useState('')
   const [trlMin, setTrlMin] = useState('')
   const [trlMax, setTrlMax] = useState('')
@@ -152,11 +154,25 @@ export default function HomePage() {
           gap: '0.75rem',
         }}
       >
-        <h1 className="text-2xl font-semibold tracking-tight">NASA TechPort Explorer</h1>
+        <div className="flex items-center gap-3">
+          <h1 className="text-2xl font-semibold tracking-tight">NASA TechPort Explorer</h1>
+
+          <div className="ml-2 flex gap-2">
+            <button
+              type="button"
+              onClick={() => router.push('/feed')}
+              className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-medium hover:bg-slate-50"
+            >
+              View feed
+            </button>
+          </div>
+        </div>
+
         <div className="mission-clock">
           <span className="mission-label">ARTEMIS II</span>
           <span id="mission-countdown">T-000:00:00:00</span>
         </div>
+
         <p className="mt-1 text-sm text-slate-600" style={{ flexBasis: '100%' }}>
           Search NASA TechPort projects by keyword and filter by TRL, organization, and technology area.
         </p>
@@ -206,6 +222,7 @@ export default function HomePage() {
                 <option value="title_asc">Alphabetical A→Z</option>
                 <option value="title_desc">Alphabetical Z→A</option>
                 <option value="relevance">Relevance (when searching)</option>
+                <option value="popularity">Most popular</option>
                 <option value="newest">Newest</option>
                 <option value="oldest">Oldest</option>
               </select>

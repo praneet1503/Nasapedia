@@ -9,6 +9,7 @@ export type Project = {
   organization: string | null
   technology_area: string | null
   last_updated: string
+  popularity_score?: number
 }
 
 export type PaginatedResponse<T> = {
