@@ -16,18 +16,29 @@ export default function SearchBar({ value, onChange, onSubmit, isLoading }: Sear
         onSubmit()
       }}
     >
-      <input
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder="Search by keyword…"
-        className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-slate-400"
-      />
+      <div className="relative w-full">
+        {/* Search icon */}
+        <svg
+          className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2"
+          width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"
+          style={{ color: 'var(--text-muted)' }}
+        >
+          <circle cx="11" cy="11" r="8" />
+          <path d="m21 21-4.3-4.3" />
+        </svg>
+        <input
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder="Search NASA missions & projects…"
+          className="space-input w-full pl-10"
+        />
+      </div>
       <button
         type="submit"
         disabled={Boolean(isLoading)}
-        className="shrink-0 rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
+        className="space-btn space-btn-primary shrink-0"
       >
-        Search
+        {isLoading ? 'Scanning…' : '🔍 Search'}
       </button>
     </form>
   )

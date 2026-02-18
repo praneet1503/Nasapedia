@@ -144,41 +144,53 @@ export default function HomePage() {
 
   return (
     <main className="mx-auto w-full max-w-5xl px-4 py-10">
-      <header
-        className="mb-6"
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          flexWrap: 'wrap',
-          gap: '0.75rem',
-        }}
-      >
-        <div className="flex items-center gap-3">
-          <h1 className="text-2xl font-semibold tracking-tight">NASA TechPort Explorer</h1>
+      {/* ── Space Hero Header ───────────────────────────────── */}
+      <header className="mb-8">
+        <div
+          className="flex items-center justify-between flex-wrap gap-3"
+        >
+          <div className="flex items-center gap-3">
+            <span className="text-3xl" aria-hidden="true">🚀</span>
+            <div>
+              <h1
+                className="text-2xl font-bold tracking-tight"
+                style={{
+                  background: 'linear-gradient(135deg, var(--accent), var(--secondary))',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                }}
+              >
+                NASA TechPort Explorer
+              </h1>
+              <p className="text-xs" style={{ color: 'var(--text-muted)', letterSpacing: '0.08em' }}>
+                MISSION CONTROL · TECHNOLOGY DATABASE
+              </p>
+            </div>
 
-          <div className="ml-2 flex gap-2">
-            <button
-              type="button"
-              onClick={() => router.push('/feed')}
-              className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-medium hover:bg-slate-50"
-            >
-              View feed
-            </button>
+            <div className="ml-2 flex gap-2">
+              <button
+                type="button"
+                onClick={() => router.push('/feed')}
+                className="space-btn text-sm"
+              >
+                🛠️ View Feed
+              </button>
+            </div>
+          </div>
+
+          <div className="mission-clock">
+            <span className="mission-label">ARTEMIS II</span>
+            <span id="mission-countdown">T-000:00:00:00</span>
           </div>
         </div>
 
-        <div className="mission-clock">
-          <span className="mission-label">ARTEMIS II</span>
-          <span id="mission-countdown">T-000:00:00:00</span>
-        </div>
-
-        <p className="mt-1 text-sm text-slate-600" style={{ flexBasis: '100%' }}>
+        <p className="mt-3 text-sm" style={{ color: 'var(--text-secondary)' }}>
           Search NASA TechPort projects by keyword and filter by TRL, organization, and technology area.
         </p>
       </header>
 
-      <div className="rounded-lg border border-slate-200 bg-white p-4">
+      {/* ── Search & Filter Panel ───────────────────────────── */}
+      <div className="space-glass p-5">
         <SearchBar value={q} onChange={setQ} onSubmit={() => applySearch(effectiveParams, true)} isLoading={isLoading} />
 
         <div className="mt-4">
@@ -202,26 +214,25 @@ export default function HomePage() {
               type="button"
               onClick={() => applySearch(effectiveParams, true)}
               disabled={isLoading}
-              className="rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
+              className="space-btn space-btn-primary"
             >
-              Search
+              🔭 Search
             </button>
 
             <label className="text-sm flex items-center gap-2">
-              <span className="text-sm text-slate-600">Sort:</span>
+              <span className="text-sm" style={{ color: 'var(--text-muted)' }}>Sort:</span>
               <select
                 value={order}
                 onChange={(e) => {
                   const nextOrder = e.target.value
                   setOrder(nextOrder)
-                  // Immediately apply sort as a new search/filter action
                   applySearch({ ...effectiveParams, order: nextOrder }, true)
                 }}
-                className="rounded-md border border-slate-300 bg-white px-2 py-1 text-sm"
+                className="space-input py-1 px-2 text-sm"
               >
                 <option value="title_asc">Alphabetical A→Z</option>
                 <option value="title_desc">Alphabetical Z→A</option>
-                <option value="relevance">Relevance (when searching)</option>
+                <option value="relevance">Relevance</option>
                 <option value="popularity">Most popular</option>
                 <option value="newest">Newest</option>
                 <option value="oldest">Oldest</option>
@@ -254,35 +265,42 @@ export default function HomePage() {
                 )
               }}
               disabled={isLoading}
-              className="text-sm text-slate-700 hover:text-slate-900 disabled:cursor-not-allowed disabled:opacity-60"
+              className="text-sm hover:underline disabled:opacity-50"
+              style={{ color: 'var(--text-muted)' }}
             >
-              Clear
+              Reset filters
             </button>
           </div>
         </div>
       </div>
 
+      {/* ── Results ─────────────────────────────────────────── */}
       <section className="mt-6">
         {errorMessage ? (
-          <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800">{errorMessage}</div>
+          <div className="rounded-xl p-4 text-sm" style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)', color: '#fca5a5' }}>{errorMessage}</div>
         ) : null}
 
         {isLoading && !projects.length ? (
-          <LoadingState label="Loading projects…" />
+          <LoadingState label="Scanning NASA databases…" />
         ) : (
           <>
             {projects.length === 0 && !errorMessage ? (
-               <div className="rounded-lg border border-slate-200 bg-white p-4 text-sm text-slate-700">
-                {hasSearched ? 'No results found.' : 'No projects available.'}
+              <div className="space-glass p-6 text-center">
+                <span className="text-3xl">&#x1F30C;</span>
+                <p className="mt-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
+                  {hasSearched ? 'No missions found in this sector.' : 'No projects available in the database.'}
+                </p>
               </div>
             ) : null}
 
             {projects.length > 0 ? (
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-lg font-medium">{hasSearched ? 'Search results' : 'All projects'}</h2>
-                  <p className="text-sm text-slate-500">
-                     Showing {projects.length} of {totalCount} projects
+                  <h2 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>
+                    {hasSearched ? '📡 Search Results' : '🌍 All Missions'}
+                  </h2>
+                  <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
+                    Showing {projects.length} of {totalCount} projects
                   </p>
                 </div>
 

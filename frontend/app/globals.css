@@ -2,35 +2,278 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── Space Design Tokens ─────────────────────────────────────── */
 :root {
-  color-scheme: light;
+  color-scheme: dark;
+
+  /* backgrounds */
+  --space-void: #06080f;
+  --space-deep: #0a0e1a;
+  --space-mid: #111827;
+  --space-surface: #1a1f2e;
+  --space-elevated: #232a3b;
+
+  /* accent — electric blue */
+  --accent: #00d4ff;
+  --accent-dim: #0ea5e9;
+  --accent-glow: rgba(0, 212, 255, 0.25);
+
+  /* secondary — violet */
+  --secondary: #a855f7;
+  --secondary-dim: #7c3aed;
+  --secondary-glow: rgba(168, 85, 247, 0.2);
+
+  /* warm / alert */
+  --warm: #f59e0b;
+  --danger: #ef4444;
+
+  /* text */
+  --text-primary: #e2e8f0;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+
+  /* borders */
+  --border: rgba(148, 163, 184, 0.12);
+  --border-glow: rgba(0, 212, 255, 0.18);
 }
 
 html,
 body {
   height: 100%;
+  background: var(--space-void);
+  color: var(--text-primary);
 }
 
+/* ── Animated Starfield ──────────────────────────────────────── */
+.starfield {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.starfield .star-layer {
+  position: absolute;
+  inset: 0;
+  background-repeat: repeat;
+  will-change: transform;
+}
+
+/* Layer 1 — distant tiny stars, slow drift */
+.starfield .stars-sm {
+  background-image:
+    radial-gradient(1px 1px at 50px 120px, rgba(255,255,255,0.6), transparent),
+    radial-gradient(1px 1px at 180px 30px, rgba(255,255,255,0.5), transparent),
+    radial-gradient(1px 1px at 300px 200px, rgba(255,255,255,0.4), transparent),
+    radial-gradient(1px 1px at 80px 280px, rgba(255,255,255,0.5), transparent),
+    radial-gradient(1px 1px at 420px 90px, rgba(255,255,255,0.45), transparent),
+    radial-gradient(1px 1px at 500px 320px, rgba(255,255,255,0.5), transparent),
+    radial-gradient(1px 1px at 200px 400px, rgba(255,255,255,0.4), transparent),
+    radial-gradient(1px 1px at 350px 350px, rgba(255,255,255,0.55), transparent),
+    radial-gradient(1px 1px at 600px 150px, rgba(255,255,255,0.5), transparent),
+    radial-gradient(1px 1px at 700px 250px, rgba(255,255,255,0.4), transparent);
+  background-size: 750px 450px;
+  animation: star-drift 120s linear infinite;
+}
+
+/* Layer 2 — mid-range stars */
+.starfield .stars-md {
+  background-image:
+    radial-gradient(1.5px 1.5px at 100px 80px, rgba(200,220,255,0.7), transparent),
+    radial-gradient(1.5px 1.5px at 350px 180px, rgba(200,220,255,0.6), transparent),
+    radial-gradient(1.5px 1.5px at 580px 50px, rgba(255,240,200,0.65), transparent),
+    radial-gradient(1.5px 1.5px at 250px 300px, rgba(200,220,255,0.6), transparent),
+    radial-gradient(1.5px 1.5px at 650px 350px, rgba(220,200,255,0.55), transparent),
+    radial-gradient(1.2px 1.2px at 450px 250px, rgba(200,230,255,0.5), transparent),
+    radial-gradient(1.5px 1.5px at 40px 350px, rgba(255,230,200,0.6), transparent);
+  background-size: 700px 420px;
+  animation: star-drift 80s linear infinite reverse;
+}
+
+/* Layer 3 — bright foreground stars with twinkle */
+.starfield .stars-lg {
+  background-image:
+    radial-gradient(2px 2px at 200px 150px, rgba(255,255,255,0.9), transparent),
+    radial-gradient(2.5px 2.5px at 500px 100px, rgba(180,220,255,0.85), transparent),
+    radial-gradient(2px 2px at 100px 350px, rgba(255,210,150,0.8), transparent),
+    radial-gradient(2px 2px at 680px 280px, rgba(200,180,255,0.85), transparent),
+    radial-gradient(2.5px 2.5px at 370px 50px, rgba(255,255,255,0.9), transparent);
+  background-size: 780px 400px;
+  animation: star-drift 200s linear infinite, star-twinkle 4s ease-in-out infinite alternate;
+}
+
+@keyframes star-drift {
+  from { transform: translateY(0); }
+  to { transform: translateY(-450px); }
+}
+
+@keyframes star-twinkle {
+  0% { opacity: 0.6; }
+  100% { opacity: 1; }
+}
+
+/* ── Nebula gradient blobs ───────────────────────────────────── */
+.nebula {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: 0.12;
+  pointer-events: none;
+  z-index: 0;
+}
+.nebula-blue {
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, #0ea5e9, transparent 70%);
+  top: -150px; right: -200px;
+}
+.nebula-purple {
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, #7c3aed, transparent 70%);
+  bottom: -100px; left: -150px;
+}
+.nebula-pink {
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, #ec4899, transparent 70%);
+  top: 40%; left: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0.06;
+}
+
+/* ── Glow card style ─────────────────────────────────────────── */
+.space-card {
+  background: var(--space-surface);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  transition: border-color 0.25s, box-shadow 0.25s;
+}
+.space-card:hover {
+  border-color: var(--border-glow);
+  box-shadow: 0 0 20px var(--accent-glow), inset 0 0 20px rgba(0,212,255,0.04);
+}
+
+/* ── Space glass panel ───────────────────────────────────────── */
+.space-glass {
+  background: rgba(26, 31, 46, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+}
+
+/* ── Space inputs ────────────────────────────────────────────── */
+.space-input {
+  background: var(--space-mid);
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  color: var(--text-primary);
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.space-input::placeholder { color: var(--text-muted); }
+.space-input:focus {
+  border-color: var(--accent-dim);
+  box-shadow: 0 0 0 2px var(--accent-glow);
+}
+
+/* ── Space button ────────────────────────────────────────────── */
+.space-btn {
+  background: var(--space-surface);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+.space-btn:hover {
+  background: var(--space-elevated);
+  border-color: var(--border-glow);
+  box-shadow: 0 0 12px var(--accent-glow);
+}
+.space-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.space-btn-primary {
+  background: linear-gradient(135deg, var(--accent-dim), var(--secondary-dim));
+  border-color: transparent;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+.space-btn-primary:hover {
+  box-shadow: 0 0 20px var(--accent-glow), 0 0 40px var(--secondary-glow);
+}
+
+/* ── Orbit loader ────────────────────────────────────────────── */
+.orbit-loader {
+  position: relative;
+  width: 48px; height: 48px;
+}
+.orbit-loader .planet {
+  width: 12px; height: 12px;
+  background: var(--accent);
+  border-radius: 50%;
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 12px var(--accent-glow);
+}
+.orbit-loader .ring {
+  position: absolute;
+  inset: 0;
+  border: 2px solid transparent;
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: orbit-spin 1.2s linear infinite;
+}
+.orbit-loader .ring:nth-child(2) {
+  inset: 4px;
+  border-top-color: var(--secondary);
+  animation-duration: 1.8s;
+  animation-direction: reverse;
+}
+.orbit-loader .ring:nth-child(3) {
+  inset: 8px;
+  border-top-color: var(--warm);
+  animation-duration: 2.4s;
+}
+@keyframes orbit-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── TRL badge variants ──────────────────────────────────────── */
+.trl-badge { padding: 0.15rem 0.5rem; border-radius: 9999px; font-size: 0.7rem; font-weight: 600; letter-spacing: 0.04em; }
+.trl-low  { background: rgba(239,68,68,0.15); color: #fca5a5; border: 1px solid rgba(239,68,68,0.25); }
+.trl-mid  { background: rgba(245,158,11,0.15); color: #fcd34d; border: 1px solid rgba(245,158,11,0.25); }
+.trl-high { background: rgba(34,197,94,0.15); color: #86efac; border: 1px solid rgba(34,197,94,0.25); }
+
+/* ── Mission clock (keep) ────────────────────────────────────── */
 .mission-clock {
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
-  padding: 0.25rem 0.45rem;
-  border-radius: 0.4rem;
-  background: #0b0b0d;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08), 0 2px 6px rgba(0, 0, 0, 0.3);
+  padding: 0.25rem 0.6rem;
+  border-radius: 0.5rem;
+  background: var(--space-void);
+  border: 1px solid var(--border);
+  box-shadow: 0 0 12px rgba(255, 30, 30, 0.08);
 }
 
 .mission-clock .mission-label {
   font-size: 0.6rem;
   font-weight: 600;
   letter-spacing: 0.1em;
-  color: #d1d5db;
+  color: var(--text-secondary);
   text-transform: uppercase;
 }
 
 .mission-clock #mission-countdown {
-  font-family: "Digital-7", "Segment7", "Share Tech Mono", "SFMono-Regular", ui-monospace, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-family: "Share Tech Mono", "SFMono-Regular", ui-monospace, Menlo, Monaco, Consolas, monospace;
   font-size: 0.9rem;
   line-height: 1;
   letter-spacing: 0.12em;
@@ -46,9 +289,17 @@ body {
     flex-wrap: wrap;
     gap: 0.3rem;
   }
-
   .mission-clock #mission-countdown {
     font-size: 0.82rem;
     letter-spacing: 0.1em;
   }
+}
+
+/* ── Reduced motion ──────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .starfield .star-layer,
+  .orbit-loader .ring {
+    animation: none !important;
+  }
+  .starfield .stars-lg { opacity: 0.8; }
 }

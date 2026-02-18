@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import Providers from './providers'
+import StarField from '../components/StarField'
 
 export const metadata: Metadata = {
   title: 'NASA TechPort Explorer',
@@ -13,9 +14,12 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
-      <body className="min-h-screen bg-white text-slate-900">
-        <Providers>{children}</Providers>
+    <html lang="en" className="dark">
+      <body className="min-h-screen bg-[var(--space-void)] text-[var(--text-primary)] antialiased">
+        <StarField />
+        <Providers>
+          <div className="relative z-10">{children}</div>
+        </Providers>
       </body>
     </html>
   )

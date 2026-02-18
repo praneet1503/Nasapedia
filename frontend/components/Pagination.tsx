@@ -56,9 +56,9 @@ export default function Pagination({
       <button
         onClick={() => onPageChange(Math.max(1, currentPage - 1))}
         disabled={currentPage === 1}
-        className="px-3 py-1 rounded border border-gray-300 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 text-gray-700 bg-white transition-colors"
+        className="space-btn px-3 py-1 text-sm disabled:opacity-40 disabled:cursor-not-allowed"
       >
-        Previous
+        ◀ Prev
       </button>
 
       {/* Page Numbers */}
@@ -66,8 +66,8 @@ export default function Pagination({
         {pages.map((page, index) => {
           if (page === '...') {
             return (
-              <span key={`ellipsis-${index}`} className="px-2 text-gray-500">
-                ...
+              <span key={`ellipsis-${index}`} className="px-2" style={{ color: 'var(--text-muted)' }}>
+                ···
               </span>
             )
           }
@@ -77,14 +77,12 @@ export default function Pagination({
             <button
               key={page}
               onClick={() => onPageChange(page as number)}
-              className={`
-                min-w-[32px] px-3 py-1 rounded border text-sm font-medium transition-colors
-                ${
-                  isCurrent
-                    ? 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700'
-                    : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-                }
-              `}
+              className={`min-w-[32px] px-3 py-1 rounded-md text-sm font-medium transition-all ${
+                isCurrent
+                  ? 'space-btn-primary border-0'
+                  : 'space-btn'
+              }`}
+              style={isCurrent ? { boxShadow: '0 0 14px var(--accent-glow)' } : undefined}
             >
               {page}
             </button>
@@ -96,9 +94,9 @@ export default function Pagination({
       <button
         onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
         disabled={currentPage === totalPages}
-        className="px-3 py-1 rounded border border-gray-300 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 text-gray-700 bg-white transition-colors"
+        className="space-btn px-3 py-1 text-sm disabled:opacity-40 disabled:cursor-not-allowed"
       >
-        Next
+        Next ▶
       </button>
     </div>
   )
