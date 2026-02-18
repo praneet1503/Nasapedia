@@ -1,5 +1,73 @@
 import type { PaginatedResponse, Project } from './types'
 
+// In-flight requests deduplication map (prevents duplicate API calls)
+const inFlightRequests = new Map<string, Promise<PaginatedResponse<Project>>>()
+
+// LRU Cache implementation with size limit to prevent unbounded memory growth
+class LRUCache<K, V> {
+  private cache: Map<K, V>
+  private maxSize: number
+  private maxAge: number
+
+  constructor(maxSize: number = 50, maxAge: number = 5 * 60 * 1000) {
+    this.cache = new Map()
+    this.maxSize = maxSize
+    this.maxAge = maxAge
+  }
+
+  get(key: K): V | null {
+    if (!this.cache.has(key)) return null
+    // Move to end (most recently used)
+    const value = this.cache.get(key)!
+    this.cache.delete(key)
+    this.cache.set(key, value)
+    return value
+  }
+
+  set(key: K, value: V): void {
+    if (this.cache.has(key)) {
+      this.cache.delete(key) // Remove old entry
+    }
+    this.cache.set(key, value) // Add to end
+    // Evict oldest (first) entry if size exceeded
+    if (this.cache.size > this.maxSize) {
+      const firstKey = this.cache.keys().next().value
+      this.cache.delete(firstKey)
+    }
+  }
+
+  clear(): void {
+    this.cache.clear()
+  }
+
+  size(): number {
+    return this.cache.size
+  }
+}
+
+// Cache instance with metadata for tracking metrics
+interface CacheEntry {
+  data: PaginatedResponse<Project>
+  expiry: number
+  timestamp: number
+}
+
+const SEARCH_CACHE = new LRUCache<string, CacheEntry>(50, 5 * 60 * 1000)
+const CACHE_STATS = { hits: 0, misses: 0 }
+const CACHE_TTL_MS = 5 * 60 * 1000 // 5 minutes
+
+// Cleanup expired cache entries periodically
+if (typeof window !== 'undefined') {
+  setInterval(() => {
+    const now = Date.now()
+    // LRU cache doesn't store expired items, but we can clean up metrics
+    if (CACHE_STATS.hits + CACHE_STATS.misses > 10000) {
+      CACHE_STATS.hits = Math.floor(CACHE_STATS.hits / 2)
+      CACHE_STATS.misses = Math.floor(CACHE_STATS.misses / 2)
+    }
+  }, 60 * 1000) // Every minute
+}
+
 export type FetchProjectsParams = {
   q?: string
   trl_min?: number
@@ -9,6 +77,7 @@ export type FetchProjectsParams = {
   order?: string
   page?: number
   limit?: number
+  search_type?: 'keyword' | 'semantic'
 }
 
 export type FetchFeedParams = {
@@ -77,12 +146,72 @@ function buildSearchParams(params: Record<string, string | number | undefined>):
   return qs ? `?${qs}` : ''
 }
 
+function getCacheKey(params: Record<string, string | number | undefined>): string {
+  const sp = new URLSearchParams()
+  // Only cache key params, not pagination
+  const cacheableKeys = ['q', 'trl_min', 'trl_max', 'organization', 'technology_area', 'order', 'search_type']
+  for (const key of cacheableKeys) {
+    const value = params[key]
+    if (value === undefined) continue
+    if (typeof value === 'string' && value.trim() === '') continue
+    sp.set(key, String(value))
+  }
+  return sp.toString()
+}
+
+function getCachedResult(cacheKey: string): PaginatedResponse<Project> | null {
+  const entry = SEARCH_CACHE.get(cacheKey as never)
+  if (!entry) {
+    CACHE_STATS.misses++
+    return null
+  }
+  if (entry.expiry < Date.now()) {
+    SEARCH_CACHE.clear()
+    CACHE_STATS.misses++
+    return null
+  }
+  CACHE_STATS.hits++
+  return entry.data
+}
+
+export function getCacheStats(): { hits: number; misses: number; hitRate: number } {
+  const total = CACHE_STATS.hits + CACHE_STATS.misses
+  return {
+    hits: CACHE_STATS.hits,
+    misses: CACHE_STATS.misses,
+    hitRate: total > 0 ? CACHE_STATS.hits / total : 0,
+  }
+}
+
 export async function fetchProjects(params: FetchProjectsParams): Promise<PaginatedResponse<Project>> {
   const baseUrl = getApiProjectUrl()
   
   const page = params.page && params.page > 0 ? params.page : 1
   const limit = params.limit ?? 10
   const offset = (page - 1) * limit
+
+  // Check cache for this query (ignoring pagination)
+  const cacheKey = getCacheKey({
+    q: params.q,
+    trl_min: params.trl_min,
+    trl_max: params.trl_max,
+    organization: params.organization,
+    technology_area: params.technology_area,
+    order: params.order,
+  })
+  
+  const cached = getCachedResult(cacheKey)
+  if (cached) {
+    // Return paginated results from cache
+    const pageSize = cached.pageSize
+    const startIdx = (page - 1) * pageSize
+    const endIdx = startIdx + pageSize
+    return {
+      ...cached,
+      data: cached.data.slice(startIdx, endIdx),
+      page,
+    }
+  }
 
   const url = `${baseUrl}${buildSearchParams({
     q: params.q,
@@ -91,39 +220,59 @@ export async function fetchProjects(params: FetchProjectsParams): Promise<Pagina
     organization: params.organization,
     technology_area: params.technology_area,
     order: params.order,
+    search_type: params.search_type,
     limit: limit,
     offset: offset,
   })}`
 
-  let res: Response
-  try {
-    res = await fetch(url, {
-      method: 'GET',
-      headers: { Accept: 'application/json' },
-    })
-  } catch (e) {
-    throw new Error('Network error while fetching projects')
+  // Request deduplication: if same request is in-flight, reuse promise
+  if (inFlightRequests.has(url)) {
+    return inFlightRequests.get(url)!
   }
 
-  // Handle empty or error states by returning a basic empty page
-  if (res.status === 404) {
-    return { data: [], page, pageSize: limit, totalCount: 0, totalPages: 0 }
-  }
-  
-  if (!res.ok) {
-    if (res.status >= 400 && res.status < 500) {
+  // Create promise for this request and store it
+  const requestPromise = (async () => {
+    let res: Response
+    try {
+      res = await fetch(url, {
+        method: 'GET',
+        headers: { Accept: 'application/json' },
+      })
+    } catch (e) {
+      inFlightRequests.delete(url)
+      throw new Error('Network error while fetching projects')
+    }
+
+    // Handle empty or error states by returning a basic empty page
+    if (res.status === 404) {
+      inFlightRequests.delete(url)
       return { data: [], page, pageSize: limit, totalCount: 0, totalPages: 0 }
     }
-    throw new Error(`Unexpected error (${res.status}) while fetching projects`)
-  }
+    
+    if (!res.ok) {
+      inFlightRequests.delete(url)
+      if (res.status >= 400 && res.status < 500) {
+        return { data: [], page, pageSize: limit, totalCount: 0, totalPages: 0 }
+      }
+      throw new Error(`Unexpected error (${res.status}) while fetching projects`)
+    }
 
-  const json = (await res.json()) as unknown
-  
-  // Type guard or casting
-  // We expect { data, page, pageSize, totalCount, totalPages }
-  // depending on backend response.
-  // We just updated backend to return this shape.
-  return json as PaginatedResponse<Project>
+    const json = (await res.json()) as unknown
+    const result = json as PaginatedResponse<Project>
+    
+    // Cache the full result set (excluding pagination offset)
+    SEARCH_CACHE.set(cacheKey as never, {
+      data: result,
+      expiry: Date.now() + CACHE_TTL_MS,
+      timestamp: Date.now(),
+    })
+
+    inFlightRequests.delete(url)
+    return result
+  })()
+
+  inFlightRequests.set(url, requestPromise)
+  return requestPromise
 }
 
 export async function fetchProjectById(id: number): Promise<Project | null> {

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import Filters from '../components/Filters'
 import LoadingState from '../components/LoadingState'
@@ -11,6 +11,7 @@ import { useProjectsPaginated } from '../hooks/useProjectsPaginated'
 
 const DEFAULT_ORDER = 'popularity'
 const RESULTS_PER_PAGE = 10
+const SEARCH_DEBOUNCE_MS = 300 // Auto-search after 300ms of no typing
 
 function parseOptionalInt(v: string): number | undefined {
   const trimmed = v.trim()
@@ -29,8 +30,10 @@ export default function HomePage() {
   const [q, setQ] = useState('')
   const [trlMin, setTrlMin] = useState('')
   const [trlMax, setTrlMax] = useState('')
+  const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const [organization, setOrganization] = useState('')
   const [technologyArea, setTechnologyArea] = useState('')
+  const [searchType, setSearchType] = useState<'keyword' | 'semantic'>('keyword')
 
   const [hasSearched, setHasSearched] = useState(false)
   const [order, setOrder] = useState<string>(DEFAULT_ORDER)
@@ -45,6 +48,7 @@ export default function HomePage() {
     organization: undefined as string | undefined,
     technology_area: undefined as string | undefined,
     order: DEFAULT_ORDER,
+    search_type: 'keyword' as 'keyword' | 'semantic',
   }))
 
   const effectiveParams = useMemo(
@@ -55,8 +59,9 @@ export default function HomePage() {
       organization: organization.trim() || undefined,
       technology_area: technologyArea.trim() || undefined,
       order: order,
+      search_type: searchType,
     }),
-    [q, trlMin, trlMax, organization, technologyArea, order]
+    [q, trlMin, trlMax, organization, technologyArea, order, searchType]
   )
 
   function applySearch(nextParams: typeof appliedParams, searched = true) {
@@ -64,6 +69,35 @@ export default function HomePage() {
     setHasSearched(searched)
     setPage(1) // Requirement: Reset to page 1 on filter/search change
   }
+
+  // Auto-search effect: debounce and auto-apply search when query or filters change
+  useEffect(() => {
+    // Clear previous timeout
+    if (debounceTimeoutRef.current) {
+      clearTimeout(debounceTimeoutRef.current)
+    }
+
+    // Only auto-search if user has typed something or changed filters
+    const hasSearchTerm = q.trim().length > 0
+    const hasFilters =
+      trlMin.trim().length > 0 ||
+      trlMax.trim().length > 0 ||
+      organization.trim().length > 0 ||
+      technologyArea.trim().length > 0
+
+    if (hasSearchTerm || hasFilters) {
+      // Debounce before auto-searching
+      debounceTimeoutRef.current = setTimeout(() => {
+        applySearch(effectiveParams, true)
+      }, SEARCH_DEBOUNCE_MS)
+    }
+
+    return () => {
+      if (debounceTimeoutRef.current) {
+        clearTimeout(debounceTimeoutRef.current)
+      }
+    }
+  }, [q, trlMin, trlMax, organization, technologyArea, effectiveParams])
 
   const { data, isLoading, isError, error, isPlaceholderData } = useProjectsPaginated({
     ...appliedParams,
@@ -191,7 +225,17 @@ export default function HomePage() {
 
       {/* ── Search & Filter Panel ───────────────────────────── */}
       <div className="space-glass p-5">
-        <SearchBar value={q} onChange={setQ} onSubmit={() => applySearch(effectiveParams, true)} isLoading={isLoading} />
+        <SearchBar 
+          value={q} 
+          onChange={setQ} 
+          onSubmit={() => applySearch(effectiveParams, true)} 
+          isLoading={isLoading}
+          searchType={searchType}
+          onSearchTypeChange={(type) => {
+            setSearchType(type)
+            applySearch({ ...effectiveParams, search_type: type }, true)
+          }}
+        />
 
         <div className="mt-4">
           <Filters
