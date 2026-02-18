@@ -1,6 +1,8 @@
 'use client'
-
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect, useCallback } from 'react'
+import { useRouter } from 'next/navigation'
+import { fetchProjects } from '../lib/api'
+import type { Project } from '../lib/types'
 
 type SearchBarProps = {
   value: string
@@ -20,22 +22,109 @@ export default function SearchBar({
   onSearchTypeChange,
 }: SearchBarProps) {
   const inputRef = useRef<HTMLInputElement>(null)
+  const wrapperRef = useRef<HTMLDivElement>(null)
+  const router = useRouter()
+
+  // Suggestions state
+  const [suggestions, setSuggestions] = useState<Project[]>([])
+  const [activeIndex, setActiveIndex] = useState(-1)
+  const [showDropdown, setShowDropdown] = useState(false)
+  const [suggestionsLoading, setSuggestionsLoading] = useState(false)
+
+  // Debounced fetch suggestions
+  useEffect(() => {
+    const trimmed = value.trim()
+    if (trimmed.length < 2) {
+      setSuggestions([])
+      setShowDropdown(false)
+      return
+    }
+
+    setSuggestionsLoading(true)
+    const timer = setTimeout(async () => {
+      try {
+        const res = await fetchProjects({
+          q: trimmed,
+          search_type: 'keyword',
+          page: 1,
+          limit: 5,
+        })
+        setSuggestions(res.data)
+        setShowDropdown(res.data.length > 0)
+        setActiveIndex(-1)
+      } catch {
+        setSuggestions([])
+        setShowDropdown(false)
+      } finally {
+        setSuggestionsLoading(false)
+      }
+    }, 200)
+
+    return () => {
+      clearTimeout(timer)
+      setSuggestionsLoading(false)
+    }
+  }, [value])
+
+  // Click-outside dismiss
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
+        setShowDropdown(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  const navigateToProject = useCallback((project: Project) => {
+    setShowDropdown(false)
+    router.push(`/project/${project.id}`)
+  }, [router])
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
+    setShowDropdown(false)
     onSubmit()
   }
 
-  // Allow Enter key to submit immediately (override debounce)
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      e.preventDefault()
-      onSubmit()
+    if (!showDropdown || suggestions.length === 0) {
+      if (e.key === 'Enter') {
+        e.preventDefault()
+        onSubmit()
+      }
+      return
+    }
+
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault()
+        setActiveIndex((prev) => (prev < suggestions.length - 1 ? prev + 1 : 0))
+        break
+      case 'ArrowUp':
+        e.preventDefault()
+        setActiveIndex((prev) => (prev > 0 ? prev - 1 : suggestions.length - 1))
+        break
+      case 'Enter':
+        e.preventDefault()
+        if (activeIndex >= 0 && activeIndex < suggestions.length) {
+          navigateToProject(suggestions[activeIndex])
+        } else {
+          setShowDropdown(false)
+          onSubmit()
+        }
+        break
+      case 'Escape':
+        e.preventDefault()
+        setShowDropdown(false)
+        setActiveIndex(-1)
+        break
     }
   }
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-3" ref={wrapperRef}>
       <form
         className="flex w-full gap-2"
         onSubmit={handleSubmit}
@@ -53,31 +142,100 @@ export default function SearchBar({
           <input
             ref={inputRef}
             value={value}
-            onChange={(e) => onChange(e.target.value)}
+            onChange={(e) => {
+              onChange(e.target.value)
+              if (e.target.value.trim().length >= 2) setShowDropdown(true)
+            }}
+            onFocus={() => {
+              if (suggestions.length > 0 && value.trim().length >= 2) setShowDropdown(true)
+            }}
             onKeyDown={handleKeyDown}
             placeholder="Search NASA missions & projects…"
             className="space-input w-full pl-10 pr-10"
             aria-label="Search projects"
             aria-live="polite"
+            autoComplete="off"
+            role="combobox"
+            aria-expanded={showDropdown}
+            aria-haspopup="listbox"
+            aria-activedescendant={activeIndex >= 0 ? `suggestion-${activeIndex}` : undefined}
           />
-          {/* Loading indicator */}
-          {isLoading && (
-            <svg
-              className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 animate-spin"
-              width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
-              style={{ color: 'var(--accent)' }}
+
+          {/* Suggestions dropdown */}
+          {showDropdown && suggestions.length > 0 && (
+            <ul
+              role="listbox"
+              className="absolute left-0 right-0 z-40 mt-2 max-h-80 overflow-y-auto overflow-x-hidden rounded-lg border shadow-xl"
+              style={{
+                backgroundColor: 'var(--space-surface)',
+                borderColor: 'var(--border)',
+                boxShadow: '0 12px 28px rgba(2, 6, 23, 0.75)',
+              }}
             >
-              <path d="M12 2v4m0 12v4M19.07 4.93l-2.83 2.83m-8.48 8.48l-2.83 2.83M20 12h4M4 12H0m16.07 4.07l2.83 2.83m-8.48-8.48L4.93 4.93" />
-            </svg>
+              {suggestions.map((project, idx) => (
+                <li
+                  key={project.id}
+                  id={`suggestion-${idx}`}
+                  role="option"
+                  aria-selected={idx === activeIndex}
+                  onMouseDown={(e) => {
+                    e.preventDefault()
+                    navigateToProject(project)
+                  }}
+                  onMouseEnter={() => setActiveIndex(idx)}
+                  className="flex cursor-pointer items-center gap-3 px-4 py-3 transition-colors"
+                  style={{
+                    backgroundColor: idx === activeIndex ? 'rgba(0, 212, 255, 0.08)' : 'transparent',
+                    borderBottom: idx < suggestions.length - 1 ? '1px solid var(--border)' : 'none',
+                  }}
+                >
+                  {/* Rocket icon */}
+                  <span
+                    className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-sm"
+                    style={{ backgroundColor: 'rgba(99,102,241,0.15)', color: 'var(--accent)' }}
+                  >
+                    🚀
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p
+                      className="truncate text-sm font-medium"
+                      style={{ color: 'var(--text-primary)' }}
+                    >
+                      {project.title}
+                    </p>
+                    {project.organization && (
+                      <p
+                        className="truncate text-xs"
+                        style={{ color: 'var(--text-muted)' }}
+                      >
+                        {project.organization}
+                      </p>
+                    )}
+                  </div>
+                  {/* Arrow icon */}
+                  <svg
+                    width="14" height="14" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" strokeWidth="2" strokeLinecap="round"
+                    className="shrink-0 transition-transform"
+                    style={{
+                      color: idx === activeIndex ? 'var(--accent)' : 'var(--text-muted)',
+                      transform: idx === activeIndex ? 'translateX(2px)' : 'none',
+                    }}
+                  >
+                    <path d="m9 18 6-6-6-6" />
+                  </svg>
+                </li>
+              ))}
+            </ul>
           )}
         </div>
         <button
           type="submit"
           disabled={Boolean(isLoading)}
-          className="space-btn space-btn-primary shrink-0"
+          className="space-btn space-btn-primary border-0 shrink-0"
           aria-label="Submit search"
         >
-          {isLoading ? 'Scanning…' : '🔍 Search'}
+          {isLoading ? 'Scanning…' : 'Search'}
         </button>
       </form>
 
@@ -92,9 +250,9 @@ export default function SearchBar({
           onChange={(e) => onSearchTypeChange?.(e.target.value as 'keyword' | 'semantic')}
           className="space-input text-sm py-2 px-3"
           style={{ 
-            backgroundColor: 'var(--bg-secondary)',
+            backgroundColor: 'var(--space-mid)',
             color: 'var(--text-primary)',
-            border: '1px solid var(--border-color)',
+            border: '1px solid var(--border)',
             borderRadius: '4px',
           }}
         >

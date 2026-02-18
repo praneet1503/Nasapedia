@@ -258,9 +258,9 @@ export default function HomePage() {
               type="button"
               onClick={() => applySearch(effectiveParams, true)}
               disabled={isLoading}
-              className="space-btn space-btn-primary"
+              className="space-btn space-btn-primary border-0"
             >
-              🔭 Search
+              Search
             </button>
 
             <label className="text-sm flex items-center gap-2">
