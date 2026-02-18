@@ -148,8 +148,8 @@ function buildSearchParams(params: Record<string, string | number | undefined>):
 
 function getCacheKey(params: Record<string, string | number | undefined>): string {
   const sp = new URLSearchParams()
-  // Only cache key params, not pagination
-  const cacheableKeys = ['q', 'trl_min', 'trl_max', 'organization', 'technology_area', 'order', 'search_type']
+  // Include pagination in cache key because server returns paginated results
+  const cacheableKeys = ['q', 'trl_min', 'trl_max', 'organization', 'technology_area', 'order', 'search_type', 'page', 'limit']
   for (const key of cacheableKeys) {
     const value = params[key]
     if (value === undefined) continue
@@ -190,7 +190,7 @@ export async function fetchProjects(params: FetchProjectsParams): Promise<Pagina
   const limit = params.limit ?? 10
   const offset = (page - 1) * limit
 
-  // Check cache for this query (ignoring pagination)
+  // Check cache for this query
   const cacheKey = getCacheKey({
     q: params.q,
     trl_min: params.trl_min,
@@ -198,19 +198,15 @@ export async function fetchProjects(params: FetchProjectsParams): Promise<Pagina
     organization: params.organization,
     technology_area: params.technology_area,
     order: params.order,
+    search_type: params.search_type,
+    page: page,
+    limit: limit,
   })
   
   const cached = getCachedResult(cacheKey)
   if (cached) {
-    // Return paginated results from cache
-    const pageSize = cached.pageSize
-    const startIdx = (page - 1) * pageSize
-    const endIdx = startIdx + pageSize
-    return {
-      ...cached,
-      data: cached.data.slice(startIdx, endIdx),
-      page,
-    }
+    // Return cached results directly
+    return cached
   }
 
   const url = `${baseUrl}${buildSearchParams({
