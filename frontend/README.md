@@ -1,6 +1,6 @@
-# NASA TechPort Explorer (Frontend)
+# Nasapedia (Frontend)
 
-V1 frontend for searching NASA TechPort projects.
+V1 frontend for searching Nasapedia projects.
 
 ## Requirements
 

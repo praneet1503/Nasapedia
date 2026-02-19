@@ -4,8 +4,8 @@ import Providers from './providers'
 import StarField from '../components/StarField'
 
 export const metadata: Metadata = {
-  title: 'NASA TechPort Explorer',
-  description: 'Search and explore NASA TechPort projects',
+  title: 'Nasapedia',
+  description: 'Search and explore Nasapedia projects',
 }
 
 export default function RootLayout({

@@ -14,6 +14,8 @@ type IssTrackerState = {
   loading: boolean
 }
 
+type WsStatus = 'connecting' | 'reconnecting' | 'connected'
+
 const IssMap = dynamic(() => import('../../components/IssMap'), { ssr: false })
 
 function formatTimestamp(unixSeconds: number): string {
@@ -26,6 +28,9 @@ export default function IssTrackerPage() {
     error: null,
     loading: true,
   })
+  const [wsStatus, setWsStatus] = useState<WsStatus>('connecting')
+  const [hasReceivedFirstWsMessage, setHasReceivedFirstWsMessage] = useState(false)
+  const [focusSignal, setFocusSignal] = useState(0)
 
   const loadIssLocation = useCallback(async () => {
     try {
@@ -48,10 +53,12 @@ export default function IssTrackerPage() {
 
     const connect = () => {
       const wsUrl = `${getApiIssWsUrl()}/iss/stream`
+      setWsStatus(reconnectAttempts > 0 ? 'reconnecting' : 'connecting')
       try {
         ws = new WebSocket(wsUrl)
       } catch (e) {
         // Fallback: do a one-time fetch and schedule reconnect
+        setWsStatus('reconnecting')
         void loadIssLocation()
         scheduleReconnect()
         return
@@ -59,11 +66,16 @@ export default function IssTrackerPage() {
 
       ws.onopen = () => {
         reconnectAttempts = 0
+        setWsStatus('connected')
       }
 
       ws.onmessage = (e) => {
         try {
           const payload = JSON.parse(e.data) as IssLocation
+          setHasReceivedFirstWsMessage(prev => {
+            if (!prev) setFocusSignal(s => s + 1)
+            return true
+          })
           setState({ data: payload, error: null, loading: false })
         } catch (err) {
           // ignore parse errors
@@ -72,11 +84,13 @@ export default function IssTrackerPage() {
 
       ws.onclose = () => {
         if (stopped) return
+        setWsStatus('reconnecting')
         scheduleReconnect()
       }
 
       ws.onerror = () => {
         // Errors will trigger onclose; close socket proactively
+        setWsStatus('reconnecting')
         try {
           ws?.close()
         } catch (e) {
@@ -128,6 +142,22 @@ export default function IssTrackerPage() {
         </Link>
       </header>
 
+      {!hasReceivedFirstWsMessage ? (
+        <div className="mb-4 flex items-center gap-3 space-glass rounded-xl p-4 font-mono text-sm" style={{ color: 'var(--text-secondary)' }}>
+          <span
+            className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"
+            aria-hidden="true"
+          />
+          <span>
+            {wsStatus === 'reconnecting'
+              ? 'Reconnecting to live ISS stream...'
+              : wsStatus === 'connected'
+                ? 'Connected. Waiting for first live ISS update...'
+                : 'Connecting to live ISS stream...'}
+          </span>
+        </div>
+      ) : null}
+
       {loading ? (
         <div className="space-glass rounded-xl p-6 font-mono text-sm" style={{ color: 'var(--text-secondary)' }}>
           Loading ISS telemetry...
@@ -146,13 +176,24 @@ export default function IssTrackerPage() {
       {!loading && !error && data ? (
         <section className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
           <div className="space-glass rounded-xl p-4">
-            <div className="relative">
-              <IssMap
-                latitude={data.latitude}
-                longitude={data.longitude}
-                altitudeKm={typeof data.altitude === 'number' ? data.altitude : null}
-              />
-            </div>
+              <div className="relative">
+                <div className="absolute right-3 top-3 z-20">
+                  <button
+                    type="button"
+                    className="space-btn"
+                    onClick={() => setFocusSignal(s => s + 1)}
+                  >
+                    Focus
+                  </button>
+                </div>
+                <IssMap
+                  latitude={data.latitude}
+                  longitude={data.longitude}
+                  altitudeKm={typeof data.altitude === 'number' ? data.altitude : null}
+                  focusSignal={focusSignal}
+                  focusAnimate={true}
+                />
+              </div>
           </div>
           <div className="space-glass rounded-xl p-6">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">

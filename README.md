@@ -1,6 +1,6 @@
-# NASA TechPort Explorer
+# Nasapedia
 
-A small web application to explore NASA TechPort projects. This repository includes a FastAPI backend, a Next.js frontend, and is configured to use a Postgres database (Neon recommended) for development and production.
+A small web application to explore Nasapedia projects. This repository includes a FastAPI backend, a Next.js frontend, and is configured to use a Postgres database (Neon recommended) for development and production.
 
 ## Apps/Tools/Websites used to make this project possible !
 - postgres (for database)

@@ -7,6 +7,8 @@ type IssMapProps = {
   latitude: number
   longitude: number
   altitudeKm?: number | null
+  focusSignal?: number
+  focusAnimate?: boolean
 }
 
 const earthRadiusKm = 6371
@@ -17,12 +19,13 @@ const issIcon = L.divIcon({
   iconAnchor: [8, 8],
 })
 
-export default function IssMap({ latitude, longitude, altitudeKm }: IssMapProps) {
+export default function IssMap({ latitude, longitude, altitudeKm, focusSignal, focusAnimate }: IssMapProps) {
   const mapContainerRef = useRef<HTMLDivElement | null>(null)
   const mapRef = useRef<L.Map | null>(null)
   const markerRef = useRef<L.Marker | null>(null)
   const circleRef = useRef<L.Circle | null>(null)
   const mountedRef = useRef(false)
+  const latestCenterRef = useRef<[number, number] | null>(null)
   const center = useMemo<[number, number]>(() => [latitude, longitude], [latitude, longitude])
 
   const footprintRadiusMeters = useMemo(() => {
@@ -81,6 +84,8 @@ export default function IssMap({ latitude, longitude, altitudeKm }: IssMapProps)
     if (!map || !mountedRef.current) return
     if (!mapContainerRef.current?.isConnected) return
 
+    // keep a ref to the latest center so focus/pan can read it
+    latestCenterRef.current = center
     markerRef.current?.setLatLng(center)
 
     if (footprintRadiusMeters) {
@@ -101,6 +106,20 @@ export default function IssMap({ latitude, longitude, altitudeKm }: IssMapProps)
       circleRef.current = null
     }
   }, [center, footprintRadiusMeters, latitude, longitude])
+
+  useEffect(() => {
+    if (typeof focusSignal === 'undefined') return
+    const map = mapRef.current
+    if (!map || !mountedRef.current) return
+    if (!mapContainerRef.current?.isConnected) return
+    try {
+      const animate = typeof focusAnimate === 'boolean' ? focusAnimate : true
+      const target = latestCenterRef.current ?? (center as [number, number])
+      map.panTo(target as L.LatLngExpression, { animate })
+    } catch (e) {
+      /* ignore */
+    }
+  }, [focusSignal, focusAnimate])
 
   return (
     <div className="iss-map-shell">

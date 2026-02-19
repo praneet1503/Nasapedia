@@ -195,7 +195,7 @@ export default function HomePage() {
                   WebkitTextFillColor: 'transparent',
                 }}
               >
-                NASA TechPort Explorer
+                Nasapedia
               </h1>
               <p className="text-xs" style={{ color: 'var(--text-muted)', letterSpacing: '0.08em' }}>
                 MISSION CONTROL · TECHNOLOGY DATABASE
@@ -212,7 +212,7 @@ export default function HomePage() {
         </div>
 
         <p className="mt-3 text-sm" style={{ color: 'var(--text-secondary)' }}>
-          Search NASA TechPort projects by keyword and filter by TRL, organization, and technology area.
+          Search Nasapedia projects by keyword and filter by TRL, organization, and technology area.
         </p>
       </header>
 
