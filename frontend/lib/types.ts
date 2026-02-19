@@ -19,3 +19,16 @@ export type PaginatedResponse<T> = {
   totalCount: number
   totalPages: number
 }
+
+export type IssLocation = {
+  latitude: number
+  longitude: number
+  velocity: number
+  visibility: string
+  timestamp: number
+  altitude?: number
+}
+
+export type ApiError = {
+  error: string
+}

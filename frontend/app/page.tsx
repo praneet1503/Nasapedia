@@ -7,6 +7,7 @@ import LoadingState from '../components/LoadingState'
 import ProjectList from '../components/ProjectList'
 import Pagination from '../components/Pagination'
 import SearchBar from '../components/SearchBar'
+import TopNav from '../components/TopNav'
 import { useProjectsPaginated } from '../hooks/useProjectsPaginated'
 
 const DEFAULT_ORDER = 'popularity'
@@ -201,15 +202,7 @@ export default function HomePage() {
               </p>
             </div>
 
-            <div className="ml-2 flex gap-2">
-              <button
-                type="button"
-                onClick={() => router.push('/feed')}
-                className="space-btn text-sm"
-              >
-                🛠️ View Feed
-              </button>
-            </div>
+            <TopNav />
           </div>
 
           <div className="mission-clock">
@@ -304,6 +297,7 @@ export default function HomePage() {
                     organization: undefined,
                     technology_area: undefined,
                     order: DEFAULT_ORDER,
+                    search_type: 'keyword',
                   },
                   false
                 )

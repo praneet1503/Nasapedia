@@ -5,7 +5,7 @@ V1 frontend for searching NASA TechPort projects.
 ## Requirements
 
 - Node.js 18+ (recommended: 20)
-- Backend API running at the deployed Modal backend. Set `NEXT_PUBLIC_API_BASE_URL` to the Modal URL (for example, `https://praneetnrana--projects-dev.modal.run`)
+- Backend API running at deployed Modal endpoints
 
 ## Setup
 
@@ -19,10 +19,14 @@ npm install
 2. Configure environment variables:
 
 - Copy `.env.local.example` to `.env.local`
-- Set the backend base URL to the Modal backend URL (use `backend/.env` `MODAL_BACKEND_URL` or the example below):
+- Set deployed Modal endpoint URLs:
 
 ```bash
-NEXT_PUBLIC_API_BASE_URL=https://praneetnrana--projects.modal.run
+NEXT_PUBLIC_API_PROJECTS_URL=https://praneetnrana--projects.modal.run
+NEXT_PUBLIC_API_PROJECTS_ID_URL=https://praneetnrana--projects-id.modal.run
+NEXT_PUBLIC_API_FEED_URL=https://praneetnrana--feed.modal.run
+NEXT_PUBLIC_API_PROJECT_CLICK_URL=https://praneetnrana--projects-click.modal.run
+NEXT_PUBLIC_API_ISS_URL=https://praneetnrana--iss.modal.run
 ```
 
 3. Run the dev server:
@@ -36,9 +40,12 @@ Open `http://localhost:3000`.
 ## How it talks to the backend
 
 - The frontend uses native `fetch()` from the browser.
-- All API calls go to `${NEXT_PUBLIC_API_BASE_URL}`:
-  - `GET /api/projects` for search + filters + pagination (offset/limit)
-  - `GET /api/projects/{id}` for the project detail page
+- API calls use explicit endpoint variables:
+  - Projects search: `NEXT_PUBLIC_API_PROJECTS_URL`
+  - Project details: `NEXT_PUBLIC_API_PROJECTS_ID_URL`
+  - Feed: `NEXT_PUBLIC_API_FEED_URL`
+  - Project click tracking: `NEXT_PUBLIC_API_PROJECT_CLICK_URL`
+  - ISS tracker: `NEXT_PUBLIC_API_ISS_URL` (fallback supported: `NEXT_PUBLIC_API_URL`)
 
 API wrappers live in [lib/api.ts](lib/api.ts).
 

@@ -1,4 +1,4 @@
-import type { PaginatedResponse, Project } from './types'
+import type { ApiError, IssLocation, PaginatedResponse, Project } from './types'
 
 // In-flight requests deduplication map (prevents duplicate API calls)
 const inFlightRequests = new Map<string, Promise<PaginatedResponse<Project>>>()
@@ -119,6 +119,29 @@ function getApiFeedUrl(): string {
     throw new Error('NEXT_PUBLIC_API_FEED_URL is not defined in environment variables')
   }
   return url.replace(/\/+$/, '')
+}
+
+function getApiIssBaseUrl(): string {
+  const issUrl = process.env.NEXT_PUBLIC_API_ISS_URL
+  if (issUrl) {
+    return issUrl.replace(/\/+$/, '')
+  }
+
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL
+  if (baseUrl) {
+    return baseUrl.replace(/\/+$/, '')
+  }
+
+  throw new Error('NEXT_PUBLIC_API_ISS_URL or NEXT_PUBLIC_API_URL is not defined in environment variables')
+}
+
+export function getApiIssWsUrl(): string {
+  const base = getApiIssBaseUrl()
+  // Replace http/https scheme with ws/wss
+  if (base.startsWith('https://')) return base.replace(/^https:/, 'wss:')
+  if (base.startsWith('http://')) return base.replace(/^http:/, 'ws:')
+  // Fallback: assume secure websocket
+  return `wss://${base}`
 }
 
 function getApiProjectClickUrl(projectId: number): string {
@@ -346,4 +369,26 @@ export async function recordProjectClick(projectId: number, visitorUuid: string)
   if (!res.ok) {
     return
   }
+}
+
+export async function fetchIssLocation(): Promise<IssLocation> {
+  const url = `${getApiIssBaseUrl()}/iss/location`
+
+  let res: Response
+  try {
+    res = await fetch(url, {
+      method: 'GET',
+      headers: { Accept: 'application/json' },
+    })
+  } catch (e) {
+    throw new Error('Network error while fetching ISS location')
+  }
+
+  const payload = (await res.json()) as IssLocation | ApiError
+
+  if (!res.ok || 'error' in payload) {
+    throw new Error('ISS data unavailable')
+  }
+
+  return payload
 }

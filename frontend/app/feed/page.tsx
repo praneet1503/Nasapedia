@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import LoadingState from '../../components/LoadingState'
 import Pagination from '../../components/Pagination'
 import ProjectList from '../../components/ProjectList'
+import TopNav from '../../components/TopNav'
 import { useAdaptiveFeedPaginated } from '../../hooks/useAdaptiveFeedPaginated'
 import { recordProjectClick } from '../../lib/api'
 import { getOrCreateVisitorUuid } from '../../lib/visitor'
@@ -69,23 +70,7 @@ export default function FeedPage() {
           </p>
         </div>
 
-        <div className="flex gap-2">
-          <button
-            type="button"
-            onClick={() => router.push('/')}
-            className="space-btn text-sm"
-          >
-            🌍 All Projects
-          </button>
-
-          <button
-            type="button"
-            onClick={() => router.push('/search')}
-            className="space-btn text-sm"
-          >
-            🔍 Search
-          </button>
-        </div>
+        <TopNav />
       </header>
 
       <section>
