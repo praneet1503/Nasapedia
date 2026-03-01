@@ -22,11 +22,11 @@ npm install
 - Set deployed Modal endpoint URLs:
 
 ```bash
-NEXT_PUBLIC_API_PROJECTS_URL=https://praneetnrana--projects.modal.run
-NEXT_PUBLIC_API_PROJECTS_ID_URL=https://praneetnrana--projects-id.modal.run
-NEXT_PUBLIC_API_FEED_URL=https://praneetnrana--feed.modal.run
-NEXT_PUBLIC_API_PROJECT_CLICK_URL=https://praneetnrana--projects-click.modal.run
-NEXT_PUBLIC_API_ISS_URL=https://praneetnrana--iss.modal.run
+NEXT_PUBLIC_API_PROJECTS_URL=https://praneetnrana--backend.modal.run/projects
+NEXT_PUBLIC_API_PROJECTS_ID_URL=https://praneetnrana--backend.modal.run/projects
+NEXT_PUBLIC_API_FEED_URL=https://praneetnrana--backend.modal.run/feed
+NEXT_PUBLIC_API_PROJECT_CLICK_URL=https://praneetnrana--backend.modal.run/projects/{id}/click
+NEXT_PUBLIC_API_ISS_URL=https://praneetnrana--backend.modal.run
 ```
 
 3. Run the dev server:
