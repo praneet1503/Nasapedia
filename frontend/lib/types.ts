@@ -32,3 +32,60 @@ export type IssLocation = {
 export type ApiError = {
   error: string
 }
+
+export type SpaceDevsErrorType = 'INVALID_KEY' | 'RATE_LIMIT' | 'NETWORK' | 'UNKNOWN'
+
+export type SpaceDevsValidationResult = {
+  valid: boolean
+  statusCode: number
+  rateLimited: boolean
+  quotaRemaining?: number
+  errorType?: SpaceDevsErrorType
+  rawResponse?: {
+    endpoint?: string
+    statusText?: string
+    rateLimit?: {
+      limit?: number
+      remaining?: number
+      retryAfter?: string
+    }
+    request?: {
+      timeoutMs?: number
+      attempt?: number
+      latencyMs?: number
+      authMode?: 'TOKEN' | 'ANON'
+      apiKeyMasked?: string
+    }
+    bodyPreview?: string
+    networkError?: {
+      type?: string
+      message?: string
+    }
+    cache?: 'HIT' | 'MISS'
+  }
+}
+
+export type SpaceDevsLatencySample = {
+  sample: number
+  latencyMs: number
+  statusCode: number
+  error?: string
+}
+
+export type SpaceDevsEndpointLatency = {
+  endpoint: string
+  samples: number
+  averageResponseTimeMs?: number | null
+  latencies: SpaceDevsLatencySample[]
+}
+
+export type SpaceDevsLatencyProbe = {
+  primary: SpaceDevsEndpointLatency
+  secondary: SpaceDevsEndpointLatency
+  fasterEndpoint?: string | null
+}
+
+export type GlobalLaunchIntelligenceResponse = {
+  validation: SpaceDevsValidationResult
+  latencyProbe?: SpaceDevsLatencyProbe
+}

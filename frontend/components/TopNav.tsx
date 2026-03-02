@@ -19,6 +19,10 @@ export default function TopNav() {
         🛰️ ISS Tracker
       </button>
 
+      <button type="button" onClick={() => router.push('/global-launch-intelligence')} className="space-btn text-sm">
+        🌐 Global Launch Intelligence
+      </button>
+
       {/* Search removed per request */}
     </div>
   )

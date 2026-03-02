@@ -1,4 +1,10 @@
-import type { ApiError, IssLocation, PaginatedResponse, Project } from './types'
+import type {
+  ApiError,
+  GlobalLaunchIntelligenceResponse,
+  IssLocation,
+  PaginatedResponse,
+  Project,
+} from './types'
 
 // In-flight requests deduplication map (prevents duplicate API calls)
 const inFlightRequests = new Map<string, Promise<PaginatedResponse<Project>>>()
@@ -133,6 +139,18 @@ function getApiIssBaseUrl(): string {
   }
 
   throw new Error('NEXT_PUBLIC_API_ISS_URL or NEXT_PUBLIC_API_URL is not defined in environment variables')
+}
+
+function getApiGlobalLaunchIntelligenceUrl(): string {
+  const explicit = process.env.NEXT_PUBLIC_API_GLOBAL_LAUNCH_INTELLIGENCE_URL
+  if (explicit) return explicit.replace(/\/+$/, '')
+
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL
+  if (baseUrl) return `${baseUrl.replace(/\/+$/, '')}/global-launch-intelligence`
+
+  throw new Error(
+    'NEXT_PUBLIC_API_GLOBAL_LAUNCH_INTELLIGENCE_URL or NEXT_PUBLIC_API_URL is not defined in environment variables'
+  )
 }
 
 export function getApiIssWsUrl(): string {
@@ -391,4 +409,37 @@ export async function fetchIssLocation(): Promise<IssLocation> {
   }
 
   return payload
+}
+
+export type FetchSpaceDevsValidationParams = {
+  mode?: 'token' | 'anon'
+  includeProbe?: boolean
+  samples?: number
+}
+
+export async function fetchSpaceDevsValidation(
+  params: FetchSpaceDevsValidationParams = {}
+): Promise<GlobalLaunchIntelligenceResponse> {
+  const baseUrl = getApiGlobalLaunchIntelligenceUrl()
+  const url = `${baseUrl}/validate${buildSearchParams({
+    mode: params.mode ?? 'token',
+    include_probe: params.includeProbe ? 'true' : 'false',
+    samples: params.samples,
+  })}`
+
+  let res: Response
+  try {
+    res = await fetch(url, {
+      method: 'GET',
+      headers: { Accept: 'application/json' },
+    })
+  } catch (e) {
+    throw new Error('Network error while validating Space Devs diagnostics')
+  }
+
+  if (!res.ok) {
+    throw new Error(`Unexpected error (${res.status}) while validating Space Devs diagnostics`)
+  }
+
+  return (await res.json()) as GlobalLaunchIntelligenceResponse
 }
