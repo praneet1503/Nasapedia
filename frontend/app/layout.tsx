@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import './globals.css'
 import Providers from './providers'
 import StarField from '../components/StarField'
+import { Analytics } from '@vercel/analytics/react'
 
 export const metadata: Metadata = {
   title: 'Nasapedia',
@@ -19,6 +20,7 @@ export default function RootLayout({
         <StarField />
         <Providers>
           <div className="relative z-10">{children}</div>
+          <Analytics />
         </Providers>
       </body>
     </html>
