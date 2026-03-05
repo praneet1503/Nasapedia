@@ -11,3 +11,4 @@ export function useAdaptiveFeedPaginated(page: number, visitorUuid: string, limi
     enabled: Boolean(visitorUuid),
   })
 }
+

@@ -6,10 +6,10 @@ import type {
   Project,
 } from './types'
 
-// In-flight requests deduplication map (prevents duplicate API calls)
+
 const inFlightRequests = new Map<string, Promise<PaginatedResponse<Project>>>()
 
-// LRU Cache implementation with size limit to prevent unbounded memory growth
+
 class LRUCache<K, V> {
   private cache: Map<K, V>
   private maxSize: number
@@ -23,7 +23,7 @@ class LRUCache<K, V> {
 
   get(key: K): V | null {
     if (!this.cache.has(key)) return null
-    // Move to end (most recently used)
+
     const value = this.cache.get(key)!
     this.cache.delete(key)
     this.cache.set(key, value)
@@ -32,10 +32,9 @@ class LRUCache<K, V> {
 
   set(key: K, value: V): void {
     if (this.cache.has(key)) {
-      this.cache.delete(key) // Remove old entry
+      this.cache.delete(key)
     }
-    this.cache.set(key, value) // Add to end
-    // Evict oldest (first) entry if size exceeded
+    this.cache.set(key, value)
     if (this.cache.size > this.maxSize) {
       const firstKey = this.cache.keys().next().value
       this.cache.delete(firstKey)
@@ -51,7 +50,6 @@ class LRUCache<K, V> {
   }
 }
 
-// Cache instance with metadata for tracking metrics
 interface CacheEntry {
   data: PaginatedResponse<Project>
   expiry: number
@@ -60,18 +58,16 @@ interface CacheEntry {
 
 const SEARCH_CACHE = new LRUCache<string, CacheEntry>(50, 5 * 60 * 1000)
 const CACHE_STATS = { hits: 0, misses: 0 }
-const CACHE_TTL_MS = 5 * 60 * 1000 // 5 minutes
+const CACHE_TTL_MS = 5 * 60 * 1000
 
-// Cleanup expired cache entries periodically
 if (typeof window !== 'undefined') {
   setInterval(() => {
     const now = Date.now()
-    // LRU cache doesn't store expired items, but we can clean up metrics
     if (CACHE_STATS.hits + CACHE_STATS.misses > 10000) {
       CACHE_STATS.hits = Math.floor(CACHE_STATS.hits / 2)
       CACHE_STATS.misses = Math.floor(CACHE_STATS.misses / 2)
     }
-  }, 60 * 1000) // Every minute
+  }, 60 * 1000)
 }
 
 export type FetchProjectsParams = {
@@ -93,14 +89,10 @@ export type FetchFeedParams = {
 }
 
 function getApiProjectUrl(): string {
-  // Use explicit environment variable for the projects search endpoint
   const url = process.env.NEXT_PUBLIC_API_PROJECTS_URL
-  // Debug: log the resolved env var and the page origin so we can verify what the client will fetch
   if (typeof window !== 'undefined') {
-    // eslint-disable-next-line no-console
     console.debug('getApiProjectUrl:', { env: url, origin: window.location?.origin })
   } else {
-    // eslint-disable-next-line no-console
     console.debug('getApiProjectUrl: server-side; env=', url)
   }
 
@@ -111,7 +103,6 @@ function getApiProjectUrl(): string {
 }
 
 function getApiProjectIdUrl(): string {
-  // Use explicit environment variable for the projects detail endpoint
   const url = process.env.NEXT_PUBLIC_API_PROJECTS_ID_URL
   if (!url) {
     throw new Error('NEXT_PUBLIC_API_PROJECTS_ID_URL is not defined in environment variables')
@@ -155,10 +146,8 @@ function getApiGlobalLaunchIntelligenceUrl(): string {
 
 export function getApiIssWsUrl(): string {
   const base = getApiIssBaseUrl()
-  // Replace http/https scheme with ws/wss
   if (base.startsWith('https://')) return base.replace(/^https:/, 'wss:')
   if (base.startsWith('http://')) return base.replace(/^http:/, 'ws:')
-  // Fallback: assume secure websocket
   return `wss://${base}`
 }
 
@@ -189,7 +178,6 @@ function buildSearchParams(params: Record<string, string | number | undefined>):
 
 function getCacheKey(params: Record<string, string | number | undefined>): string {
   const sp = new URLSearchParams()
-  // Include pagination in cache key because server returns paginated results
   const cacheableKeys = ['q', 'trl_min', 'trl_max', 'organization', 'technology_area', 'order', 'search_type', 'page', 'limit']
   for (const key of cacheableKeys) {
     const value = params[key]
@@ -226,12 +214,12 @@ export function getCacheStats(): { hits: number; misses: number; hitRate: number
 
 export async function fetchProjects(params: FetchProjectsParams): Promise<PaginatedResponse<Project>> {
   const baseUrl = getApiProjectUrl()
-  
+
   const page = params.page && params.page > 0 ? params.page : 1
   const limit = params.limit ?? 10
   const offset = (page - 1) * limit
 
-  // Check cache for this query
+
   const cacheKey = getCacheKey({
     q: params.q,
     trl_min: params.trl_min,
@@ -243,10 +231,9 @@ export async function fetchProjects(params: FetchProjectsParams): Promise<Pagina
     page: page,
     limit: limit,
   })
-  
+
   const cached = getCachedResult(cacheKey)
   if (cached) {
-    // Return cached results directly
     return cached
   }
 
@@ -262,12 +249,10 @@ export async function fetchProjects(params: FetchProjectsParams): Promise<Pagina
     offset: offset,
   })}`
 
-  // Request deduplication: if same request is in-flight, reuse promise
   if (inFlightRequests.has(url)) {
     return inFlightRequests.get(url)!
   }
 
-  // Create promise for this request and store it
   const requestPromise = (async () => {
     let res: Response
     try {
@@ -280,12 +265,11 @@ export async function fetchProjects(params: FetchProjectsParams): Promise<Pagina
       throw new Error('Network error while fetching projects')
     }
 
-    // Handle empty or error states by returning a basic empty page
     if (res.status === 404) {
       inFlightRequests.delete(url)
       return { data: [], page, pageSize: limit, totalCount: 0, totalPages: 0 }
     }
-    
+
     if (!res.ok) {
       inFlightRequests.delete(url)
       if (res.status >= 400 && res.status < 500) {
@@ -296,8 +280,7 @@ export async function fetchProjects(params: FetchProjectsParams): Promise<Pagina
 
     const json = (await res.json()) as unknown
     const result = json as PaginatedResponse<Project>
-    
-    // Cache the full result set (excluding pagination offset)
+
     SEARCH_CACHE.set(cacheKey as never, {
       data: result,
       expiry: Date.now() + CACHE_TTL_MS,
@@ -314,7 +297,6 @@ export async function fetchProjects(params: FetchProjectsParams): Promise<Pagina
 
 export async function fetchProjectById(id: number): Promise<Project | null> {
   const baseUrl = getApiProjectIdUrl()
-  // Append project_id as a query parameter because the Modal endpoint supports it via query_params
   const url = `${baseUrl}?project_id=${id}`
 
   let res: Response

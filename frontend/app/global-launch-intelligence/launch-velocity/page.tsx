@@ -31,12 +31,10 @@ export default function LaunchVelocityPage() {
 
   return (
     <div className="space-y-4">
-      {/* Alerts */}
       {data.surge_detected && (
         <AlertBanner type="surge" message={`HIGH ACTIVITY PHASE DETECTED — ${data.launches_30d} launches in 30 days exceeds monthly average by >20%`} />
       )}
 
-      {/* Header */}
       <div className="flex items-center justify-between">
         <h2 className="text-sm font-bold uppercase tracking-[0.2em] text-[var(--accent)]">
           Launch Velocity Engine
@@ -47,7 +45,6 @@ export default function LaunchVelocityPage() {
         />
       </div>
 
-      {/* KPI Row */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <IntelCard title="7-Day Launches" status="info">
           <Metric label="Past 7 Days" value={data.launches_7d} size="lg" />
@@ -77,7 +74,6 @@ export default function LaunchVelocityPage() {
         </IntelCard>
       </div>
 
-      {/* Upcoming */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <IntelCard title="Upcoming — 7 Days" status="info">
           <Metric label="Scheduled Launches" value={data.upcoming_7d} size="md" />
@@ -87,7 +83,6 @@ export default function LaunchVelocityPage() {
         </IntelCard>
       </div>
 
-      {/* Chart */}
       <IntelCard title="30-Day Launch Timeline" subtitle="Daily launch frequency">
         <div className="h-64 mt-2">
           <ResponsiveContainer width="100%" height="100%">

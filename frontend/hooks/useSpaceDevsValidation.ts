@@ -21,3 +21,4 @@ export function useSpaceDevsValidation(params: UseSpaceDevsValidationParams) {
     staleTime: 5 * 60 * 1000,
   })
 }
+

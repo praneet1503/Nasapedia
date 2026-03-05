@@ -26,12 +26,10 @@ export default function AstronautActivityPage() {
 
   return (
     <div className="space-y-4">
-      {/* Header */}
       <h2 className="text-sm font-bold uppercase tracking-[0.2em] text-[var(--accent)]">
         Astronaut &amp; Crew Intelligence
       </h2>
 
-      {/* KPI Row */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <IntelCard title="Active Astronauts" status="nominal">
           <Metric label="In active service" value={data.total_active} size="lg" />
@@ -48,7 +46,6 @@ export default function AstronautActivityPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* Agency Breakdown */}
         <IntelCard title="Agency Representation">
           <div className="h-72 mt-2">
             <ResponsiveContainer width="100%" height="100%">
@@ -82,7 +79,6 @@ export default function AstronautActivityPage() {
           </div>
         </IntelCard>
 
-        {/* Upcoming Crewed Missions */}
         <IntelCard title="Crewed Launch Timeline">
           {data.upcoming_crewed_missions.length === 0 ? (
             <p className="text-xs text-[var(--text-muted)] py-4">No upcoming crewed missions in current data window</p>
@@ -109,7 +105,6 @@ export default function AstronautActivityPage() {
         </IntelCard>
       </div>
 
-      {/* Astronaut Roster */}
       <IntelCard title="Active Astronaut Roster">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 mt-2 max-h-96 overflow-y-auto pr-1">
           {data.astronauts.map((astro, i) => (

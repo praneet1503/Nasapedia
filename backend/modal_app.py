@@ -33,11 +33,8 @@ image = (
     .add_local_dir(ROOT_DIR / "routers", remote_path="/root/routers")
 )
 
-# Build secrets list: allow adding Space Devs key via environment at deploy time
-# so the secret can be provisioned automatically without using the dashboard.
 space_key = os.environ.get("SPACEDEVS_API_KEY")
 if space_key:
-    # create or update secret from dict; deploy will register it
     secrets = [modal.Secret.from_dict({"SPACEDEVS_API_KEY": space_key})]
 else:
     secrets = [modal.Secret.from_name(SECRET_NAME)]
@@ -50,7 +47,6 @@ else:
     min_containers=MIN_CONTAINERS,
     scaledown_window=SCALEDOWN_WINDOW,
 )
-# label controls the webhook subdomain, change to avoid collision
 @modal.asgi_app(label="backend-v3")
 def backend():
     return fastapi_app

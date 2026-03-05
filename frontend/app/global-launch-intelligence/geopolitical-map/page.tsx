@@ -26,7 +26,6 @@ export default function GeopoliticalMapPage() {
 
   return (
     <div className="space-y-4">
-      {/* Alerts */}
       {data.regional_spikes.length > 0 && (
         <AlertBanner
           type="surge"
@@ -34,12 +33,10 @@ export default function GeopoliticalMapPage() {
         />
       )}
 
-      {/* Header */}
       <h2 className="text-sm font-bold uppercase tracking-[0.2em] text-[var(--accent)]">
         Launch Site Geopolitical Intelligence
       </h2>
 
-      {/* KPIs */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <IntelCard title="Active Countries" status="info">
           <Metric label="With launch activity" value={data.total_countries} size="lg" />
@@ -61,7 +58,6 @@ export default function GeopoliticalMapPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* Country Leaderboard */}
         <IntelCard title="Launches by Country">
           <div className="h-80 mt-2">
             <ResponsiveContainer width="100%" height="100%">
@@ -95,7 +91,6 @@ export default function GeopoliticalMapPage() {
           </div>
         </IntelCard>
 
-        {/* Site Leaderboard */}
         <IntelCard title="Top Launch Facilities">
           <div className="space-y-2 mt-2 max-h-80 overflow-y-auto pr-1">
             {data.site_leaderboard.map((site, i) => (
@@ -116,7 +111,6 @@ export default function GeopoliticalMapPage() {
         </IntelCard>
       </div>
 
-      {/* Regional Spikes Table */}
       {data.regional_spikes.length > 0 && (
         <IntelCard title="Regional Activity Spike Analysis">
           <div className="overflow-x-auto mt-2">
@@ -151,7 +145,6 @@ export default function GeopoliticalMapPage() {
         </IntelCard>
       )}
 
-      {/* Launch Sites with Coordinates */}
       <IntelCard title="Launch Site Coordinates">
         <div className="overflow-x-auto mt-2">
           <table className="w-full text-left">
@@ -168,7 +161,6 @@ export default function GeopoliticalMapPage() {
               {data.site_leaderboard
                 .filter(s => s.latitude != null && s.longitude != null)
                 .map((site, i) => {
-                  // coerce to numbers just in case backend returned string
                   const latNum = Number(site.latitude)
                   const lonNum = Number(site.longitude)
                   const latStr = isNaN(latNum) ? String(site.latitude) : latNum.toFixed(4)

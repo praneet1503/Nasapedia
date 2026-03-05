@@ -6,7 +6,6 @@ function generateVisitorUuid(): string {
     return crypto.randomUUID()
   }
 
-  // Fallback UUID-like value for environments without crypto.randomUUID
   const random = Math.random().toString(16).slice(2)
   const ts = Date.now().toString(16)
   return `${ts}-${random}`
@@ -33,7 +32,6 @@ function getVisitorCookie(): string | null {
 export function getOrCreateVisitorUuid(): string {
   if (typeof window === 'undefined') return 'server-render'
 
-  // Visitor UUID storage/fetch point: persisted in localStorage + cookie for cross-session continuity.
   const fromStorage = window.localStorage.getItem(VISITOR_UUID_STORAGE_KEY)
   if (fromStorage) {
     setVisitorCookie(fromStorage)

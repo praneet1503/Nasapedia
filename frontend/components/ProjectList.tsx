@@ -15,3 +15,4 @@ export default function ProjectList({ projects, onProjectClick }: ProjectListPro
     </div>
   )
 }
+

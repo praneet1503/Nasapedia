@@ -34,7 +34,6 @@ export default function AgencyDominancePage() {
 
   return (
     <div className="space-y-4">
-      {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-2">
         <h2 className="text-sm font-bold uppercase tracking-[0.2em] text-[var(--accent)]">
           Agency Dominance Ranking
@@ -55,7 +54,6 @@ export default function AgencyDominancePage() {
         </div>
       </div>
 
-      {/* Summary KPIs */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <IntelCard title="Total Launches" status="info">
           <Metric label={`Past ${data.period_days} days`} value={data.total_launches} size="lg" />
@@ -72,7 +70,6 @@ export default function AgencyDominancePage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        {/* Top 5 Leaderboard */}
         <IntelCard title="Top 5 Launch Providers" className="lg:col-span-2">
           <div className="h-72 mt-2">
             <ResponsiveContainer width="100%" height="100%">
@@ -110,7 +107,6 @@ export default function AgencyDominancePage() {
           </div>
         </IntelCard>
 
-        {/* State vs Private Pie */}
         <IntelCard title="State vs Private">
           <div className="h-72 flex items-center justify-center">
             <ResponsiveContainer width="100%" height="100%">
@@ -154,7 +150,6 @@ export default function AgencyDominancePage() {
         </IntelCard>
       </div>
 
-      {/* Full Leaderboard Table */}
       <IntelCard title="Full Provider Leaderboard">
         <div className="overflow-x-auto mt-2">
           <table className="w-full text-left">

@@ -84,7 +84,6 @@ export default function IssMap({ latitude, longitude, altitudeKm, focusSignal, f
     if (!map || !mountedRef.current) return
     if (!mapContainerRef.current?.isConnected) return
 
-    // keep a ref to the latest center so focus/pan can read it
     latestCenterRef.current = center
     markerRef.current?.setLatLng(center)
 
@@ -117,7 +116,6 @@ export default function IssMap({ latitude, longitude, altitudeKm, focusSignal, f
       const target = latestCenterRef.current ?? (center as [number, number])
       map.panTo(target as L.LatLngExpression, { animate })
     } catch (e) {
-      /* ignore */
     }
   }, [focusSignal, focusAnimate])
 

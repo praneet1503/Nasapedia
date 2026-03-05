@@ -56,12 +56,10 @@ export default function OrbitalIntelligencePage() {
 
   return (
     <div className="space-y-4">
-      {/* Alerts */}
       {data.telecom_expansion_flag && (
         <AlertBanner type="expansion" message={`TELECOM EXPANSION EVENT — GEO traffic spike detected (${data.geo_launches_30d} GEO launches in 30 days)`} />
       )}
 
-      {/* Header */}
       <div className="flex items-center justify-between">
         <h2 className="text-sm font-bold uppercase tracking-[0.2em] text-[var(--accent)]">
           Orbital Intelligence Mapping
@@ -72,7 +70,6 @@ export default function OrbitalIntelligencePage() {
         />
       </div>
 
-      {/* KPIs */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {Object.entries(data.distribution).slice(0, 4).map(([orbit, val]) => (
           <IntelCard key={orbit} title={orbit} status="info">
@@ -82,7 +79,6 @@ export default function OrbitalIntelligencePage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* Orbital Distribution Pie */}
         <IntelCard title="Orbital Allocation">
           <div className="h-72 flex items-center justify-center">
             <ResponsiveContainer width="100%" height="100%">
@@ -124,7 +120,6 @@ export default function OrbitalIntelligencePage() {
           </div>
         </IntelCard>
 
-        {/* Usage Split */}
         <IntelCard title="Strategic Usage Classification">
           <div className="h-72 flex items-center justify-center">
             <ResponsiveContainer width="100%" height="100%">
@@ -167,7 +162,6 @@ export default function OrbitalIntelligencePage() {
         </IntelCard>
       </div>
 
-      {/* Orbit Distribution Bar */}
       <IntelCard title="Orbit Concentration Analysis">
         <div className="h-56 mt-2">
           <ResponsiveContainer width="100%" height="100%">

@@ -89,3 +89,4 @@ export type GlobalLaunchIntelligenceResponse = {
   validation: SpaceDevsValidationResult
   latencyProbe?: SpaceDevsLatencyProbe
 }
+

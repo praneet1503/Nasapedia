@@ -16,13 +16,10 @@ export function useProject(id: number | null) {
     initialData: () => {
       if (typeof id !== 'number') return undefined
 
-      // 1. Check direct list cache (exact match)
       const exactList = queryClient.getQueryData<Project[]>(projectsQueryKey)
       const foundInExact = exactList?.find((p) => p.id === id)
       if (foundInExact) return foundInExact
 
-      // 2. Check any cached query starting with ['projects'] (e.g. filtered searches)
-      // getQueriesData returns [[queryKey, data], ...]
       const allProjectsQueries = queryClient.getQueriesData<Project[]>({ queryKey: projectsQueryKey })
       
       for (const [, projects] of allProjectsQueries) {
@@ -34,8 +31,7 @@ export function useProject(id: number | null) {
 
       return undefined
     },
-    // Consider the data "fresh" for 30s if loaded from cache, 
-    // to avoid immediate refetch if the user just clicked it.
+
     staleTime: 30 * 1000, 
   })
 }

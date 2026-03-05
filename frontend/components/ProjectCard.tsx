@@ -39,7 +39,6 @@ export default function ProjectCard({ project, onProjectClick }: ProjectCardProp
           <span className="text-base" aria-hidden="true">{statusIcon(project.status)}</span>
           <h3 className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>{project.title}</h3>
 
-          {/* Popularity indicator */}
           {typeof project.popularity_score !== 'undefined' && project.popularity_score > 0 ? (
             <span
               className="shrink-0 flex items-center gap-1 rounded-full px-2 py-0.5 text-xs"
@@ -54,7 +53,6 @@ export default function ProjectCard({ project, onProjectClick }: ProjectCardProp
             </span>
           ) : null}
 
-          {/* TRL badge with color coding */}
           <span className={trlClass(project.trl)}>
             TRL {valueOrDash(project.trl)}
           </span>
@@ -82,3 +80,4 @@ export default function ProjectCard({ project, onProjectClick }: ProjectCardProp
     </Link>
   )
 }
+

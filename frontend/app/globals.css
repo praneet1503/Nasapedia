@@ -4,37 +4,30 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ── Space Design Tokens ─────────────────────────────────────── */
 :root {
   color-scheme: dark;
 
-  /* backgrounds */
   --space-void: #06080f;
   --space-deep: #0a0e1a;
   --space-mid: #111827;
   --space-surface: #1a1f2e;
   --space-elevated: #232a3b;
 
-  /* accent — electric blue */
   --accent: #00d4ff;
   --accent-dim: #0ea5e9;
   --accent-glow: rgba(0, 212, 255, 0.25);
 
-  /* secondary — violet */
   --secondary: #a855f7;
   --secondary-dim: #7c3aed;
   --secondary-glow: rgba(168, 85, 247, 0.2);
 
-  /* warm / alert */
   --warm: #f59e0b;
   --danger: #ef4444;
 
-  /* text */
   --text-primary: #e2e8f0;
   --text-secondary: #94a3b8;
   --text-muted: #64748b;
 
-  /* borders */
   --border: rgba(148, 163, 184, 0.12);
   --border-glow: rgba(0, 212, 255, 0.18);
 }
@@ -46,7 +39,6 @@ body {
   color: var(--text-primary);
 }
 
-/* ── Animated Starfield ──────────────────────────────────────── */
 .starfield {
   position: fixed;
   inset: 0;
@@ -62,7 +54,6 @@ body {
   will-change: transform;
 }
 
-/* Layer 1 — distant tiny stars, slow drift */
 .starfield .stars-sm {
   background-image:
     radial-gradient(1px 1px at 50px 120px, rgba(255,255,255,0.6), transparent),
@@ -79,7 +70,6 @@ body {
   animation: star-drift 120s linear infinite;
 }
 
-/* Layer 2 — mid-range stars */
 .starfield .stars-md {
   background-image:
     radial-gradient(1.5px 1.5px at 100px 80px, rgba(200,220,255,0.7), transparent),
@@ -93,7 +83,6 @@ body {
   animation: star-drift 80s linear infinite reverse;
 }
 
-/* Layer 3 — bright foreground stars with twinkle */
 .starfield .stars-lg {
   background-image:
     radial-gradient(2px 2px at 200px 150px, rgba(255,255,255,0.9), transparent),
@@ -115,7 +104,6 @@ body {
   100% { opacity: 1; }
 }
 
-/* ── Nebula gradient blobs ───────────────────────────────────── */
 .nebula {
   position: fixed;
   border-radius: 50%;
@@ -142,7 +130,6 @@ body {
   opacity: 0.06;
 }
 
-/* ── Glow card style ─────────────────────────────────────────── */
 .space-card {
   background: var(--space-surface);
   border: 1px solid var(--border);
@@ -154,7 +141,6 @@ body {
   box-shadow: 0 0 20px var(--accent-glow), inset 0 0 20px rgba(0,212,255,0.04);
 }
 
-/* ── Space glass panel ───────────────────────────────────────── */
 .space-glass {
   background: rgba(26, 31, 46, 0.7);
   backdrop-filter: blur(12px);
@@ -163,7 +149,6 @@ body {
   border-radius: 0.75rem;
 }
 
-/* ── ISS map styling ────────────────────────────────────────── */
 .iss-map-shell {
   position: relative;
   border-radius: 0.85rem;
@@ -219,7 +204,6 @@ body {
   color: var(--text-muted) !important;
 }
 
-/* ── Space inputs ────────────────────────────────────────────── */
 .space-input {
   background: var(--space-mid);
   border: 1px solid var(--border);
@@ -236,7 +220,6 @@ body {
   box-shadow: 0 0 0 2px var(--accent-glow);
 }
 
-/* ── Space button ────────────────────────────────────────────── */
 .space-btn {
   background: var(--space-surface);
   border: 1px solid var(--border);
@@ -267,7 +250,6 @@ body {
   box-shadow: 0 0 20px var(--accent-glow), 0 0 40px var(--secondary-glow);
 }
 
-/* ── Orbit loader ────────────────────────────────────────────── */
 .orbit-loader {
   position: relative;
   width: 48px; height: 48px;
@@ -304,13 +286,11 @@ body {
   to { transform: rotate(360deg); }
 }
 
-/* ── TRL badge variants ──────────────────────────────────────── */
 .trl-badge { padding: 0.15rem 0.5rem; border-radius: 9999px; font-size: 0.7rem; font-weight: 600; letter-spacing: 0.04em; }
 .trl-low  { background: rgba(239,68,68,0.15); color: #fca5a5; border: 1px solid rgba(239,68,68,0.25); }
 .trl-mid  { background: rgba(245,158,11,0.15); color: #fcd34d; border: 1px solid rgba(245,158,11,0.25); }
 .trl-high { background: rgba(34,197,94,0.15); color: #86efac; border: 1px solid rgba(34,197,94,0.25); }
 
-/* ── Mission clock (keep) ────────────────────────────────────── */
 .mission-clock {
   display: inline-flex;
   align-items: center;
@@ -353,7 +333,6 @@ body {
   }
 }
 
-/* ── Reduced motion ──────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   .starfield .star-layer,
   .orbit-loader .ring {
@@ -362,11 +341,6 @@ body {
   .starfield .stars-lg { opacity: 0.8; }
 }
 
-/* ══════════════════════════════════════════════════════════════
-   GLOBAL LAUNCH INTELLIGENCE — Bloomberg Terminal Theme
-   ══════════════════════════════════════════════════════════════ */
-
-/* ── Top bar ─────────────────────────────────────────────────── */
 .intel-topbar {
   position: sticky;
   top: 0;
@@ -383,7 +357,6 @@ body {
   font-family: ui-monospace, 'Cascadia Code', 'Fira Code', Menlo, monospace;
 }
 
-/* ── Sidebar navigation ──────────────────────────────────────── */
 .intel-sidebar {
   position: fixed;
   top: 3rem;
@@ -410,7 +383,6 @@ body {
   display: none;
 }
 
-/* ── Nav items ───────────────────────────────────────────────── */
 .intel-nav-item {
   display: flex;
   align-items: center;
@@ -437,7 +409,6 @@ body {
   box-shadow: inset 3px 0 0 var(--accent);
 }
 
-/* ── Intelligence card ───────────────────────────────────────── */
 .intel-card {
   background: linear-gradient(135deg, var(--space-surface) 0%, var(--space-mid) 100%);
   border: 1px solid var(--border);
@@ -462,7 +433,6 @@ body {
   box-shadow: 0 0 20px rgba(0, 212, 255, 0.06);
 }
 
-/* ── Table styles ────────────────────────────────────────────── */
 .intel-th {
   padding: 0.5rem 0.75rem;
   text-align: left;
@@ -488,7 +458,6 @@ tr:hover .intel-td {
   background: rgba(0, 212, 255, 0.03);
 }
 
-/* ── LIVE badge pulse ────────────────────────────────────────── */
 @keyframes intel-pulse {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.4; }
@@ -502,7 +471,6 @@ tr:hover .intel-td {
   animation: intel-pulse 2s ease-in-out infinite;
 }
 
-/* ── Index gauge bar ─────────────────────────────────────────── */
 .intel-gauge-track {
   height: 6px;
   border-radius: 3px;
@@ -517,7 +485,6 @@ tr:hover .intel-td {
   background: linear-gradient(90deg, var(--accent-dim), var(--accent));
 }
 
-/* ── Alert banner ────────────────────────────────────────────── */
 .intel-alert {
   display: flex;
   align-items: center;
@@ -547,7 +514,6 @@ tr:hover .intel-td {
   color: #c084fc;
 }
 
-/* ── Status indicator dot on cards ───────────────────────────── */
 .intel-status-dot {
   position: absolute;
   top: 0.75rem;
@@ -561,7 +527,6 @@ tr:hover .intel-td {
 .intel-status-elevated { background: #f59e0b; box-shadow: 0 0 6px rgba(245, 158, 11, 0.4); }
 .intel-status-critical { background: #ef4444; box-shadow: 0 0 6px rgba(239, 68, 68, 0.4); }
 
-/* ── Recharts overrides for dark theme ───────────────────────── */
 .intel-chart .recharts-cartesian-grid line {
   stroke: rgba(148, 163, 184, 0.08);
 }
@@ -572,7 +537,6 @@ tr:hover .intel-td {
   font-family: ui-monospace, 'Cascadia Code', 'Fira Code', Menlo, monospace;
 }
 
-/* tooltip text should always be light regardless of chart container */
 .recharts-tooltip-wrapper .recharts-default-tooltip,
 .intel-chart .recharts-tooltip-wrapper .recharts-default-tooltip {
   background: var(--space-elevated) !important;
@@ -582,7 +546,6 @@ tr:hover .intel-td {
   color: var(--text-primary) !important;
 }
 
-/* force all children and SVG text within the tooltip to use light color */
 .recharts-tooltip-wrapper .recharts-default-tooltip *,
 .intel-chart .recharts-tooltip-wrapper .recharts-default-tooltip *,
 .recharts-tooltip-wrapper .recharts-default-tooltip text,
@@ -591,7 +554,6 @@ tr:hover .intel-td {
   fill: var(--text-primary) !important;
 }
 
-/* ── Responsive: collapse sidebar on small screens ───────────── */
 @media (max-width: 768px) {
   .intel-sidebar {
     width: 52px;
@@ -601,3 +563,4 @@ tr:hover .intel-td {
     display: none;
   }
 }
+

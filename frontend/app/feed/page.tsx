@@ -18,7 +18,6 @@ export default function FeedPage() {
   const [visitorUuid, setVisitorUuid] = useState('')
 
   useEffect(() => {
-    // Visitor UUID creation/fetch point (persisted across sessions).
     setVisitorUuid(getOrCreateVisitorUuid())
   }, [])
 

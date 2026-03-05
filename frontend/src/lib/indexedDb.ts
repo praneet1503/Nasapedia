@@ -97,7 +97,6 @@ export async function getProjects(ids: number[]): Promise<Project[]> {
 }
 
 export async function setProject(project: Project): Promise<void> {
-  // Store each project independently to avoid large blobs and keep writes incremental.
   const record: ProjectRecord = { id: project.id, project, updatedAt: Date.now() }
   await withStore(PROJECTS_STORE, 'readwrite', (store) => {
     store.put(record)
@@ -116,14 +115,12 @@ export async function getPage(key: string): Promise<PageRecord | null> {
 }
 
 export async function setPage(record: PageRecord): Promise<void> {
-  // Store page metadata separately so pagination history stays lightweight.
   await withStore(PAGES_STORE, 'readwrite', (store) => {
     store.put(record)
   })
 }
 
 export async function evictOldPages(maxPages: number): Promise<void> {
-  // Evict only page metadata; projects can be reused across pages without re-fetching.
   const db = await openDb()
   return new Promise((resolve, reject) => {
     const tx = db.transaction(PAGES_STORE, 'readwrite')

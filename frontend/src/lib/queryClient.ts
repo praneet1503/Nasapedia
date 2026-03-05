@@ -10,11 +10,9 @@ export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: TEN_MINUTES,
-      // React Query v5 uses gcTime (cacheTime in v4) to control memory retention.
       gcTime: THIRTY_MINUTES,
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
-      // When true, stale queries refetch on every mount/route change; keep false to prevent loops.
       refetchOnMount: false,
       retry: 1,
     },

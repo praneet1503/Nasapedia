@@ -21,12 +21,10 @@ export default function StationTrafficPage() {
 
   return (
     <div className="space-y-4">
-      {/* Header */}
       <h2 className="text-sm font-bold uppercase tracking-[0.2em] text-[var(--accent)]">
         Space Station Traffic Monitor
       </h2>
 
-      {/* KPIs */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <IntelCard title="Active Stations" status="nominal">
           <Metric label="Orbiting" value={data.active_stations.length} size="lg" />
@@ -42,7 +40,6 @@ export default function StationTrafficPage() {
         </IntelCard>
       </div>
 
-      {/* Station Cards */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {data.all_stations.map((station) => (
           <IntelCard
@@ -52,7 +49,6 @@ export default function StationTrafficPage() {
             subtitle={station.status}
           >
             <div className="space-y-3 mt-2">
-              {/* Station Info */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <span className="text-[9px] uppercase tracking-wider text-[var(--text-muted)]">Orbit</span>
@@ -72,7 +68,6 @@ export default function StationTrafficPage() {
                 </div>
               </div>
 
-              {/* Docked Vehicles */}
               {station.docked_vehicles.length > 0 && (
                 <div>
                   <span className="text-[9px] uppercase tracking-wider text-[var(--text-muted)]">Docked Spacecraft</span>
