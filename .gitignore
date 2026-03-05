@@ -1,43 +1,42 @@
-# Ignore node modules in any package
+# Project-level ignores (consolidated)
+
+# Node (any workspace package)
 node_modules/
-/dist
 
 # Environment files
-/.env
+.env
 .env.local
 .env.*.local
-/backend/.env
+backend/.env
 
-# Ignore entire backend folder (untracked files only; tracked files remain until removed)
+# Python virtualenvs and caches
+.venv/
+*/.venv/
+backend/.venv311/
+__pycache__/
+*.py[cod]
 
+# Build artifacts
+/dist
+/build
+/out
+/coverage
+/target
 
-/.vscode
+# Editor/IDE
+.vscode/
+.idea/
 .DS_Store
+
+# Logs / temp
 *.log
 *.tmp
 *.bak
 *.swp
 *.swo
 
-# Ignore build artifacts
-/build
-/coverage
-/target
-/out
+# TypeScript cache
+tsconfig.tsbuildinfo
 
-# Ignore IDE and editor files
-/.idea/
-
-
-
-/backend/.venv311
-
-
-
-
-
-backend/app/__pycache__/
-backend/app/__pycache__/db.cpython-312.pyc
-backend/app/__pycache__/db.cpython-312.pyc
-/.venv
+# Misc local-only files
 zrandom.txt
