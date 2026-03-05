@@ -39,4 +39,5 @@ __pycache__/
 tsconfig.tsbuildinfo
 
 # Misc local-only files
-zrandom.txt
+
+
