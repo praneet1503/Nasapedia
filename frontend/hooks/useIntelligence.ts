@@ -26,7 +26,7 @@ import type {
   FullDashboardData,
 } from '../lib/intelligence-types'
 
-const STALE_TIME = 5 * 60 * 1000 // 5 minutes
+const STALE_TIME = 5 * 60 * 1000 
 
 export function useLaunchVelocity() {
   return useQuery<LaunchVelocityData, Error>({

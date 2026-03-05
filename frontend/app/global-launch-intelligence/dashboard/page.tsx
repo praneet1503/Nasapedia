@@ -51,7 +51,6 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-4">
-      {/* Alerts */}
       {indices.surge_detected && (
         <AlertBanner type="surge" message={`HIGH ACTIVITY PHASE — ${velocity.launches_30d} launches in 30 days`} />
       )}
@@ -62,7 +61,6 @@ export default function DashboardPage() {
         <AlertBanner type="expansion" message="TELECOM EXPANSION — GEO traffic spike detected" />
       )}
 
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <h2 className="text-sm font-bold uppercase tracking-[0.2em] text-[var(--accent)]">
@@ -75,7 +73,6 @@ export default function DashboardPage() {
         </button>
       </div>
 
-      {/* ── Intelligence Indices ─────────────────────────────── */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
         <IntelCard title="Space Activity">
           <IndexGauge label="Composite Index" value={indices.space_activity_index} icon="◆" />
@@ -94,9 +91,7 @@ export default function DashboardPage() {
         </IntelCard>
       </div>
 
-      {/* ── Module Summary Grid ─────────────────────────────── */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {/* Launch Velocity Mini */}
         <Link href="/global-launch-intelligence/launch-velocity" className="group">
           <IntelCard title="Launch Velocity" status={velocity.surge_detected ? 'warning' : 'nominal'}
             headerRight={<span className="text-[9px] text-[var(--text-muted)] group-hover:text-[var(--accent)] transition-colors">DRILL DOWN →</span>}>
@@ -127,7 +122,6 @@ export default function DashboardPage() {
           </IntelCard>
         </Link>
 
-        {/* Agency Dominance Mini */}
         <Link href="/global-launch-intelligence/agency-dominance" className="group">
           <IntelCard title="Agency Dominance" status="nominal"
             headerRight={<span className="text-[9px] text-[var(--text-muted)] group-hover:text-[var(--accent)] transition-colors">DRILL DOWN →</span>}>
@@ -148,7 +142,6 @@ export default function DashboardPage() {
           </IntelCard>
         </Link>
 
-        {/* Orbital Intelligence Mini */}
         <Link href="/global-launch-intelligence/orbital-intelligence" className="group">
           <IntelCard title="Orbital Intel" status={orbital.telecom_expansion_flag ? 'warning' : 'nominal'}
             headerRight={<span className="text-[9px] text-[var(--text-muted)] group-hover:text-[var(--accent)] transition-colors">DRILL DOWN →</span>}>
@@ -165,7 +158,6 @@ export default function DashboardPage() {
           </IntelCard>
         </Link>
 
-        {/* Mission Classification Mini */}
         <Link href="/global-launch-intelligence/mission-classification" className="group">
           <IntelCard title="Mission Classification" status={missions.military_escalation_flag ? 'critical' : 'nominal'}
             headerRight={<span className="text-[9px] text-[var(--text-muted)] group-hover:text-[var(--accent)] transition-colors">DRILL DOWN →</span>}>
@@ -184,7 +176,6 @@ export default function DashboardPage() {
           </IntelCard>
         </Link>
 
-        {/* Astronaut Activity Mini */}
         <Link href="/global-launch-intelligence/astronaut-activity" className="group">
           <IntelCard title="Astronaut Ops" status="nominal"
             headerRight={<span className="text-[9px] text-[var(--text-muted)] group-hover:text-[var(--accent)] transition-colors">DRILL DOWN →</span>}>
@@ -196,7 +187,6 @@ export default function DashboardPage() {
           </IntelCard>
         </Link>
 
-        {/* Station Traffic Mini */}
         <Link href="/global-launch-intelligence/station-traffic" className="group">
           <IntelCard title="Station Traffic" status="nominal"
             headerRight={<span className="text-[9px] text-[var(--text-muted)] group-hover:text-[var(--accent)] transition-colors">DRILL DOWN →</span>}>
@@ -209,7 +199,6 @@ export default function DashboardPage() {
         </Link>
       </div>
 
-      {/* Geopolitical Quick View */}
       <Link href="/global-launch-intelligence/geopolitical-map" className="group block">
         <IntelCard title="Geopolitical Overview" status="info"
           headerRight={<span className="text-[9px] text-[var(--text-muted)] group-hover:text-[var(--accent)] transition-colors">DRILL DOWN →</span>}>

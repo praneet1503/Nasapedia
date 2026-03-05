@@ -25,13 +25,11 @@ export default function SearchBar({
   const wrapperRef = useRef<HTMLDivElement>(null)
   const router = useRouter()
 
-  // Suggestions state
   const [suggestions, setSuggestions] = useState<Project[]>([])
   const [activeIndex, setActiveIndex] = useState(-1)
   const [showDropdown, setShowDropdown] = useState(false)
   const [suggestionsLoading, setSuggestionsLoading] = useState(false)
 
-  // Debounced fetch suggestions
   useEffect(() => {
     const trimmed = value.trim()
     if (trimmed.length < 2) {
@@ -66,7 +64,6 @@ export default function SearchBar({
     }
   }, [value])
 
-  // Click-outside dismiss
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
@@ -130,7 +127,6 @@ export default function SearchBar({
         onSubmit={handleSubmit}
       >
         <div className="relative w-full">
-          {/* Search icon */}
           <svg
             className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2"
             width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"
@@ -161,7 +157,6 @@ export default function SearchBar({
             aria-activedescendant={activeIndex >= 0 ? `suggestion-${activeIndex}` : undefined}
           />
 
-          {/* Suggestions dropdown */}
           {showDropdown && suggestions.length > 0 && (
             <ul
               role="listbox"
@@ -189,7 +184,6 @@ export default function SearchBar({
                     borderBottom: idx < suggestions.length - 1 ? '1px solid var(--border)' : 'none',
                   }}
                 >
-                  {/* Rocket icon */}
                   <span
                     className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-sm"
                     style={{ backgroundColor: 'rgba(99,102,241,0.15)', color: 'var(--accent)' }}
@@ -212,7 +206,6 @@ export default function SearchBar({
                       </p>
                     )}
                   </div>
-                  {/* Arrow icon */}
                   <svg
                     width="14" height="14" viewBox="0 0 24 24" fill="none"
                     stroke="currentColor" strokeWidth="2" strokeLinecap="round"
@@ -239,7 +232,6 @@ export default function SearchBar({
         </button>
       </form>
 
-      {/* Search mode selector */}
       <div className="flex items-center gap-3">
         <label htmlFor="search-mode" className="text-sm" style={{ color: 'var(--text-secondary)' }}>
           Search Mode:

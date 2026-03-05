@@ -37,7 +37,6 @@ export default function MissionClassificationPage() {
 
   return (
     <div className="space-y-4">
-      {/* Alerts */}
       {data.military_escalation_flag && (
         <AlertBanner type="escalation" message={`STRATEGIC ESCALATION INDICATOR — Military missions at ${data.military_percent_30d}% (>25% threshold) in past 30 days`} />
       )}
@@ -45,7 +44,6 @@ export default function MissionClassificationPage() {
         <AlertBanner type="info" message={`EMERGING CATEGORIES: ${data.emerging_categories.join(', ')}`} />
       )}
 
-      {/* Header */}
       <div className="flex items-center justify-between">
         <h2 className="text-sm font-bold uppercase tracking-[0.2em] text-[var(--accent)]">
           Mission Classification Intelligence
@@ -56,7 +54,6 @@ export default function MissionClassificationPage() {
         />
       </div>
 
-      {/* KPIs */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <IntelCard title="Total Classified" status="info">
           <Metric label="All missions" value={data.total_classified} size="lg" />
@@ -73,7 +70,6 @@ export default function MissionClassificationPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* Category Bar Chart */}
         <IntelCard title="Mission Type Distribution" className="lg:col-span-1">
           <div className="h-80 mt-2">
             <ResponsiveContainer width="100%" height="100%">
@@ -107,7 +103,6 @@ export default function MissionClassificationPage() {
           </div>
         </IntelCard>
 
-        {/* 30-Day Trend */}
         <IntelCard title="30-Day Category Activity" className="lg:col-span-1">
           <div className="h-80 mt-2">
             <ResponsiveContainer width="100%" height="100%">
@@ -142,7 +137,6 @@ export default function MissionClassificationPage() {
         </IntelCard>
       </div>
 
-      {/* Heatmap / Table */}
       <IntelCard title="Category Intelligence Table">
         <div className="overflow-x-auto mt-2">
           <table className="w-full text-left">

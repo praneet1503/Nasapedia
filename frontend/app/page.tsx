@@ -12,7 +12,7 @@ import { useProjectsPaginated } from '../hooks/useProjectsPaginated'
 
 const DEFAULT_ORDER = 'popularity'
 const RESULTS_PER_PAGE = 10
-const SEARCH_DEBOUNCE_MS = 300 // Auto-search after 300ms of no typing
+const SEARCH_DEBOUNCE_MS = 300 
 
 function parseOptionalInt(v: string): number | undefined {
   const trimmed = v.trim()
@@ -21,7 +21,6 @@ function parseOptionalInt(v: string): number | undefined {
   if (!Number.isFinite(n)) return undefined
   const i = Math.trunc(n)
   if (String(i) !== trimmed && String(n) !== trimmed) {
-    // allow "3.0" but avoid weird strings
   }
   return i
 }
@@ -39,7 +38,6 @@ export default function HomePage() {
   const [hasSearched, setHasSearched] = useState(false)
   const [order, setOrder] = useState<string>(DEFAULT_ORDER)
   
-  // Pagination State
   const [page, setPage] = useState(1)
 
   const [appliedParams, setAppliedParams] = useState(() => ({
@@ -68,17 +66,14 @@ export default function HomePage() {
   function applySearch(nextParams: typeof appliedParams, searched = true) {
     setAppliedParams(nextParams)
     setHasSearched(searched)
-    setPage(1) // Requirement: Reset to page 1 on filter/search change
+    setPage(1) 
   }
 
-  // Auto-search effect: debounce and auto-apply search when query or filters change
   useEffect(() => {
-    // Clear previous timeout
     if (debounceTimeoutRef.current) {
       clearTimeout(debounceTimeoutRef.current)
     }
 
-    // Only auto-search if user has typed something or changed filters
     const hasSearchTerm = q.trim().length > 0
     const hasFilters =
       trlMin.trim().length > 0 ||
@@ -87,7 +82,6 @@ export default function HomePage() {
       technologyArea.trim().length > 0
 
     if (hasSearchTerm || hasFilters) {
-      // Debounce before auto-searching
       debounceTimeoutRef.current = setTimeout(() => {
         applySearch(effectiveParams, true)
       }, SEARCH_DEBOUNCE_MS)
@@ -106,8 +100,6 @@ export default function HomePage() {
     limit: RESULTS_PER_PAGE,
   })
 
-  // Derive projects and total from query result
-  // If data is undefined (loading first time), defaults to empty
   const projects = data?.data ?? []
   const totalCount = data?.totalCount ?? 0
   const totalPages = data?.totalPages ?? 0
@@ -128,7 +120,6 @@ export default function HomePage() {
       const countdownEl = document.getElementById('mission-countdown')
       if (!countdownEl) return
 
-      // Temporary: show delayed state instead of running the timer
       const showDelayed = true
       if (showDelayed) {
         countdownEl.textContent = 'T- Delayed'
@@ -179,7 +170,6 @@ export default function HomePage() {
 
   return (
     <main className="mx-auto w-full max-w-5xl px-4 py-10">
-      {/* ── Space Hero Header ───────────────────────────────── */}
       <header className="mb-8">
         <div
           className="flex items-center justify-between flex-wrap gap-3"
@@ -216,7 +206,7 @@ export default function HomePage() {
         </p>
       </header>
 
-      {/* ── Search & Filter Panel ───────────────────────────── */}
+
       <div className="space-glass p-5">
         <SearchBar 
           value={q} 
@@ -312,7 +302,6 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* ── Results ─────────────────────────────────────────── */}
       <section className="mt-6">
         {errorMessage ? (
           <div className="rounded-xl p-4 text-sm" style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)', color: '#fca5a5' }}>{errorMessage}</div>

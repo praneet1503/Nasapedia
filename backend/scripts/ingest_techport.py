@@ -15,7 +15,6 @@ import threading
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
-# Thread-local sessions and pool tuning
 _thread_local = threading.local()
 SESSION_POOL_SIZE = 10
 
@@ -37,8 +36,6 @@ def get_session() -> requests.Session:
         _thread_local.session = s
     return s
 
-# Optional progress bar (tqdm). If not installed, the script will fall back to simple
-# periodic textual progress updates.
 try:
     from tqdm import tqdm
 except Exception:
@@ -50,7 +47,6 @@ sys.path.append(str(BACKEND_DIR))
 
 from app.db import create_db_engine, get_required_env
 
-# Engine will be initialized in main() after environment variables are loaded
 engine = None
 
 
@@ -148,7 +144,6 @@ def fetch_project_ids(api_key: str) -> Iterable[int]:
             logging.error("Failed to parse JSON for offset=%d: %s", offset, exc)
             break
 
-        # Normalize: look for 'projects' list and optional totalCount
         projects = data.get("projects") if isinstance(data, dict) else None
         total_count = None
         if isinstance(data, dict) and "totalCount" in data:
@@ -158,7 +153,6 @@ def fetch_project_ids(api_key: str) -> Iterable[int]:
                 total_count = None
 
         if projects is None:
-            # fallback: data may itself be the list
             if isinstance(data, list):
                 projects = data
             else:
@@ -169,7 +163,6 @@ def fetch_project_ids(api_key: str) -> Iterable[int]:
             logging.debug("No items returned for offset=%d", offset)
             break
 
-        # Extract project ids (TechPort uses 'projectId')
         ids: List[int] = []
         for it in projects:
             if not isinstance(it, dict):
@@ -187,7 +180,6 @@ def fetch_project_ids(api_key: str) -> Iterable[int]:
         else:
             logging.info("Fetched %d items for offset=%d (no numeric projectId fields)", len(projects), offset)
 
-        # Yield project ids from this page
         for it in projects:
             if isinstance(it, dict):
                 pid = it.get("projectId") or it.get("id")
@@ -197,7 +189,6 @@ def fetch_project_ids(api_key: str) -> Iterable[int]:
                     except Exception:
                         continue
 
-        # Termination: use totalCount if provided, otherwise stop when a page is smaller than limit
         if total_count is not None:
             if offset + len(projects) >= total_count:
                 break
@@ -281,7 +272,6 @@ def main(argv: Optional[List[str]] = None) -> int:
             logging.debug("Failed to write state file %s", p)
 
     def interactive_menu() -> List[str]:
-        # numbered option menu for easier interaction
         cfg = {
             "limit": 10,
             "batch_size": 10,
@@ -408,26 +398,23 @@ def main(argv: Optional[List[str]] = None) -> int:
             return 1
         args = parser.parse_args(menu_args)
     else:
-        args = parser.parse_args(argv)  # allow CLI args or non-interactive runs
+        args = parser.parse_args(argv) 
 
     logging.basicConfig(
         level=logging.INFO if not args.verbose else logging.DEBUG,
         format="%(asctime)s %(levelname)s %(message)s",
     )
 
-    # Enforce a soft cap on workers to avoid runaway concurrency
     max_workers_cap = 128
     if args.workers > max_workers_cap:
         logging.warning("--workers value %d capped to %d", args.workers, max_workers_cap)
         args.workers = max_workers_cap
 
-    # Tune session pool size based on workers
     global SESSION_POOL_SIZE
     SESSION_POOL_SIZE = min(max(10, args.workers), 200)
 
     api_key = get_required_env("NASA_TECHPORT_API_KEY")
 
-    # Initialize DB engine now that environment variables are loaded
     global engine
     engine = create_db_engine(get_required_env("DATABASE_URL"))
 
@@ -445,17 +432,15 @@ def main(argv: Optional[List[str]] = None) -> int:
     except RuntimeError as exc:
         logging.error("%s", exc)
         return 1
-
-    # Warm up a session for the main thread (used by fetch_project_ids)
-    # This ensures the session adapter has been configured with the chosen pool size.
+    
     _ = get_session()
 
-    # If using state file and present, load saved index
+
     if args.use_state_file:
         saved = load_state()
         if saved:
             logging.info("Found saved state: last_index=%d", saved)
-            # prefer explicit start-index if provided
+
             if args.start_index and args.start_index > 0:
                 logging.info("Using provided --start-index %d instead of saved state", args.start_index)
             else:
@@ -476,9 +461,9 @@ def main(argv: Optional[List[str]] = None) -> int:
     last_log_time = start_time
     upserted_count = 0
 
-    # Concurrent fetch of project details using a ThreadPoolExecutor
+
     def fetch_worker(pid: int):
-        # Return tuple (status, project_id, payload) where status is 'ok', 'skip', or 'error'
+
         try:
             if args.skip_existing:
                 with engine.connect() as conn:
@@ -530,7 +515,6 @@ def main(argv: Optional[List[str]] = None) -> int:
 
                 if status == "ok":
                     batch.append(payload)
-                # skip and error are already logged or counted
 
                 if len(batch) >= args.batch_size:
                     try:

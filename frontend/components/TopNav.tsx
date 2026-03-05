@@ -23,7 +23,6 @@ export default function TopNav() {
         🌐 Global Launch Intelligence
       </button>
 
-      {/* Search removed per request */}
     </div>
   )
 }

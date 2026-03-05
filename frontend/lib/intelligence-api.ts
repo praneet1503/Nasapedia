@@ -1,7 +1,3 @@
-// ── Launch Intelligence API Client ───────────────────────────
-// Centralized fetch manager for all intelligence endpoints
-// with built-in caching/error handling
-
 import type {
   AgencyDominanceData,
   AstronautActivityData,

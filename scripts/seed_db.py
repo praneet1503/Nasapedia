@@ -1,7 +1,3 @@
-#!/usr/bin/env python3
-"""Simple seeding script to populate the `projects` table.
-Usage: DATABASE_URL="postgresql://user:pass@host:5432/db" python3 scripts/seed_db.py
-"""
 import os
 from sqlalchemy import create_engine, text
 

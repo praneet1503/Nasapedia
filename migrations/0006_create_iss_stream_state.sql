@@ -1,6 +1,3 @@
--- 0006_create_iss_stream_state.sql
--- Global coordination row for ISS 1Hz stream polling and fan-out
-
 CREATE TABLE IF NOT EXISTS iss_stream_state (
     id SMALLINT PRIMARY KEY,
     leader_instance TEXT,

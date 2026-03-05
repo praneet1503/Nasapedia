@@ -5,7 +5,6 @@ type LoadingStateProps = {
 export default function LoadingState({ label = 'Loading…' }: LoadingStateProps) {
   return (
     <div className="flex w-full items-center gap-4 rounded-xl p-6 space-glass">
-      {/* Orbit loader */}
       <div className="orbit-loader">
         <div className="ring" />
         <div className="ring" />

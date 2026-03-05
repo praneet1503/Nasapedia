@@ -1,6 +1,3 @@
-// ── Launch Intelligence Types ────────────────────────────────
-// Mirrors backend schemas for the Global Launch Intelligence system
-
 export type DailyLaunchPoint = {
   date: string
   launches: number

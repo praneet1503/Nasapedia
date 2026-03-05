@@ -57,7 +57,6 @@ export default function IssTrackerPage() {
       try {
         ws = new WebSocket(wsUrl)
       } catch (e) {
-        // Fallback: do a one-time fetch and schedule reconnect
         setWsStatus('reconnecting')
         void loadIssLocation()
         scheduleReconnect()
@@ -78,7 +77,6 @@ export default function IssTrackerPage() {
           })
           setState({ data: payload, error: null, loading: false })
         } catch (err) {
-          // ignore parse errors
         }
       }
 
@@ -89,12 +87,10 @@ export default function IssTrackerPage() {
       }
 
       ws.onerror = () => {
-        // Errors will trigger onclose; close socket proactively
         setWsStatus('reconnecting')
         try {
           ws?.close()
         } catch (e) {
-          /* ignore */
         }
       }
     }
@@ -108,7 +104,6 @@ export default function IssTrackerPage() {
       }, backoff + jitter)
     }
 
-    // Attempt to get an initial snapshot while WS connects
     void loadIssLocation()
     connect()
 
@@ -118,7 +113,6 @@ export default function IssTrackerPage() {
       try {
         ws?.close()
       } catch (e) {
-        /* ignore */
       }
     }
   }, [loadIssLocation])

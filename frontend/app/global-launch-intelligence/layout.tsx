@@ -42,7 +42,6 @@ export default function IntelligenceLayout({ children }: { children: ReactNode }
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* ── Top Bar ─────────────────────────────────────────── */}
       <header className="intel-topbar">
         <div className="flex items-center gap-3">
           <Link href="/" className="text-[var(--text-muted)] hover:text-[var(--accent)] transition-colors text-xs">
@@ -62,7 +61,6 @@ export default function IntelligenceLayout({ children }: { children: ReactNode }
       </header>
 
       <div className="flex flex-1">
-        {/* ── Sidebar ───────────────────────────────────────── */}
         <nav className={`intel-sidebar ${collapsed ? 'intel-sidebar-collapsed' : ''}`}>
           <button
             onClick={() => setCollapsed(!collapsed)}
@@ -86,7 +84,6 @@ export default function IntelligenceLayout({ children }: { children: ReactNode }
           })}
         </nav>
 
-        {/* ── Main Content ──────────────────────────────────── */}
         <main
           className="flex-1 p-4 md:p-6 overflow-auto"
           style={{ marginLeft: collapsed ? 52 : 220 }}

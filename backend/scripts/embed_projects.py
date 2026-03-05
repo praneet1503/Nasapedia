@@ -3,21 +3,14 @@ Batch Embedding Generation Script
 
 Generates embeddings for all NASA projects using sentence-transformers.
 Can be run as a Modal function with: modal run scripts/embed_projects.py
-
-Features:
-- Processes projects in batches of 100 to avoid timeouts
-- Updates embedding_updated_at and embedding_model columns
-- Skips projects that already have embeddings (can force refresh with --refresh flag)
-- Provides progress tracking and performance metrics
 """
-
 import sys
 import os
 import time
 import logging
 from typing import Optional
 
-# Add backend to path for imports
+
 from pathlib import Path
 ROOT_DIR = Path(__file__).resolve().parent.parent
 if str(ROOT_DIR) not in sys.path:
@@ -30,7 +23,7 @@ from app.embedding_model import embed_batch, MODEL_NAME, EMBEDDING_DIMENSION
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-BATCH_SIZE = 100  # Process in batches to avoid timeouts
+BATCH_SIZE = 100 
 
 
 def get_projects_without_embeddings(
@@ -78,16 +71,6 @@ def update_embeddings(
     database_url: str,
     projects_with_embeddings: list[tuple],
 ) -> int:
-    """
-    Update the database with embeddings.
-    
-    Args:
-        database_url: Database connection string
-        projects_with_embeddings: List of (project_id, embedding_vector)
-        
-    Returns:
-        Number of updated rows
-    """
     if not projects_with_embeddings:
         return 0
     
@@ -96,7 +79,6 @@ def update_embeddings(
         with engine.connect() as conn:
             updated_count = 0
             
-            # Update in small batches to avoid overwhelming the connection
             for project_id, embedding_vector in projects_with_embeddings:
                 sql = text(
                     "UPDATE projects "
@@ -127,20 +109,9 @@ def embed_projects(
     force_refresh: bool = False,
     max_projects: Optional[int] = None,
 ) -> dict:
-    """
-    Generate embeddings for projects.
-    
-    Args:
-        database_url: Database connection string
-        force_refresh: If True, refresh embeddings for all projects
-        max_projects: Maximum number of projects to process
-        
-    Returns:
-        Statistics about the embedding generation
-    """
     logger.info(f"Starting embedding generation (force_refresh={force_refresh})")
     
-    # Get projects needing embeddings
+
     if force_refresh:
         projects = get_all_projects_for_refresh(database_url, max_projects or 10000)
         logger.info(f"Force-refreshing embeddings for {len(projects)} projects")
@@ -160,30 +131,25 @@ def embed_projects(
     total_processed = 0
     projects_with_embeddings = []
     
-    # Process in batches
     for i in range(0, len(projects), BATCH_SIZE):
         batch = projects[i : i + BATCH_SIZE]
         batch_start = time.perf_counter()
         
         logger.info(f"Processing batch {i // BATCH_SIZE + 1}: {len(batch)} projects")
         
-        # Prepare text for embedding (combine title + description)
         texts = [
             f"{p['title']} {p['description'] or ''}"
             for p in batch
         ]
         
         try:
-            # Generate embeddings for the batch
             embeddings = embed_batch(texts)
             
-            # Pair project IDs with embeddings
             for project, embedding_vector in zip(batch, embeddings):
                 projects_with_embeddings.append((project['id'], embedding_vector))
             
-            # Update database with this batch
             updated = update_embeddings(database_url, [(p[0], p[1]) for p in projects_with_embeddings])
-            projects_with_embeddings = []  # Clear for next batch
+            projects_with_embeddings = [] 
             
             batch_elapsed = time.perf_counter() - batch_start
             logger.info(
@@ -194,7 +160,6 @@ def embed_projects(
             
         except Exception as e:
             logger.error(f"Error processing batch: {e}")
-            # Continue with next batch
             continue
     
     elapsed = time.perf_counter() - start_time
@@ -212,14 +177,11 @@ def embed_projects(
 
 
 if __name__ == "__main__":
-    # Can be run as a script or as a Modal function
     database_url = get_required_env("DATABASE_URL")
     
-    # Check for --refresh flag to force refresh
     force_refresh = "--refresh" in sys.argv
     max_projects = None
     
-    # Check for --max-projects argument
     if "--max-projects" in sys.argv:
         idx = sys.argv.index("--max-projects")
         if idx + 1 < len(sys.argv):

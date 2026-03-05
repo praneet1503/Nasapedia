@@ -1,10 +1,5 @@
 'use client'
-
 import { type ReactNode } from 'react'
-
-// ── Intel Card ──────────────────────────────────────────────
-// Reusable card component for intelligence modules
-
 type IntelCardProps = {
   title: string
   subtitle?: string
@@ -45,7 +40,6 @@ export function IntelCard({ title, subtitle, status, className = '', children, h
   )
 }
 
-// ── Metric Display ──────────────────────────────────────────
 
 type MetricProps = {
   label: string
@@ -83,8 +77,6 @@ export function Metric({ label, value, unit, trend, trendValue, size = 'md' }: M
   )
 }
 
-// ── Status Badge ────────────────────────────────────────────
-
 type StatusBadgeProps = {
   label: string
   variant: 'green' | 'yellow' | 'red' | 'cyan' | 'purple'
@@ -106,11 +98,9 @@ export function StatusBadge({ label, variant }: StatusBadgeProps) {
   )
 }
 
-// ── Index Gauge ─────────────────────────────────────────────
-
 type IndexGaugeProps = {
   label: string
-  value: number // 0-100
+  value: number 
   icon?: string
 }
 
@@ -143,7 +133,6 @@ export function IndexGauge({ label, value, icon }: IndexGaugeProps) {
   )
 }
 
-// ── Alert Banner ────────────────────────────────────────────
 
 type AlertBannerProps = {
   message: string
@@ -173,8 +162,6 @@ export function AlertBanner({ message, type }: AlertBannerProps) {
   )
 }
 
-// ── Loading Skeleton ────────────────────────────────────────
-
 export function IntelSkeleton({ rows = 3 }: { rows?: number }) {
   return (
     <div className="space-y-3 animate-pulse">
@@ -184,8 +171,6 @@ export function IntelSkeleton({ rows = 3 }: { rows?: number }) {
     </div>
   )
 }
-
-// ── Error State ─────────────────────────────────────────────
 
 export function IntelError({ message, onRetry }: { message: string; onRetry?: () => void }) {
   return (
@@ -202,8 +187,6 @@ export function IntelError({ message, onRetry }: { message: string; onRetry?: ()
     </div>
   )
 }
-
-// ── Section Header ──────────────────────────────────────────
 
 export function SectionHeader({ title, description }: { title: string; description?: string }) {
   return (

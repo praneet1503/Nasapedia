@@ -27,7 +27,6 @@ export function useProjects() {
 
   return {
     ...query,
-    // Default to an empty list so UIs can render safely while cache hydrates.
     projects: query.data ?? [],
   }
 }

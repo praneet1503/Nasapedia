@@ -1,6 +1,3 @@
--- 0002_add_project_clicks_and_popularity.sql
--- Adds adaptive feed support tables/columns/indexes
-
 ALTER TABLE projects
 ADD COLUMN IF NOT EXISTS popularity_score DOUBLE PRECISION NOT NULL DEFAULT 0;
 
