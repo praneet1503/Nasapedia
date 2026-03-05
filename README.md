@@ -56,3 +56,5 @@ and you are good to go!!!!!
 - you can fork the repo > make your changes > create a pull request 
 - if you have any suggestions or feedback, please feel free to open an issue or reach out to me directly on Slack.
 
+# Docs 
+refer to docs folder[here](./docs) for detailed documentation on codebase understanding,deployment, and database migrations. (if you are really trying to change the codebase for a new project or something you should read the docs or atleast let ur ai read the docs bro....)

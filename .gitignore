@@ -9,7 +9,7 @@ node_modules/
 /backend/.env
 
 # Ignore entire backend folder (untracked files only; tracked files remain until removed)
-/backend/
+
 
 /.vscode
 .DS_Store
@@ -30,7 +30,7 @@ node_modules/
 
 
 
-/.agents
+/backend/.venv311
 
 
 
