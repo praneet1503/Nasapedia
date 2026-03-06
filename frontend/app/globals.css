@@ -934,7 +934,7 @@ a {
   margin: 0;
   max-width: 13ch;
   font-size: clamp(2rem, 3vw, 3.25rem);
-  line-height: 0.95;
+  line-height: 1.15;
   letter-spacing: -0.04em;
   color: #f8fbff;
 }
@@ -1069,6 +1069,7 @@ a {
   .intel-hero__title {
     max-width: none;
     font-size: 1.8rem;
+    line-height: 1.15;
   }
 
   .intel-hero__title-chip {
