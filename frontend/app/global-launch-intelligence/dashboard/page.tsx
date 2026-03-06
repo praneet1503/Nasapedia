@@ -21,6 +21,46 @@ export default function DashboardPage() {
   if (isLoading) {
     return (
       <div className="space-y-4">
+        <section className="intel-hero">
+          <div className="intel-hero__copy">
+            <div className="intel-hero__eyebrow">Nasapedia Command Grid</div>
+            <h1 className="intel-hero__title">
+              We are the{' '}
+              <span className="intel-hero__title-chip">
+                <span className="intel-hero__title-chip-core">NEXT GEN</span>
+                <span className="intel-hero__title-chip-orbit" aria-hidden="true">◎</span>
+              </span>{' '}
+              of space data.
+            </h1>
+            <p className="intel-hero__body">
+              Our mission is to provide real-time, actionable intelligence on global space activites.
+            </p>
+            <div className="intel-hero__actions">
+              <Link href="/projects" className="space-btn space-btn-primary border-0">Open Project Atlas</Link>
+              <Link href="/feed" className="space-btn">Adaptive Feed</Link>
+              <Link href="/iss-tracker" className="space-btn">ISS Tracker</Link>
+            </div>
+          </div>
+
+          <div className="intel-hero__summary">
+            <div className="intel-hero__panel">
+              <span className="intel-hero__label">30-Day Launches</span>
+              <strong className="intel-hero__value">--</strong>
+              <span className="intel-hero__hint">syncing live feed</span>
+            </div>
+            <div className="intel-hero__panel">
+              <span className="intel-hero__label">Top Operator</span>
+              <strong className="intel-hero__value">Syncing...</strong>
+              <span className="intel-hero__hint">leaderboard in progress</span>
+            </div>
+            <div className="intel-hero__panel">
+              <span className="intel-hero__label">Regional Spikes</span>
+              <strong className="intel-hero__value">--</strong>
+              <span className="intel-hero__hint">watchlist booting</span>
+            </div>
+          </div>
+        </section>
+
         <div className="flex items-center gap-3">
           <h2 className="text-sm font-bold uppercase tracking-[0.2em] text-[var(--accent)]">Command Center</h2>
           <span className="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
