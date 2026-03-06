@@ -121,9 +121,9 @@ export default function SearchBar({
   }
 
   return (
-    <div className="space-y-3" ref={wrapperRef}>
+    <div className="search-suite" ref={wrapperRef}>
       <form
-        className="flex w-full gap-2"
+        className="search-suite__form"
         onSubmit={handleSubmit}
       >
         <div className="relative w-full">
@@ -160,7 +160,7 @@ export default function SearchBar({
           {showDropdown && suggestions.length > 0 && (
             <ul
               role="listbox"
-              className="absolute left-0 right-0 z-40 mt-2 max-h-80 overflow-y-auto overflow-x-hidden rounded-lg border shadow-xl"
+              className="search-suite__dropdown absolute left-0 right-0 z-40 mt-2 max-h-80 overflow-y-auto overflow-x-hidden rounded-lg border shadow-xl"
               style={{
                 backgroundColor: 'var(--space-surface)',
                 borderColor: 'var(--border)',
@@ -232,7 +232,7 @@ export default function SearchBar({
         </button>
       </form>
 
-      <div className="flex items-center gap-3">
+      <div className="search-suite__meta">
         <label htmlFor="search-mode" className="text-sm" style={{ color: 'var(--text-secondary)' }}>
           Search Mode:
         </label>
@@ -251,7 +251,7 @@ export default function SearchBar({
           <option value="keyword">⚡ Fast (Keyword)</option>
           <option value="semantic">🧠 Smart (Semantic)</option>
         </select>
-        <span className="text-xs" style={{ color: 'var(--text-muted)' }}>
+        <span className="search-suite__meta-copy">
           {searchType === 'semantic' 
             ? 'Meaning-based search (slower, better for intent)' 
             : 'Keyword matching (faster, precise)'}

@@ -48,31 +48,46 @@ export default function FeedPage() {
   }
 
   return (
-    <main className="mx-auto w-full max-w-5xl px-4 py-10">
-      <header className="mb-8 flex items-center justify-between gap-4 flex-wrap">
-        <div>
+    <main className="page-shell">
+      <header className="page-hero page-hero--feed">
+        <div className="page-hero__copy">
+          <div className="page-eyebrow">
+            Adaptive Feed
+            <span className="page-eyebrow__tag">Personalized ranking</span>
+          </div>
           <div className="flex items-center gap-2">
             <span className="text-2xl" aria-hidden="true">🛠️</span>
-            <h1
-              className="text-2xl font-bold tracking-tight"
-              style={{
-                background: 'linear-gradient(135deg, var(--accent), var(--secondary))',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-              }}
-            >
-              Adaptive Project Feed
-            </h1>
+            <h1 className="page-title">Adaptive Project Feed</h1>
           </div>
-          <p className="mt-1 text-sm" style={{ color: 'var(--text-secondary)' }}>
-            Personalized project feed based on popularity and freshness.
+          <p className="page-subtitle">
+            Personalized project sequencing tuned around popularity, freshness, and your active visitor profile so the highest-signal missions surface first.
           </p>
         </div>
 
-        <TopNav />
+        <div className="page-hero__rail">
+          <TopNav />
+
+          <div className="page-hero__stats">
+            <div className="page-stat">
+              <span className="page-stat__label">Profile state</span>
+              <strong className="page-stat__value">{visitorUuid ? 'Synced' : 'Booting'}</strong>
+              <span className="page-stat__hint">personal signal fingerprint</span>
+            </div>
+            <div className="page-stat">
+              <span className="page-stat__label">Visible missions</span>
+              <strong className="page-stat__value">{projects.length || '—'}</strong>
+              <span className="page-stat__hint">current page density</span>
+            </div>
+            <div className="page-stat">
+              <span className="page-stat__label">Ranking mode</span>
+              <strong className="page-stat__value">Adaptive</strong>
+              <span className="page-stat__hint">freshness + popularity blend</span>
+            </div>
+          </div>
+        </div>
       </header>
 
-      <section>
+      <section className="page-section">
         {errorMessage ? (
           <div className="rounded-xl p-4 text-sm" style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)', color: '#fca5a5' }}>{errorMessage}</div>
         ) : null}
@@ -82,17 +97,17 @@ export default function FeedPage() {
         ) : (
           <>
             {projects.length === 0 && !errorMessage ? (
-              <div className="space-glass p-6 text-center">
+              <div className="surface-panel surface-panel--empty text-center">
                 <span className="text-3xl">&#x1F30C;</span>
                 <p className="mt-2 text-sm" style={{ color: 'var(--text-secondary)' }}>No feed projects in this sector.</p>
               </div>
             ) : null}
 
             {projects.length > 0 ? (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>📡 Recommended Missions</h2>
-                  <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
+              <div className="space-y-5">
+                <div className="section-heading-row">
+                  <h2 className="section-title">📡 Recommended Missions</h2>
+                  <p className="section-meta">
                     Showing {projects.length} of {totalCount} projects
                   </p>
                 </div>

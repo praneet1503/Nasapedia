@@ -44,8 +44,8 @@ export default function IntelligenceLayout({ children }: { children: ReactNode }
     <div className="min-h-screen flex flex-col">
       <header className="intel-topbar">
         <div className="flex items-center gap-3">
-          <Link href="/" className="text-[var(--text-muted)] hover:text-[var(--accent)] transition-colors text-xs">
-            ← NASAPEDIA
+          <Link href="/" className="intel-brand-link">
+            NASAPEDIA
           </Link>
           <div className="w-px h-4 bg-[var(--border)]" />
           <h1 className="text-xs font-bold uppercase tracking-[0.25em] text-[var(--accent)]">
@@ -56,6 +56,11 @@ export default function IntelligenceLayout({ children }: { children: ReactNode }
           </span>
         </div>
         <div className="flex items-center gap-4">
+          <div className="hidden lg:flex items-center gap-2">
+            <Link href="/projects" className="intel-topbar-link">Project Atlas</Link>
+            <Link href="/feed" className="intel-topbar-link">Adaptive Feed</Link>
+            <Link href="/iss-tracker" className="intel-topbar-link">ISS Tracker</Link>
+          </div>
           <MissionClock />
         </div>
       </header>

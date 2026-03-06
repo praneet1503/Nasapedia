@@ -21,9 +21,9 @@ export default function Filters({
   onChange,
 }: FiltersProps) {
   return (
-    <div className="grid grid-cols-1 gap-3 md:grid-cols-4">
-      <div>
-        <label className="block text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>TRL min</label>
+    <div className="filter-grid">
+      <div className="filter-field">
+        <label className="filter-label">TRL min</label>
         <input
           inputMode="numeric"
           value={trlMin}
@@ -33,8 +33,8 @@ export default function Filters({
         />
       </div>
 
-      <div>
-        <label className="block text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>TRL max</label>
+      <div className="filter-field">
+        <label className="filter-label">TRL max</label>
         <input
           inputMode="numeric"
           value={trlMax}
@@ -44,8 +44,8 @@ export default function Filters({
         />
       </div>
 
-      <div>
-        <label className="block text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>Organization</label>
+      <div className="filter-field">
+        <label className="filter-label">Organization</label>
         <input
           value={organization}
           onChange={(e) => onChange({ organization: e.target.value })}
@@ -54,8 +54,8 @@ export default function Filters({
         />
       </div>
 
-      <div>
-        <label className="block text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>Technology area</label>
+      <div className="filter-field">
+        <label className="filter-label">Technology area</label>
         <input
           value={technologyArea}
           onChange={(e) => onChange({ technologyArea: e.target.value })}

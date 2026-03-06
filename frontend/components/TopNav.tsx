@@ -1,28 +1,34 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+
+const NAV_ITEMS = [
+  { href: '/', label: 'Command Center', icon: '◆', match: (pathname: string) => pathname === '/' || pathname.startsWith('/global-launch-intelligence') },
+  { href: '/projects', label: 'Project Atlas', icon: '◌', match: (pathname: string) => pathname === '/projects' || pathname.startsWith('/project/') },
+  { href: '/feed', label: 'Adaptive Feed', icon: '↗', match: (pathname: string) => pathname.startsWith('/feed') },
+  { href: '/iss-tracker', label: 'ISS Tracker', icon: '◎', match: (pathname: string) => pathname.startsWith('/iss-tracker') },
+]
 
 export default function TopNav() {
-  const router = useRouter()
+  const pathname = usePathname()
 
   return (
-    <div className="ml-2 flex gap-2">
-      <button type="button" onClick={() => router.push('/')} className="space-btn text-sm">
-        🌍 All Projects
-      </button>
+    <nav className="space-nav" aria-label="Primary">
+      {NAV_ITEMS.map((item) => {
+        const isActive = item.match(pathname)
 
-      <button type="button" onClick={() => router.push('/feed')} className="space-btn text-sm">
-        🛠️ View Feed
-      </button>
-
-      <button type="button" onClick={() => router.push('/iss-tracker')} className="space-btn text-sm">
-        🛰️ ISS Tracker
-      </button>
-
-      <button type="button" onClick={() => router.push('/global-launch-intelligence')} className="space-btn text-sm">
-        🌐 Global Launch Intelligence
-      </button>
-
-    </div>
+        return (
+          <Link
+            key={item.href}
+            href={item.href}
+            className={`space-nav-link ${isActive ? 'space-nav-link-active' : ''}`}
+          >
+            <span className="space-nav-link-icon" aria-hidden="true">{item.icon}</span>
+            <span>{item.label}</span>
+          </Link>
+        )
+      })}
+    </nav>
   )
 }

@@ -8,7 +8,7 @@ type ProjectListProps = {
 
 export default function ProjectList({ projects, onProjectClick }: ProjectListProps) {
   return (
-    <div className="grid grid-cols-1 gap-3">
+    <div className="project-list">
       {projects.map((p) => (
         <ProjectCard key={p.id} project={p} onProjectClick={onProjectClick} />
       ))}

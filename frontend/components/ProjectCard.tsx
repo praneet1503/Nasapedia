@@ -32,24 +32,28 @@ export default function ProjectCard({ project, onProjectClick }: ProjectCardProp
     <Link
       href={`/project/${project.id}`}
       onClick={() => onProjectClick?.(project.id)}
-      className="block space-card p-4"
+      className="project-card"
     >
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="text-base" aria-hidden="true">{statusIcon(project.status)}</span>
-          <h3 className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>{project.title}</h3>
+      <div className="project-card__header">
+        <div className="project-card__lead">
+          <span className="project-card__icon" aria-hidden="true">{statusIcon(project.status)}</span>
+          <div className="project-card__title-group">
+            <span className="project-card__eyebrow">{valueOrDash(project.organization)}</span>
+            <h3 className="project-card__title">{project.title}</h3>
+          </div>
+        </div>
 
+        <div className="project-card__badges">
           {typeof project.popularity_score !== 'undefined' && project.popularity_score > 0 ? (
             <span
-              className="shrink-0 flex items-center gap-1 rounded-full px-2 py-0.5 text-xs"
-              style={{ background: 'rgba(245,158,11,0.12)', color: '#fcd34d', border: '1px solid rgba(245,158,11,0.2)' }}
+              className="project-card__signal"
               aria-label={`popularity ${project.popularity_score}`}
               title={`Click count: ${Math.round(project.popularity_score)}`}
             >
               <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M12 .587l3.668 7.431L23.5 9.75l-5.5 5.36L19.335 24 12 20.013 4.665 24 6 15.11 0.5 9.75l7.832-1.732z" />
               </svg>
-              {Math.round(project.popularity_score)}
+              {Math.round(project.popularity_score)} signal
             </span>
           ) : null}
 
@@ -60,21 +64,23 @@ export default function ProjectCard({ project, onProjectClick }: ProjectCardProp
       </div>
 
       {project.description ? (
-        <p className="mt-2 line-clamp-3 text-sm" style={{ color: 'var(--text-secondary)' }}>{project.description}</p>
+        <p className="project-card__description">{project.description}</p>
       ) : (
-        <p className="mt-2 text-sm" style={{ color: 'var(--text-muted)' }}>No telemetry data available.</p>
+        <p className="project-card__description project-card__description-muted">No telemetry data available.</p>
       )}
 
-      <div className="mt-3 grid grid-cols-1 gap-1 text-xs md:grid-cols-3" style={{ color: 'var(--text-muted)' }}>
-        <div>
-          <span className="font-medium" style={{ color: 'var(--text-secondary)' }}>Org:</span> {valueOrDash(project.organization)}
+      <div className="project-card__meta-grid">
+        <div className="project-card__meta-item">
+          <span className="project-card__meta-label">Organization</span>
+          <span className="project-card__meta-value">{valueOrDash(project.organization)}</span>
         </div>
-        <div>
-          <span className="font-medium" style={{ color: 'var(--text-secondary)' }}>Area:</span>{' '}
-          {valueOrDash(project.technology_area)}
+        <div className="project-card__meta-item">
+          <span className="project-card__meta-label">Technology area</span>
+          <span className="project-card__meta-value">{valueOrDash(project.technology_area)}</span>
         </div>
-        <div>
-          <span className="font-medium" style={{ color: 'var(--text-secondary)' }}>Status:</span> {valueOrDash(project.status)}
+        <div className="project-card__meta-item">
+          <span className="project-card__meta-label">Mission state</span>
+          <span className="project-card__meta-value">{valueOrDash(project.status)}</span>
         </div>
       </div>
     </Link>

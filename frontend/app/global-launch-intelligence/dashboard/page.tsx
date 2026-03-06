@@ -51,6 +51,46 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-4">
+      <section className="intel-hero">
+        <div className="intel-hero__copy">
+          <div className="intel-hero__eyebrow">Nasapedia Command Grid</div>
+          <h1 className="intel-hero__title">
+            We are the{' '}
+            <span className="intel-hero__title-chip">
+              <span className="intel-hero__title-chip-core">NEXT GEN</span>
+              <span className="intel-hero__title-chip-orbit" aria-hidden="true">◎</span>
+            </span>{' '}
+            of space data.
+          </h1>
+          <p className="intel-hero__body">
+            Our mission is to provide real-time, actionable intelligence on global space activites.
+          </p>
+          <div className="intel-hero__actions">
+            <Link href="/projects" className="space-btn space-btn-primary border-0">Open Project Atlas</Link>
+            <Link href="/feed" className="space-btn">Adaptive Feed</Link>
+            <Link href="/iss-tracker" className="space-btn">ISS Tracker</Link>
+          </div>
+        </div>
+
+        <div className="intel-hero__summary">
+          <div className="intel-hero__panel">
+            <span className="intel-hero__label">30-Day Launches</span>
+            <strong className="intel-hero__value">{velocity.launches_30d}</strong>
+            <span className="intel-hero__hint">live cadence snapshot</span>
+          </div>
+          <div className="intel-hero__panel">
+            <span className="intel-hero__label">Top Operator</span>
+            <strong className="intel-hero__value">{agencies.top_5[0]?.name ?? 'N/A'}</strong>
+            <span className="intel-hero__hint">current leaderboard lead</span>
+          </div>
+          <div className="intel-hero__panel">
+            <span className="intel-hero__label">Regional Spikes</span>
+            <strong className="intel-hero__value">{geopolitics.regional_spikes.length}</strong>
+            <span className="intel-hero__hint">watchlist signals</span>
+          </div>
+        </div>
+      </section>
+
       {indices.surge_detected && (
         <AlertBanner type="surge" message={`HIGH ACTIVITY PHASE — ${velocity.launches_30d} launches in 30 days`} />
       )}
