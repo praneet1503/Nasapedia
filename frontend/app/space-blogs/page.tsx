@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 import LoadingState from '../../components/LoadingState'
-import TopNav from '../../components/TopNav'
 import LoadMoreButton from '../../components/news/LoadMoreButton'
 import NewsGrid from '../../components/news/NewsGrid'
 import SectionHeader from '../../components/news/SectionHeader'
@@ -71,39 +70,7 @@ export default function SpaceBlogsPage() {
   const hasError = blogsQuery.isError && articlesQuery.isError
 
   return (
-    <main className="page-shell">
-      <header className="page-hero page-hero--blogs">
-        <div className="page-hero__copy">
-          <div className="page-eyebrow">
-            Space Blogs
-            <span className="page-eyebrow__tag">Expert analysis</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-2xl" aria-hidden="true">✍️</span>
-            <h1 className="page-title">Space Blogs &amp; Articles</h1>
-          </div>
-          <p className="page-subtitle">
-            Expert blogs and analysis about space exploration and astronomy from across the industry.
-          </p>
-        </div>
-
-        <div className="page-hero__rail">
-          <TopNav />
-          <div className="page-hero__stats">
-            <div className="page-stat">
-              <span className="page-stat__label">Blogs loaded</span>
-              <strong className="page-stat__value">{blogItems.length || '—'}</strong>
-              <span className="page-stat__hint">expert perspectives</span>
-            </div>
-            <div className="page-stat">
-              <span className="page-stat__label">Articles loaded</span>
-              <strong className="page-stat__value">{articleItems.length || '—'}</strong>
-              <span className="page-stat__hint">news coverage</span>
-            </div>
-          </div>
-        </div>
-      </header>
-
+    <main className="page-shell pt-10">
       <section className="page-section">
         {hasError ? (
           <div

@@ -7,7 +7,7 @@ import {
 } from 'recharts'
 
 const CATEGORY_COLORS = [
-  '#00d4ff', '#a855f7', '#f59e0b', '#22c55e', '#ef4444',
+  '#f2c40d', '#c58b2f', '#f59e0b', '#22c55e', '#ef4444',
   '#6366f1', '#ec4899', '#14b8a6', '#f97316', '#8b5cf6',
 ]
 
@@ -86,8 +86,8 @@ export default function MissionClassificationPage() {
                 />
                 <Tooltip
                   contentStyle={{
-                    background: '#1a1f2e',
-                    border: '1px solid rgba(0,212,255,0.2)',
+                    background: '#221e10',
+                    border: '1px solid rgba(242,196,13,0.2)',
                     borderRadius: '8px',
                     fontSize: 11,
                     color: '#e2e8f0',
@@ -119,8 +119,8 @@ export default function MissionClassificationPage() {
                 />
                 <Tooltip
                   contentStyle={{
-                    background: '#1a1f2e',
-                    border: '1px solid rgba(0,212,255,0.2)',
+                    background: '#221e10',
+                    border: '1px solid rgba(242,196,13,0.2)',
                     borderRadius: '8px',
                     fontSize: 11,
                     color: '#e2e8f0',

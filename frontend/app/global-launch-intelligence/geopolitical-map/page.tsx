@@ -6,7 +6,7 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell,
 } from 'recharts'
 
-const BAR_COLORS = ['#00d4ff', '#a855f7', '#f59e0b', '#22c55e', '#ef4444', '#6366f1', '#ec4899', '#14b8a6', '#f97316', '#84cc16']
+const BAR_COLORS = ['#f2c40d', '#c58b2f', '#f59e0b', '#22c55e', '#ef4444', '#6366f1', '#ec4899', '#14b8a6', '#f97316', '#84cc16']
 
 export default function GeopoliticalMapPage() {
   const { data, isLoading, error, refetch } = useGeopoliticalData()
@@ -74,8 +74,8 @@ export default function GeopoliticalMapPage() {
                 />
                 <Tooltip
                   contentStyle={{
-                    background: '#1a1f2e',
-                    border: '1px solid rgba(0,212,255,0.2)',
+                    background: '#221e10',
+                    border: '1px solid rgba(242,196,13,0.2)',
                     borderRadius: '8px',
                     fontSize: 11,
                     color: '#e2e8f0',

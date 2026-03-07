@@ -60,8 +60,8 @@ export default function IssMap({ latitude, longitude, altitudeKm, focusSignal, f
     if (footprintRadiusMeters) {
       circleRef.current = L.circle(center, {
         radius: footprintRadiusMeters,
-        color: '#00d4ff',
-        fillColor: '#00d4ff',
+        color: '#f2c40d',
+        fillColor: '#f2c40d',
         fillOpacity: 0.15,
         weight: 1,
       }).addTo(map)
@@ -91,8 +91,8 @@ export default function IssMap({ latitude, longitude, altitudeKm, focusSignal, f
       if (!circleRef.current) {
         circleRef.current = L.circle(center, {
           radius: footprintRadiusMeters,
-          color: '#00d4ff',
-          fillColor: '#00d4ff',
+          color: '#f2c40d',
+          fillColor: '#f2c40d',
           fillOpacity: 0.15,
           weight: 1,
         }).addTo(map)

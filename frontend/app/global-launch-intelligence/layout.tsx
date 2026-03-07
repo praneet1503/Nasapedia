@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { type ReactNode, useState, useEffect } from 'react'
+import { type ReactNode, useState } from 'react'
 
 const NAV_ITEMS = [
   { href: '/global-launch-intelligence/dashboard', label: 'COMMAND CENTER', icon: '◆' },
@@ -15,58 +15,12 @@ const NAV_ITEMS = [
   { href: '/global-launch-intelligence/geopolitical-map', label: 'GEO MAP', icon: '⊕' },
 ]
 
-function MissionClock() {
-  const [time, setTime] = useState('')
-
-  useEffect(() => {
-    const tick = () => {
-      const now = new Date()
-      setTime(now.toISOString().replace('T', ' ').slice(0, 19) + ' UTC')
-    }
-    tick()
-    const id = setInterval(tick, 1000)
-    return () => clearInterval(id)
-  }, [])
-
-  return (
-    <span className="font-mono text-[11px] tracking-[0.12em] text-red-400"
-      style={{ textShadow: '0 0 6px rgba(255,30,30,0.5)' }}>
-      {time}
-    </span>
-  )
-}
-
 export default function IntelligenceLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname()
   const [collapsed, setCollapsed] = useState(false)
 
   return (
     <div className="min-h-screen flex flex-col">
-      <header className="intel-topbar">
-        <div className="flex items-center gap-3">
-          <Link href="/" className="intel-brand-link">
-            NASAPEDIA
-          </Link>
-          <div className="w-px h-4 bg-[var(--border)]" />
-          <h1 className="text-xs font-bold uppercase tracking-[0.25em] text-[var(--accent)]">
-            Global Launch Intelligence
-          </h1>
-          <span className="hidden sm:inline-block px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-emerald-500/15 text-emerald-400 border border-emerald-500/25">
-            LIVE
-          </span>
-        </div>
-        <div className="flex items-center gap-4">
-          <div className="hidden lg:flex items-center gap-2">
-            <Link href="/projects" className="intel-topbar-link">Project Atlas</Link>
-            <Link href="/feed" className="intel-topbar-link">Adaptive Feed</Link>
-            <Link href="/space-news" className="intel-topbar-link">Space News</Link>
-            <Link href="/space-blogs" className="intel-topbar-link">Articles &amp; Blogs</Link>
-            <Link href="/iss-tracker" className="intel-topbar-link">ISS Tracker</Link>
-          </div>
-          <MissionClock />
-        </div>
-      </header>
-
       <div className="flex flex-1">
         <nav className={`intel-sidebar ${collapsed ? 'intel-sidebar-collapsed' : ''}`}>
           <button

@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation'
 import LoadingState from '../../components/LoadingState'
 import Pagination from '../../components/Pagination'
 import ProjectList from '../../components/ProjectList'
-import TopNav from '../../components/TopNav'
 import { useAdaptiveFeedPaginated } from '../../hooks/useAdaptiveFeedPaginated'
 import { recordProjectClick } from '../../lib/api'
 import { getOrCreateVisitorUuid } from '../../lib/visitor'
@@ -48,45 +47,7 @@ export default function FeedPage() {
   }
 
   return (
-    <main className="page-shell">
-      <header className="page-hero page-hero--feed">
-        <div className="page-hero__copy">
-          <div className="page-eyebrow">
-            Adaptive Feed
-            <span className="page-eyebrow__tag">Personalized ranking</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-2xl" aria-hidden="true">🛠️</span>
-            <h1 className="page-title">Adaptive Project Feed</h1>
-          </div>
-          <p className="page-subtitle">
-            Personalized project sequencing tuned around popularity, freshness, and your active visitor profile so the highest-signal missions surface first.
-          </p>
-        </div>
-
-        <div className="page-hero__rail">
-          <TopNav />
-
-          <div className="page-hero__stats">
-            <div className="page-stat">
-              <span className="page-stat__label">Profile state</span>
-              <strong className="page-stat__value">{visitorUuid ? 'Synced' : 'Booting'}</strong>
-              <span className="page-stat__hint">personal signal fingerprint</span>
-            </div>
-            <div className="page-stat">
-              <span className="page-stat__label">Visible missions</span>
-              <strong className="page-stat__value">{projects.length || '—'}</strong>
-              <span className="page-stat__hint">current page density</span>
-            </div>
-            <div className="page-stat">
-              <span className="page-stat__label">Ranking mode</span>
-              <strong className="page-stat__value">Adaptive</strong>
-              <span className="page-stat__hint">freshness + popularity blend</span>
-            </div>
-          </div>
-        </div>
-      </header>
-
+    <main className="page-shell pt-10">
       <section className="page-section">
         {errorMessage ? (
           <div className="rounded-xl p-4 text-sm" style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)', color: '#fca5a5' }}>{errorMessage}</div>

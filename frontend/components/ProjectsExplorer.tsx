@@ -6,7 +6,6 @@ import LoadingState from '../components/LoadingState'
 import Pagination from '../components/Pagination'
 import ProjectList from '../components/ProjectList'
 import SearchBar from '../components/SearchBar'
-import TopNav from '../components/TopNav'
 import { useProjectsPaginated } from '../hooks/useProjectsPaginated'
 
 const DEFAULT_ORDER = 'popularity'
@@ -116,49 +115,6 @@ export default function ProjectsExplorer() {
 
   return (
     <main className="page-shell">
-      <header className="page-hero page-hero--atlas">
-        <div className="page-hero__copy">
-          <div className="page-eyebrow">
-            Project Atlas
-            <span className="page-eyebrow__tag">Search Grid</span>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <span className="text-3xl" aria-hidden="true">🚀</span>
-            <div>
-              <h1 className="page-title">Nasapedia Mission Atlas</h1>
-              <p className="page-kicker">TECHNOLOGY DATABASE · CLEAN SEARCH FLOW · LIVE INTEL ACCESS</p>
-            </div>
-          </div>
-
-          <p className="page-subtitle">
-            Search Nasapedia projects by keyword, TRL, organization, and technology area, then pivot into the live command center when you need orbital intelligence.
-          </p>
-        </div>
-
-        <div className="page-hero__rail">
-          <TopNav />
-        </div>
-
-        <div className="page-hero__stats page-hero__stats--atlas">
-          <div className="page-stat">
-            <span className="page-stat__label">Catalog size</span>
-            <strong className="page-stat__value">{totalCount || '20K+'}</strong>
-            <span className="page-stat__hint">mission records online</span>
-          </div>
-          <div className="page-stat">
-            <span className="page-stat__label">Search mode</span>
-            <strong className="page-stat__value">{searchType === 'semantic' ? 'Smart' : 'Fast'}</strong>
-            <span className="page-stat__hint">{searchType === 'semantic' ? 'semantic intent routing' : 'keyword-first scan'}</span>
-          </div>
-          <div className="page-stat">
-            <span className="page-stat__label">Active filters</span>
-            <strong className="page-stat__value">{activeFilterCount}</strong>
-            <span className="page-stat__hint">refining the mission stream</span>
-          </div>
-        </div>
-      </header>
-
       <div className="surface-panel surface-panel--search">
         <SearchBar
           value={q}

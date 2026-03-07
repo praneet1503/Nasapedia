@@ -54,7 +54,10 @@ export default function NewsCard({ item, onItemClick, contentType = 'article' }:
       <div className="news-card__body">
         <h3 className="news-card__title">{item.title}</h3>
         {item.summary ? (
-          <p className="news-card__summary">{item.summary}</p>
+          <>
+            <p className="news-card__summary">{item.summary}</p>
+            <div className="news-card__readmore">READ MORE</div>
+          </>
         ) : null}
         <div className="news-card__footer">
           <time className="news-card__date" dateTime={item.published_at}>

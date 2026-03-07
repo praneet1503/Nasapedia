@@ -89,8 +89,8 @@ export default function LaunchVelocityPage() {
             <AreaChart data={data.daily_timeline}>
               <defs>
                 <linearGradient id="velocityGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#00d4ff" stopOpacity={0.3} />
-                  <stop offset="95%" stopColor="#00d4ff" stopOpacity={0} />
+                  <stop offset="5%" stopColor="#f2c40d" stopOpacity={0.3} />
+                  <stop offset="95%" stopColor="#f2c40d" stopOpacity={0} />
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(148,163,184,0.08)" />
@@ -107,8 +107,8 @@ export default function LaunchVelocityPage() {
               />
               <Tooltip
                 contentStyle={{
-                  background: '#1a1f2e',
-                  border: '1px solid rgba(0,212,255,0.2)',
+                  background: '#221e10',
+                  border: '1px solid rgba(242,196,13,0.2)',
                   borderRadius: '8px',
                   fontSize: 11,
                   color: '#e2e8f0',
@@ -117,11 +117,11 @@ export default function LaunchVelocityPage() {
               <Area
                 type="monotone"
                 dataKey="launches"
-                stroke="#00d4ff"
+                stroke="#f2c40d"
                 strokeWidth={2}
                 fill="url(#velocityGrad)"
                 dot={false}
-                activeDot={{ r: 4, stroke: '#00d4ff', strokeWidth: 2, fill: '#1a1f2e' }}
+                activeDot={{ r: 4, stroke: '#f2c40d', strokeWidth: 2, fill: '#221e10' }}
               />
             </AreaChart>
           </ResponsiveContainer>

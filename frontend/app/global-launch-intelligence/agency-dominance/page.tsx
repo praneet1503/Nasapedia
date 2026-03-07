@@ -8,7 +8,7 @@ import {
   PieChart, Pie,
 } from 'recharts'
 
-const BAR_COLORS = ['#00d4ff', '#a855f7', '#f59e0b', '#22c55e', '#ef4444', '#6366f1', '#ec4899']
+const BAR_COLORS = ['#f2c40d', '#c58b2f', '#f59e0b', '#22c55e', '#ef4444', '#6366f1', '#ec4899']
 
 export default function AgencyDominancePage() {
   const [days, setDays] = useState(90)
@@ -28,8 +28,8 @@ export default function AgencyDominancePage() {
   }
 
   const pieData = [
-    { name: 'State', value: data.state_launches, fill: '#a855f7' },
-    { name: 'Private', value: data.private_launches, fill: '#00d4ff' },
+    { name: 'State', value: data.state_launches, fill: '#c58b2f' },
+    { name: 'Private', value: data.private_launches, fill: '#f2c40d' },
   ]
 
   return (
@@ -86,8 +86,8 @@ export default function AgencyDominancePage() {
                 />
                 <Tooltip
                   contentStyle={{
-                    background: '#1a1f2e',
-                    border: '1px solid rgba(0,212,255,0.2)',
+                    background: '#221e10',
+                    border: '1px solid rgba(242,196,13,0.2)',
                     borderRadius: '8px',
                     fontSize: 11,
                     color: '#e2e8f0',
@@ -127,8 +127,8 @@ export default function AgencyDominancePage() {
                 </Pie>
                 <Tooltip
                   contentStyle={{
-                    background: '#1a1f2e',
-                    border: '1px solid rgba(0,212,255,0.2)',
+                    background: '#221e10',
+                    border: '1px solid rgba(242,196,13,0.2)',
                     borderRadius: '8px',
                     fontSize: 11,
                     color: '#e2e8f0',

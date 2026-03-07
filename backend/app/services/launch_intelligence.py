@@ -410,14 +410,14 @@ def compute_mission_classification(previous: List[Dict], upcoming: List[Dict]) -
         mission = launch.get("mission") or {}
         mission_type = mission.get("type", "Unknown")
         if not mission_type:
-            mission_type = "Unknown"
+            mission_type = _safe_str(launch, "mission", "type", default="Unknown")
         category_counts[mission_type] += 1
 
     for launch in recent:
         mission = launch.get("mission") or {}
         mission_type = mission.get("type", "Unknown")
         if not mission_type:
-            mission_type = "Unknown"
+            mission_type = _safe_str(launch, "mission", "type", default="Unknown")
         recent_category[mission_type] += 1
 
     total = sum(category_counts.values()) or 1
@@ -435,14 +435,18 @@ def compute_mission_classification(previous: List[Dict], upcoming: List[Dict]) -
         })
 
     # Military flag
-    military_recent = recent_category.get("Government/Top Secret", 0) + recent_category.get("Military", 0)
-    military_escalation = military_recent / recent_total > 0.25 if recent_total > 0 else False
+    military_recent = recent_category.get("Government/Top Secret", 0) + \
+                      recent_category.get("Military", 0) + \
+                      recent_category.get("Defense", 0) + \
+                      recent_category.get("National Security", 0)
+    military_escalation = military_recent / recent_total > 0.15 if recent_total > 0 else False
 
     # Emerging category: any category with >50% more launches in 30d vs average
     emerging = []
+    days_previous = max(len(previous) / 1, 1) # Fallback if time units are weird
     for cat in categories:
-        expected_monthly = cat["total"] / max(len(previous) / 30, 1) * 30
-        if expected_monthly > 0 and cat["recent_30d"] > expected_monthly * 1.5:
+        # Simple heuristic: if recent 30d is more than 40% of their total history (which covers 100+ launches, usually ~6-12 months)
+        if cat["total"] > 5 and cat["recent_30d"] > (cat["total"] * 0.4):
             emerging.append(cat["name"])
 
     return {
@@ -467,7 +471,9 @@ def compute_astronaut_activity(
     active_astronauts = []
 
     for astro in astronauts:
-        agency = _safe_str(astro, "agency", "name")
+        # Some are in training status but fetch_astronauts filters by status 1 (Active)
+        # However, the nested agency object can be None or missing name
+        agency = _safe_str(astro, "agency", "name", default="Independent / Other")
         agency_count[agency] += 1
         active_astronauts.append({
             "name": astro.get("name", "Unknown"),
@@ -480,10 +486,17 @@ def compute_astronaut_activity(
     # Crewed upcoming missions
     crewed_launches = []
     for launch in upcoming:
+        name = (launch.get("name") or "").lower()
         mission = launch.get("mission") or {}
         mission_type = (mission.get("type") or "").lower()
-        # Check if human spaceflight
-        if "human" in mission_type or "crew" in mission_type or "spaceflight" in mission_type:
+        mission_desc = (mission.get("description") or "").lower()
+
+        # Robust human spaceflight detection
+        is_crewed = any(k in mission_type for k in ("human", "crew", "spaceflight")) or \
+                     any(k in mission_desc for k in ("crew", "astronaut", "passengers")) or \
+                     any(k in name for k in ("crew-", "axiom", "polaris", "soyuz ms-"))
+
+        if is_crewed:
             crewed_launches.append({
                 "name": launch.get("name", "Unknown"),
                 "net": launch.get("net"),
@@ -493,12 +506,15 @@ def compute_astronaut_activity(
                 "mission": mission.get("name", "Unknown"),
             })
 
+    # Sort astronauts by flight count to show most experienced first in roster
+    active_astronauts.sort(key=lambda x: x["flights_count"], reverse=True)
+
     agency_breakdown = [{"agency": k, "count": v} for k, v in agency_count.most_common(10)]
 
     return {
         "total_active": len(active_astronauts),
         "agency_breakdown": agency_breakdown,
-        "astronauts": active_astronauts[:30],  # top 30
+        "astronauts": active_astronauts[:100],  # Increase to 100
         "upcoming_crewed_missions": crewed_launches,
         "human_activity_index": min(len(crewed_launches) * 15 + len(active_astronauts), 100),
     }
@@ -515,15 +531,26 @@ def compute_station_traffic(stations: List[Dict]) -> Dict[str, Any]:
     total_docked = 0
 
     for station in stations:
-        status = _safe_str(station, "status", "name")
+        status_raw = _safe_str(station, "status", "name", default="Active")
+        # Handle LL2 names like "De-Orbited" or "Active"
+        status = status_raw if status_raw else "Active"
+        
         docked_vehicles = station.get("docked_vehicles") or []
         spacecraft_count = len(docked_vehicles)
         total_docked += spacecraft_count
 
         vehicles = []
         for dv in docked_vehicles:
+            v_name = "Unknown Vehicle"
+            if dv.get("spacecraft_flight") and dv["spacecraft_flight"].get("spacecraft"):
+                v_name = dv["spacecraft_flight"]["spacecraft"].get("name", "Unknown")
+            elif dv.get("flight_vehicle") and dv["flight_vehicle"].get("spacecraft"):
+                v_name = dv["flight_vehicle"]["spacecraft"].get("name", "Unknown")
+            elif dv.get("spacecraft"):
+                v_name = dv["spacecraft"].get("name", "Unknown")
+
             vehicles.append({
-                "name": _safe_str(dv, "spacecraft", "name") if dv.get("spacecraft") else _safe_str(dv, "flight_vehicle", "spacecraft", "name"),
+                "name": v_name,
                 "docking_date": dv.get("docking"),
                 "departure_date": dv.get("departure"),
             })
@@ -531,7 +558,7 @@ def compute_station_traffic(stations: List[Dict]) -> Dict[str, Any]:
         station_data.append({
             "name": station.get("name", "Unknown"),
             "status": status,
-            "orbit": _safe_str(station, "orbit"),
+            "orbit": _safe_str(station, "orbit", default="Low Earth Orbit"),
             "founded": station.get("founded"),
             "owners": [_safe_str(o, "name") for o in (station.get("owners") or [])],
             "docked_vehicles": vehicles,
@@ -539,8 +566,12 @@ def compute_station_traffic(stations: List[Dict]) -> Dict[str, Any]:
             "image_url": station.get("image_url"),
         })
 
+    # Sort stations to put active ones at top (ISS, Tiangong usually)
+    active_statuses = ("active", "de-orbited", "functional")
+    station_data.sort(key=lambda s: s["status"].lower() in active_statuses, reverse=True)
+
     return {
-        "active_stations": [s for s in station_data if s["status"].lower() in ("active", "de-orbited", "")],
+        "active_stations": [s for s in station_data if s["status"].lower() in active_statuses],
         "all_stations": station_data,
         "total_stations": len(station_data),
         "total_docked_vehicles": total_docked,

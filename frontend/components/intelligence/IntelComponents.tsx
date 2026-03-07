@@ -13,7 +13,7 @@ const STATUS_COLORS = {
   nominal: 'bg-emerald-500',
   warning: 'bg-amber-500',
   critical: 'bg-red-500',
-  info: 'bg-cyan-500',
+  info: 'bg-amber-500',
 }
 
 export function IntelCard({ title, subtitle, status, className = '', children, headerRight }: IntelCardProps) {
@@ -22,7 +22,7 @@ export function IntelCard({ title, subtitle, status, className = '', children, h
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           {status && (
-            <span className={`w-2 h-2 rounded-full ${STATUS_COLORS[status]} shadow-[0_0_6px] ${status === 'nominal' ? 'shadow-emerald-500/50' : status === 'warning' ? 'shadow-amber-500/50' : status === 'critical' ? 'shadow-red-500/50' : 'shadow-cyan-500/50'}`} />
+            <span className={`w-2 h-2 rounded-full ${STATUS_COLORS[status]} shadow-[0_0_6px] ${status === 'nominal' ? 'shadow-emerald-500/50' : status === 'warning' ? 'shadow-amber-500/50' : status === 'critical' ? 'shadow-red-500/50' : 'shadow-amber-500/50'}`} />
           )}
           <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-[var(--text-secondary)]">
             {title}
@@ -79,14 +79,14 @@ export function Metric({ label, value, unit, trend, trendValue, size = 'md' }: M
 
 type StatusBadgeProps = {
   label: string
-  variant: 'green' | 'yellow' | 'red' | 'cyan' | 'purple'
+  variant: 'green' | 'yellow' | 'red' | 'gold' | 'purple'
 }
 
 const BADGE_STYLES = {
   green: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/25',
   yellow: 'bg-amber-500/15 text-amber-400 border-amber-500/25',
   red: 'bg-red-500/15 text-red-400 border-red-500/25',
-  cyan: 'bg-cyan-500/15 text-cyan-400 border-cyan-500/25',
+  gold: 'bg-amber-500/15 text-amber-400 border-amber-500/25',
   purple: 'bg-purple-500/15 text-purple-400 border-purple-500/25',
 }
 
@@ -142,7 +142,7 @@ type AlertBannerProps = {
 const ALERT_STYLES = {
   surge: 'border-amber-500/30 bg-amber-500/8 text-amber-300',
   escalation: 'border-red-500/30 bg-red-500/8 text-red-300',
-  expansion: 'border-cyan-500/30 bg-cyan-500/8 text-cyan-300',
+  expansion: 'border-amber-500/30 bg-amber-500/8 text-amber-300',
   info: 'border-[var(--border)] bg-[var(--space-surface)] text-[var(--text-secondary)]',
 }
 

@@ -7,21 +7,21 @@ export default {
     extend: {
       colors: {
         space: {
-          void: '#06080f',
-          deep: '#0a0e1a',
-          mid: '#111827',
-          surface: '#1a1f2e',
-          elevated: '#232a3b',
+          void: '#0c0a04',
+          deep: '#141008',
+          mid: '#1a1610',
+          surface: '#221e10',
+          elevated: '#2e2818',
         },
         accent: {
-          DEFAULT: '#00d4ff',
-          dim: '#0ea5e9',
+          DEFAULT: '#f2c40d',
+          dim: '#d4a80a',
         },
       },
       boxShadow: {
-        'glow-sm': '0 0 10px rgba(0, 212, 255, 0.15)',
-        'glow-md': '0 0 20px rgba(0, 212, 255, 0.25)',
-        'glow-lg': '0 0 40px rgba(0, 212, 255, 0.3)',
+        'glow-sm': '0 0 10px rgba(242, 196, 13, 0.15)',
+        'glow-md': '0 0 20px rgba(242, 196, 13, 0.25)',
+        'glow-lg': '0 0 40px rgba(242, 196, 13, 0.3)',
       },
     },
   },

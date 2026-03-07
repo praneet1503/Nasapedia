@@ -180,7 +180,7 @@ export default function SearchBar({
                   onMouseEnter={() => setActiveIndex(idx)}
                   className="flex cursor-pointer items-center gap-3 px-4 py-3 transition-colors"
                   style={{
-                    backgroundColor: idx === activeIndex ? 'rgba(0, 212, 255, 0.08)' : 'transparent',
+                    backgroundColor: idx === activeIndex ? 'rgba(242, 196, 13, 0.08)' : 'transparent',
                     borderBottom: idx < suggestions.length - 1 ? '1px solid var(--border)' : 'none',
                   }}
                 >

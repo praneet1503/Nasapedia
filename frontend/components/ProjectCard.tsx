@@ -63,25 +63,32 @@ export default function ProjectCard({ project, onProjectClick }: ProjectCardProp
         </div>
       </div>
 
-      {project.description ? (
-        <p className="project-card__description">{project.description}</p>
-      ) : (
-        <p className="project-card__description project-card__description-muted">No telemetry data available.</p>
+      {project.description && (
+        <>
+          <p className="project-card__description" dangerouslySetInnerHTML={{ __html: project.description }} />
+          <div className="project-card__readmore">READ MORE</div>
+        </>
       )}
 
       <div className="project-card__meta-grid">
-        <div className="project-card__meta-item">
-          <span className="project-card__meta-label">Organization</span>
-          <span className="project-card__meta-value">{valueOrDash(project.organization)}</span>
-        </div>
-        <div className="project-card__meta-item">
-          <span className="project-card__meta-label">Technology area</span>
-          <span className="project-card__meta-value">{valueOrDash(project.technology_area)}</span>
-        </div>
-        <div className="project-card__meta-item">
-          <span className="project-card__meta-label">Mission state</span>
-          <span className="project-card__meta-value">{valueOrDash(project.status)}</span>
-        </div>
+        {project.organization && (
+          <div className="project-card__meta-item">
+            <span className="project-card__meta-label">Organization</span>
+            <span className="project-card__meta-value">{project.organization}</span>
+          </div>
+        )}
+        {project.technology_area && (
+          <div className="project-card__meta-item">
+            <span className="project-card__meta-label">Technology area</span>
+            <span className="project-card__meta-value">{project.technology_area}</span>
+          </div>
+        )}
+        {project.status && (
+          <div className="project-card__meta-item">
+            <span className="project-card__meta-label">Mission state</span>
+            <span className="project-card__meta-value">{project.status}</span>
+          </div>
+        )}
       </div>
     </Link>
   )

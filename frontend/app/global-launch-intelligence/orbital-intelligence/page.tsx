@@ -7,8 +7,8 @@ import {
 } from 'recharts'
 
 const ORBIT_COLORS: Record<string, string> = {
-  LEO: '#00d4ff',
-  MEO: '#a855f7',
+  LEO: '#f2c40d',
+  MEO: '#c58b2f',
   GEO: '#f59e0b',
   'Deep Space': '#ef4444',
   Other: '#64748b',
@@ -16,7 +16,7 @@ const ORBIT_COLORS: Record<string, string> = {
 
 const USAGE_COLORS: Record<string, string> = {
   Military: '#ef4444',
-  Commercial: '#00d4ff',
+  Commercial: '#f2c40d',
   Civilian: '#22c55e',
 }
 
@@ -100,8 +100,8 @@ export default function OrbitalIntelligencePage() {
                 </Pie>
                 <Tooltip
                   contentStyle={{
-                    background: '#1a1f2e',
-                    border: '1px solid rgba(0,212,255,0.2)',
+                    background: '#221e10',
+                    border: '1px solid rgba(242,196,13,0.2)',
                     borderRadius: '8px',
                     fontSize: 11,
                     color: '#e2e8f0',
@@ -141,8 +141,8 @@ export default function OrbitalIntelligencePage() {
                 </Pie>
                 <Tooltip
                   contentStyle={{
-                    background: '#1a1f2e',
-                    border: '1px solid rgba(0,212,255,0.2)',
+                    background: '#221e10',
+                    border: '1px solid rgba(242,196,13,0.2)',
                     borderRadius: '8px',
                     fontSize: 11,
                     color: '#e2e8f0',
@@ -171,8 +171,8 @@ export default function OrbitalIntelligencePage() {
               <YAxis tick={{ fill: '#64748b', fontSize: 10 }} axisLine={{ stroke: 'rgba(148,163,184,0.12)' }} />
               <Tooltip
                 contentStyle={{
-                  background: '#1a1f2e',
-                  border: '1px solid rgba(0,212,255,0.2)',
+                  background: '#221e10',
+                  border: '1px solid rgba(242,196,13,0.2)',
                   borderRadius: '8px',
                   fontSize: 11,
                   color: '#e2e8f0',

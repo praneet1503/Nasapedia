@@ -12,7 +12,7 @@ import {
 } from 'recharts'
 
 const ORBIT_COLORS: Record<string, string> = {
-  LEO: '#00d4ff', MEO: '#a855f7', GEO: '#f59e0b', 'Deep Space': '#ef4444', Other: '#64748b',
+  LEO: '#f2c40d', MEO: '#c58b2f', GEO: '#f59e0b', 'Deep Space': '#ef4444', Other: '#64748b',
 }
 
 export default function DashboardPage() {
@@ -21,47 +21,7 @@ export default function DashboardPage() {
   if (isLoading) {
     return (
       <div className="space-y-4">
-        <section className="intel-hero">
-          <div className="intel-hero__copy">
-            <div className="intel-hero__eyebrow">Nasapedia Command Grid</div>
-            <h1 className="intel-hero__title">
-              We are the{' '}
-              <span className="intel-hero__title-chip">
-                <span className="intel-hero__title-chip-core">NEXT GEN</span>
-                <span className="intel-hero__title-chip-orbit" aria-hidden="true">◎</span>
-              </span>{' '}
-              of space data.
-            </h1>
-            <p className="intel-hero__body">
-              Our mission is to provide real-time, actionable intelligence on global space activites.
-            </p>
-            <div className="intel-hero__actions">
-              <Link href="/projects" className="space-btn space-btn-primary border-0">Open Project Atlas</Link>
-              <Link href="/feed" className="space-btn">Adaptive Feed</Link>
-              <Link href="/space-news" className="space-btn">Space News</Link>
-              <Link href="/space-blogs" className="space-btn">Articles &amp; Blogs</Link>
-              <Link href="/iss-tracker" className="space-btn">ISS Tracker</Link>
-            </div>
-          </div>
-
-          <div className="intel-hero__summary">
-            <div className="intel-hero__panel">
-              <span className="intel-hero__label">30-Day Launches</span>
-              <strong className="intel-hero__value">--</strong>
-              <span className="intel-hero__hint">syncing live feed</span>
-            </div>
-            <div className="intel-hero__panel">
-              <span className="intel-hero__label">Top Operator</span>
-              <strong className="intel-hero__value">Syncing...</strong>
-              <span className="intel-hero__hint">leaderboard in progress</span>
-            </div>
-            <div className="intel-hero__panel">
-              <span className="intel-hero__label">Regional Spikes</span>
-              <strong className="intel-hero__value">--</strong>
-              <span className="intel-hero__hint">watchlist booting</span>
-            </div>
-          </div>
-        </section>
+        
 
         <div className="flex items-center gap-3">
           <h2 className="text-sm font-bold uppercase tracking-[0.2em] text-[var(--accent)]">Command Center</h2>
@@ -93,48 +53,6 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-4">
-      <section className="intel-hero">
-        <div className="intel-hero__copy">
-          <div className="intel-hero__eyebrow">Nasapedia Command Grid</div>
-          <h1 className="intel-hero__title">
-            We are the{' '}
-            <span className="intel-hero__title-chip">
-              <span className="intel-hero__title-chip-core">NEXT GEN</span>
-              <span className="intel-hero__title-chip-orbit" aria-hidden="true">◎</span>
-            </span>{' '}
-            of space data.
-          </h1>
-          <p className="intel-hero__body">
-            Our mission is to provide real-time, actionable intelligence on global space activites.
-          </p>
-          <div className="intel-hero__actions">
-            <Link href="/projects" className="space-btn space-btn-primary border-0">Open Project Atlas</Link>
-            <Link href="/feed" className="space-btn">Adaptive Feed</Link>
-            <Link href="/space-news" className="space-btn">Space News</Link>
-            <Link href="/space-blogs" className="space-btn">Articles &amp; Blogs</Link>
-            <Link href="/iss-tracker" className="space-btn">ISS Tracker</Link>
-          </div>
-        </div>
-
-        <div className="intel-hero__summary">
-          <div className="intel-hero__panel">
-            <span className="intel-hero__label">30-Day Launches</span>
-            <strong className="intel-hero__value">{velocity.launches_30d}</strong>
-            <span className="intel-hero__hint">live cadence snapshot</span>
-          </div>
-          <div className="intel-hero__panel">
-            <span className="intel-hero__label">Top Operator</span>
-            <strong className="intel-hero__value">{agencies.top_5[0]?.name ?? 'N/A'}</strong>
-            <span className="intel-hero__hint">current leaderboard lead</span>
-          </div>
-          <div className="intel-hero__panel">
-            <span className="intel-hero__label">Regional Spikes</span>
-            <strong className="intel-hero__value">{geopolitics.regional_spikes.length}</strong>
-            <span className="intel-hero__hint">watchlist signals</span>
-          </div>
-        </div>
-      </section>
-
       {indices.surge_detected && (
         <AlertBanner type="surge" message={`HIGH ACTIVITY PHASE — ${velocity.launches_30d} launches in 30 days`} />
       )}
@@ -195,11 +113,11 @@ export default function DashboardPage() {
                 <AreaChart data={velocity.daily_timeline}>
                   <defs>
                     <linearGradient id="miniVelocityGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#00d4ff" stopOpacity={0.2} />
-                      <stop offset="95%" stopColor="#00d4ff" stopOpacity={0} />
+                      <stop offset="5%" stopColor="#f2c40d" stopOpacity={0.2} />
+                      <stop offset="95%" stopColor="#f2c40d" stopOpacity={0} />
                     </linearGradient>
                   </defs>
-                  <Area type="monotone" dataKey="launches" stroke="#00d4ff" strokeWidth={1.5} fill="url(#miniVelocityGrad)" dot={false} />
+                  <Area type="monotone" dataKey="launches" stroke="#f2c40d" strokeWidth={1.5} fill="url(#miniVelocityGrad)" dot={false} />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
@@ -235,7 +153,7 @@ export default function DashboardPage() {
                   <Pie data={orbitPieData} cx="50%" cy="50%" innerRadius={30} outerRadius={55} paddingAngle={3} dataKey="value" stroke="none">
                     {orbitPieData.map((entry, i) => <Cell key={i} fill={entry.fill} />)}
                   </Pie>
-                  <Tooltip contentStyle={{ background: '#1a1f2e', border: '1px solid rgba(0,212,255,0.2)', borderRadius: '8px', fontSize: 10, color: '#e2e8f0' }} />
+                  <Tooltip contentStyle={{ background: '#221e10', border: '1px solid rgba(242,196,13,0.2)', borderRadius: '8px', fontSize: 10, color: '#e2e8f0' }} />
                 </PieChart>
               </ResponsiveContainer>
             </div>
