@@ -10,6 +10,7 @@ if str(ROOT_DIR) not in sys.path:
 
 from app.asgi import api as fastapi_app
 
+# v3 because v1 and v2 are buried in a git history we don't talk about
 APP_NAME = "nasa-techport-backend-v3"
 SECRET_NAME = "NASA_WEB_KEYS"
 MIN_CONTAINERS = int(os.environ.get("MODAL_MIN_CONTAINERS", "1"))
@@ -39,7 +40,7 @@ if space_key:
 else:
     secrets = [modal.Secret.from_name(SECRET_NAME)]
 
-
+# timeout=86400. one full day. if this is still running after 24 hours something has gone VERY wrong
 @app.function(
     image=image,
     secrets=secrets,

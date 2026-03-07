@@ -4,6 +4,7 @@ Nasapedia is a comprehensive website that provides space information that the pu
 # note: 
 - to all those who think the website is ai slop, i just want to say say that i have put a lot of effort into this project and tried not to use ai for any work except for some minor code snippets and stuff but the overall project is done by me.
 -btw please vote nicely and fairly cause i want those rpi 5 pleaseeeeeeeeee
+
 ### Key Features
 - **Searchable Projects**: Full-text keyword search with filters for TRL, organization, and technology area.
 - **Advanced Sorting**: Multiple sort modes (relevance, popularity, alphabetical, newest/oldest).
@@ -22,33 +23,34 @@ Nasapedia is a comprehensive website that provides space information that the pu
 - Utilities: Lightweight caching, request dedupe, pagination helpers, and modular services
 
 # Setup
-1. Clone the repository:
-   ```zsh
-   git clone https://github.com/praneet1503/Nasapedia.git
-   ```
-2. setup the backend:
-   ```zsh
-   cd Nasapedia/backend
-   python -m venv venv
-   source venv/bin/activate
-   pip install -r requirements.txt
-   ```
-3. setup the frontend:
-   ```zsh
-   cd frontend
+alright so setting this up is pretty straightforward, just follow these steps and you should be good:
+1. first clone the repo:
+    ```zsh
+    git clone https://github.com/praneet1503/Nasapedia.git
+    ```
+2. now lets get the backend running, go into the backend folder and set up a virtual environment (trust me it saves so much pain later):
+    ```zsh
+    cd Nasapedia/backend
+    python -m venv venv
+    source venv/bin/activate
+    pip install -r requirements.txt
+    ```
+3. now the frontend, just install the dependencies:
+    ```zsh
+    cd frontend
     npm install
     ```
-4. Run the backend server:
-    ```zsh
-    uvicorn main:app --reload
-    ```
-5. Run the frontend development server:
-    ```zsh
-    npm run dev
-    ```
-6. Open your browser and navigate to `http://localhost:3000` to access the Nasapedia website.
+4. spin up the backend server:
+     ```zsh
+     uvicorn main:app --reload
+     ```
+5. and now the frontend dev server:
+     ```zsh
+     npm run dev
+     ```
+6. open your browser and go to `http://localhost:3000` and boom you should see Nasapedia!
 
-and you are good to go!!!!!
+and thats literally it, you're all set!! if something breaks just check that the backend is running before you open the frontend, that fixes like 90% of the issues lol
 
 # note:
 - make sure to have the backend server running before accessing the frontend to ensure that the API endpoints are available for fetching data.

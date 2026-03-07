@@ -15,6 +15,7 @@ import threading
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
+# 10 sessions walk into a bar. the bartender says "we only have 3 connections left"
 _thread_local = threading.local()
 SESSION_POOL_SIZE = 10
 
@@ -416,6 +417,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     api_key = get_required_env("NASA_TECHPORT_API_KEY")
 
     global engine
+# moment of truth. nasa has thousands of projects. go fetch, little script.shu shu !!!!!!
     engine = create_db_engine(get_required_env("DATABASE_URL"))
 
     try:
@@ -426,7 +428,8 @@ def main(argv: Optional[List[str]] = None) -> int:
         return 1
 
     logging.info("Fetching NASA TechPort project list")
-
+#@!#!#$#%!#$!@$#$!@$@#&%(^&$&*$^&($))
+#unesscary comment you lot. go on find another one 
     try:
         project_ids = list(fetch_project_ids(api_key))
     except RuntimeError as exc:

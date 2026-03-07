@@ -7,6 +7,7 @@ from sqlalchemy.exc import OperationalError, SQLAlchemyError
 from app.core import DatabaseQueryFailed, DatabaseUnavailable
 from app.db import create_db_engine
 
+# 70% popular + 30% fresh. like a trending tweet but make it space.
 POPULARITY_WEIGHT = 0.7
 RECENCY_WEIGHT = 0.3
 DEFAULT_PER_PAGE = 20
@@ -21,7 +22,7 @@ def _adaptive_score_sql() -> str:
         "(:recency_weight * (1.0 / (GREATEST(EXTRACT(EPOCH FROM (now() - p.last_updated)) / 86400.0, 0) + 1.0)))"
         ")"
     )
-
+# someone clicked something!! throw a party!! update the score!!!
 
 def record_project_click(database_url: str, visitor_uuid: str, project_id: int) -> Dict[str, object]:
     engine = create_db_engine(database_url)
@@ -113,6 +114,7 @@ def _random_rows(conn, exclude_ids: List[int], desired_count: int, include_empty
     if not include_empty_descriptions:
         where_clauses.append("p.description IS NOT NULL AND btrim(p.description) <> ''")
 
+# ORDER BY random() — this line costs me sleep every night
     where_exclude = ""
     if where_clauses:
         where_exclude = "WHERE " + " AND ".join(where_clauses) + " "

@@ -1,6 +1,7 @@
+// this file knows more about you than your therapist
 const VISITOR_UUID_STORAGE_KEY = 'nasapedia_visitor_uuid'
 const VISITOR_UUID_COOKIE_KEY = 'nasapedia_visitor_uuid'
-
+// generating a UUID so we can track clicks without knowing who you are. privacy-respecting stalking.
 function generateVisitorUuid(): string {
   if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
     return crypto.randomUUID()

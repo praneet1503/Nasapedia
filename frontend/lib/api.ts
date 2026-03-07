@@ -8,8 +8,9 @@ import type {
 
 
 const inFlightRequests = new Map<string, Promise<PaginatedResponse<Project>>>()
+// request deduplication. because users click buttons 47 times and we're not animals.
 
-
+// LRU Cache: fancy way of saying "remember the last 50 things, forget the rest, just like me"
 class LRUCache<K, V> {
   private cache: Map<K, V>
   private maxSize: number
@@ -56,6 +57,7 @@ interface CacheEntry {
   timestamp: number
 }
 
+// every 60 seconds we halve the cache stats so they don't overflow. this is fine.
 const SEARCH_CACHE = new LRUCache<string, CacheEntry>(50, 5 * 60 * 1000)
 const CACHE_STATS = { hits: 0, misses: 0 }
 const CACHE_TTL_MS = 5 * 60 * 1000

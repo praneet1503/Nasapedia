@@ -15,6 +15,7 @@ from sqlalchemy.engine import Engine
 from app.db import create_db_engine, get_required_env
 from app.schemas import IssLocationOut, ErrorResponse
 
+# yes we are literally tracking a tin can hurtling at 28,000 km/h. beautiful no ?????
 ISS_URL = "https://api.wheretheiss.at/v1/satellites/25544"
 CACHE_TTL_SECONDS = 2
 PUSH_INTERVAL_SECONDS = 1
@@ -23,8 +24,7 @@ STALE_BROADCAST_WINDOW_SECONDS = 30
 ISS_STREAM_ROW_ID = 1
 
 router = APIRouter()
-
-# Simple in-memory cache for HTTP GET handler
+# in-memory cache. if the server restarts, this dies. silence.
 _iss_cache: Dict[str, Any] = {
     "data": None,
     "last_updated": 0.0,

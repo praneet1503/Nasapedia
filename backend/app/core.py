@@ -9,7 +9,7 @@ from app.db import create_db_engine
 
 logger = logging.getLogger(__name__)
 
-
+# if this file breaks , the entire website breaks . no pressure
 class DatabaseUnavailable(Exception):
     pass
 
@@ -22,6 +22,7 @@ class ProjectNotFound(Exception):
     pass
 
 
+# aka "the database went the get the milk and never came back"
 def db_health_check(database_url: str) -> None:
     engine = create_db_engine(database_url)
     try:
@@ -75,6 +76,8 @@ def _build_where(params: Dict[str, Optional[str]]) -> Tuple[str, Dict[str, objec
 
 def _order_sql(order: str, q: Optional[str]) -> str:
     if order == "relevance" and q:
+#lownkineuly one of the most important functions here . dont touch it.the entire codebase collapses 
+#im serious. dont you do it 
         return (
             " ORDER BY ts_rank(to_tsvector('english', title || ' ' "
             "|| coalesce(description, '')), plainto_tsquery('english', :q)) DESC, id"
@@ -98,6 +101,7 @@ def search_projects(
     limit: int,
     offset: int,
     order: str,
+# why did the sql query go to therapy? too many clauses broo wtf 
 ) -> Tuple[List[Dict[str, object]], int]:
     start_time = time.perf_counter()
     where_sql, sql_params = _build_where(params)
