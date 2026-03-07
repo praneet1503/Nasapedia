@@ -65,5 +65,5 @@ and thats literally it, you're all set!! if something breaks just check that the
 refer to docs folder for detailed documentation on codebase understanding,deployment, and database migrations. (if you are really trying to change the codebase for a new project or something you should read the docs or atleast let ur ai read the docs bro....)
 
 # update 
- we are still working on the website redesign basically we are finallizing on it 
+V1 is live baby!! go check it out [here](https://nasapedia.vercel.app) and please vote for me in the hackathon, i really want those rpi 5s to test this project on and make it even better!!
  
