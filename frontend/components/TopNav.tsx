@@ -54,7 +54,7 @@ export default function TopNav() {
   return (
     <header className="global-topbar">
       <div className="flex items-center gap-3 min-w-0">
-        <Link href="/" className="intel-brand-link">
+        <Link href="/global-launch-intelligence/dashboard" className="intel-brand-link">
           NASAPEDIA
         </Link>
         <span className="global-topbar-separator" aria-hidden="true">|</span>

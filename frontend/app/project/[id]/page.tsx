@@ -66,7 +66,7 @@ export default function ProjectDetailPage() {
             onClick={() => router.push('/')}
             className="space-btn text-sm"
           >
-            🌍 All Projects
+             All Projects
           </button>
         </div>
       </div>
