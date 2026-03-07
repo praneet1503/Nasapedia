@@ -80,6 +80,7 @@ export type FetchProjectsParams = {
   page?: number
   limit?: number
   search_type?: 'keyword' | 'semantic'
+  include_empty_descriptions?: boolean
 }
 
 export type FetchFeedParams = {
@@ -178,7 +179,7 @@ function buildSearchParams(params: Record<string, string | number | undefined>):
 
 function getCacheKey(params: Record<string, string | number | undefined>): string {
   const sp = new URLSearchParams()
-  const cacheableKeys = ['q', 'trl_min', 'trl_max', 'organization', 'technology_area', 'order', 'search_type', 'page', 'limit']
+  const cacheableKeys = ['q', 'trl_min', 'trl_max', 'organization', 'technology_area', 'order', 'search_type', 'page', 'limit', 'include_empty_descriptions']
   for (const key of cacheableKeys) {
     const value = params[key]
     if (value === undefined) continue
@@ -245,6 +246,7 @@ export async function fetchProjects(params: FetchProjectsParams): Promise<Pagina
     technology_area: params.technology_area,
     order: params.order,
     search_type: params.search_type,
+    include_empty_descriptions: params.include_empty_descriptions,
     limit: limit,
     offset: offset,
   })}`

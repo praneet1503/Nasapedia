@@ -61,19 +61,29 @@ def record_project_click(database_url: str, visitor_uuid: str, project_id: int) 
         engine.dispose()
 
 
-def _get_total_count(conn) -> int:
-    total = conn.execute(text("SELECT COUNT(*) FROM projects")).scalar_one()
+def _get_total_count(conn, include_empty_descriptions: bool) -> int:
+    if include_empty_descriptions:
+        total = conn.execute(text("SELECT COUNT(*) FROM projects")).scalar_one()
+    else:
+        total = conn.execute(
+            text("SELECT COUNT(*) FROM projects WHERE description IS NOT NULL AND btrim(description) <> ''")
+        ).scalar_one()
     return int(total)
 
 
-def _ranked_page_rows(conn, page: int, per_page: int) -> List[Dict[str, object]]:
+def _ranked_page_rows(conn, page: int, per_page: int, include_empty_descriptions: bool) -> List[Dict[str, object]]:
     offset = max(page - 1, 0) * per_page
     score_sql = _adaptive_score_sql()
+    where_clause = ""
+    if not include_empty_descriptions:
+        where_clause = "WHERE p.description IS NOT NULL AND btrim(p.description) <> '' "
+
     sql = text(
         "SELECT p.id, p.title, p.description, p.status, p.start_date, p.end_date, p.trl, "
         "p.organization, p.technology_area, p.last_updated, COALESCE(p.popularity_score, 0) AS popularity_score, "
         f"{score_sql} AS adaptive_score "
         "FROM projects p "
+        f"{where_clause}"
         "ORDER BY adaptive_score DESC, p.id "
         "LIMIT :limit OFFSET :offset"
     )
@@ -90,15 +100,22 @@ def _ranked_page_rows(conn, page: int, per_page: int) -> List[Dict[str, object]]
     return [dict(row) for row in rows]
 
 
-def _random_rows(conn, exclude_ids: List[int], desired_count: int) -> List[Dict[str, object]]:
+def _random_rows(conn, exclude_ids: List[int], desired_count: int, include_empty_descriptions: bool) -> List[Dict[str, object]]:
     if desired_count <= 0:
         return []
 
     params: Dict[str, object] = {"limit": desired_count * RANDOM_POOL_MULTIPLIER}
-    where_exclude = ""
+    where_clauses: List[str] = []
     if exclude_ids:
-        where_exclude = "WHERE p.id NOT IN :exclude_ids "
+        where_clauses.append("p.id NOT IN :exclude_ids")
         params["exclude_ids"] = tuple(exclude_ids)
+
+    if not include_empty_descriptions:
+        where_clauses.append("p.description IS NOT NULL AND btrim(p.description) <> ''")
+
+    where_exclude = ""
+    if where_clauses:
+        where_exclude = "WHERE " + " AND ".join(where_clauses) + " "
 
     sql = text(
         "SELECT p.id, p.title, p.description, p.status, p.start_date, p.end_date, p.trl, "
@@ -108,6 +125,9 @@ def _random_rows(conn, exclude_ids: List[int], desired_count: int) -> List[Dict[
         "ORDER BY random() "
         "LIMIT :limit"
     )
+
+    if exclude_ids:
+        sql = sql.bindparams(bindparam("exclude_ids", expanding=True))
 
     if exclude_ids:
         sql = sql.bindparams(bindparam("exclude_ids", expanding=True))
@@ -133,6 +153,7 @@ def get_adaptive_feed(
     page: int = 1,
     per_page: int = DEFAULT_PER_PAGE,
     visitor_uuid: Optional[str] = None,
+    include_empty_descriptions: bool = False,
 ) -> Tuple[List[Dict[str, object]], int]:
     safe_page = max(page, 1)
     safe_per_page = max(per_page, 1)
@@ -140,12 +161,12 @@ def get_adaptive_feed(
     engine = create_db_engine(database_url)
     try:
         with engine.connect() as conn:
-            total = _get_total_count(conn)
-            ranked_rows = _ranked_page_rows(conn, safe_page, safe_per_page)
+            total = _get_total_count(conn, include_empty_descriptions)
+            ranked_rows = _ranked_page_rows(conn, safe_page, safe_per_page, include_empty_descriptions)
 
             ranked_ids = [int(row["id"]) for row in ranked_rows]
             max_random = min(MIN_RANDOM_PER_PAGE, max(total - len(ranked_ids), 0))
-            random_rows = _random_rows(conn, ranked_ids, max_random)
+            random_rows = _random_rows(conn, ranked_ids, max_random, include_empty_descriptions)
 
             retained_ranked_count = max(safe_per_page - len(random_rows), 0)
             combined_rows = ranked_rows[:retained_ranked_count] + random_rows

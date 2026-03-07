@@ -12,6 +12,7 @@ class ProjectSearchParams(BaseModel):
     limit: int = 10
     offset: int = 0
     order: str = "title_asc"
+    include_empty_descriptions: bool = False
 
 class ProjectOut(BaseModel):
     id: int
@@ -37,6 +38,7 @@ class ProjectClickIn(BaseModel):
 
 class FeedParams(BaseModel):
     page: int = 1
+    include_empty_descriptions: bool = False
 
 class ErrorResponse(BaseModel):
     error: str

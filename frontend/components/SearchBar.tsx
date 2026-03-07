@@ -251,6 +251,14 @@ export default function SearchBar({
           <option value="keyword">⚡ Fast (Keyword)</option>
           <option value="semantic">🧠 Smart (Semantic)</option>
         </select>
+        <button
+          type="button"
+          onClick={() => router.push('/projects/unknown')}
+          className="ml-3 space-btn space-btn-ghost"
+          aria-label="Open mission data"
+        >
+          Mission Data
+        </button>
         <span className="search-suite__meta-copy">
           {searchType === 'semantic' 
             ? 'Meaning-based search (slower, better for intent)' 

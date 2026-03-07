@@ -32,6 +32,7 @@ async def feed(request: Request) -> JSONResponse:
             page=params.page,
             per_page=20,
             visitor_uuid=visitor_uuid,
+            include_empty_descriptions=params.include_empty_descriptions,
         )
     except DatabaseUnavailable:
         return json_error(503, "Database unavailable", request_id=request_id)

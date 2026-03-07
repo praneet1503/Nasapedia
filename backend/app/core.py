@@ -64,6 +64,10 @@ def _build_where(params: Dict[str, Optional[str]]) -> Tuple[str, Dict[str, objec
     if technology_area:
         where_clauses.append("technology_area = :technology_area")
         sql_params["technology_area"] = technology_area
+    # By default, exclude projects with empty or null descriptions unless explicitly requested
+    include_empty = params.get("include_empty_descriptions")
+    if include_empty is None or not include_empty:
+        where_clauses.append("description IS NOT NULL AND btrim(description) <> ''")
 
     where_sql = " WHERE " + " AND ".join(where_clauses) if where_clauses else ""
     return where_sql, sql_params
