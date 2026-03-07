@@ -7,6 +7,7 @@ from routers.global_launch_intelligence import router as global_launch_intellige
 from routers.health import router as health_router
 from routers.iss import router as iss_router
 from routers.projects import router as projects_router
+from routers.space import router as space_router
 
 
 def create_app() -> FastAPI:
@@ -24,6 +25,7 @@ def create_app() -> FastAPI:
     fastapi_app.include_router(analytics_router)
     fastapi_app.include_router(global_launch_intelligence_router)
     fastapi_app.include_router(iss_router, prefix="/iss")
+    fastapi_app.include_router(space_router)
     return fastapi_app
 
 

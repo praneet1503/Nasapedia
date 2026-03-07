@@ -7,6 +7,8 @@ const NAV_ITEMS = [
   { href: '/', label: 'Command Center', icon: '◆', match: (pathname: string) => pathname === '/' || pathname.startsWith('/global-launch-intelligence') },
   { href: '/projects', label: 'Project Atlas', icon: '◌', match: (pathname: string) => pathname === '/projects' || pathname.startsWith('/project/') },
   { href: '/feed', label: 'Adaptive Feed', icon: '↗', match: (pathname: string) => pathname.startsWith('/feed') },
+  { href: '/space-news', label: 'Space News', icon: '📡', match: (pathname: string) => pathname.startsWith('/space-news') },
+  { href: '/space-blogs', label: 'Space Blogs', icon: '✍️', match: (pathname: string) => pathname.startsWith('/space-blogs') },
   { href: '/iss-tracker', label: 'ISS Tracker', icon: '◎', match: (pathname: string) => pathname.startsWith('/iss-tracker') },
 ]
 

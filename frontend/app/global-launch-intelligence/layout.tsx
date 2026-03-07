@@ -59,6 +59,8 @@ export default function IntelligenceLayout({ children }: { children: ReactNode }
           <div className="hidden lg:flex items-center gap-2">
             <Link href="/projects" className="intel-topbar-link">Project Atlas</Link>
             <Link href="/feed" className="intel-topbar-link">Adaptive Feed</Link>
+            <Link href="/space-news" className="intel-topbar-link">Space News</Link>
+            <Link href="/space-blogs" className="intel-topbar-link">Articles &amp; Blogs</Link>
             <Link href="/iss-tracker" className="intel-topbar-link">ISS Tracker</Link>
           </div>
           <MissionClock />

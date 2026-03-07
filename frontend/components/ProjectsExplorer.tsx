@@ -138,23 +138,23 @@ export default function ProjectsExplorer() {
 
         <div className="page-hero__rail">
           <TopNav />
+        </div>
 
-          <div className="page-hero__stats">
-            <div className="page-stat">
-              <span className="page-stat__label">Catalog size</span>
-              <strong className="page-stat__value">{totalCount || '20K+'}</strong>
-              <span className="page-stat__hint">mission records online</span>
-            </div>
-            <div className="page-stat">
-              <span className="page-stat__label">Search mode</span>
-              <strong className="page-stat__value">{searchType === 'semantic' ? 'Smart' : 'Fast'}</strong>
-              <span className="page-stat__hint">{searchType === 'semantic' ? 'semantic intent routing' : 'keyword-first scan'}</span>
-            </div>
-            <div className="page-stat">
-              <span className="page-stat__label">Active filters</span>
-              <strong className="page-stat__value">{activeFilterCount}</strong>
-              <span className="page-stat__hint">refining the mission stream</span>
-            </div>
+        <div className="page-hero__stats page-hero__stats--atlas">
+          <div className="page-stat">
+            <span className="page-stat__label">Catalog size</span>
+            <strong className="page-stat__value">{totalCount || '20K+'}</strong>
+            <span className="page-stat__hint">mission records online</span>
+          </div>
+          <div className="page-stat">
+            <span className="page-stat__label">Search mode</span>
+            <strong className="page-stat__value">{searchType === 'semantic' ? 'Smart' : 'Fast'}</strong>
+            <span className="page-stat__hint">{searchType === 'semantic' ? 'semantic intent routing' : 'keyword-first scan'}</span>
+          </div>
+          <div className="page-stat">
+            <span className="page-stat__label">Active filters</span>
+            <strong className="page-stat__value">{activeFilterCount}</strong>
+            <span className="page-stat__hint">refining the mission stream</span>
           </div>
         </div>
       </header>

@@ -38,6 +38,8 @@ export default function DashboardPage() {
             <div className="intel-hero__actions">
               <Link href="/projects" className="space-btn space-btn-primary border-0">Open Project Atlas</Link>
               <Link href="/feed" className="space-btn">Adaptive Feed</Link>
+              <Link href="/space-news" className="space-btn">Space News</Link>
+              <Link href="/space-blogs" className="space-btn">Articles &amp; Blogs</Link>
               <Link href="/iss-tracker" className="space-btn">ISS Tracker</Link>
             </div>
           </div>
@@ -108,6 +110,8 @@ export default function DashboardPage() {
           <div className="intel-hero__actions">
             <Link href="/projects" className="space-btn space-btn-primary border-0">Open Project Atlas</Link>
             <Link href="/feed" className="space-btn">Adaptive Feed</Link>
+            <Link href="/space-news" className="space-btn">Space News</Link>
+            <Link href="/space-blogs" className="space-btn">Articles &amp; Blogs</Link>
             <Link href="/iss-tracker" className="space-btn">ISS Tracker</Link>
           </div>
         </div>

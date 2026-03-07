@@ -90,3 +90,21 @@ export type GlobalLaunchIntelligenceResponse = {
   latencyProbe?: SpaceDevsLatencyProbe
 }
 
+// ── Spaceflight News Types ──────────────────────────────────
+
+export type SpaceContentItem = {
+  id: number
+  title: string
+  summary: string
+  image_url: string
+  news_site: string
+  published_at: string
+  url: string
+}
+
+export type SpaceContentResponse = {
+  items: SpaceContentItem[]
+  next: string | null
+  previous: string | null
+}
+

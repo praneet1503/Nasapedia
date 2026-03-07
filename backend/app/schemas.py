@@ -245,3 +245,34 @@ class IntelligenceIndicesResponse(BaseModel):
     telecom_expansion: bool = False
     military_escalation: bool = False
     phase: str = "NOMINAL"
+
+
+# ── Spaceflight News Schemas ─────────────────────────────────
+
+class SpaceContentParams(BaseModel):
+    limit: int = 20
+    offset: int = 0
+
+    @property
+    def safe_limit(self) -> int:
+        return max(1, min(self.limit, 20))
+
+    @property
+    def safe_offset(self) -> int:
+        return max(0, self.offset)
+
+
+class SpaceContentItemOut(BaseModel):
+    id: int
+    title: str
+    summary: str = ""
+    image_url: str = ""
+    news_site: str = ""
+    published_at: str = ""
+    url: str = ""
+
+
+class SpaceContentResponse(BaseModel):
+    items: List[SpaceContentItemOut] = []
+    next: Optional[str] = None
+    previous: Optional[str] = None
