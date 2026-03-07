@@ -41,3 +41,4 @@ tsconfig.tsbuildinfo
 # Misc local-only files
 
 
+/design

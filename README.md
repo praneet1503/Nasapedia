@@ -61,3 +61,7 @@ and you are good to go!!!!!
 
 # Docs 
 refer to docs folder for detailed documentation on codebase understanding,deployment, and database migrations. (if you are really trying to change the codebase for a new project or something you should read the docs or atleast let ur ai read the docs bro....)
+
+# update 
+ we are still working on the website redesign basically we are finallizing on it 
+ 
