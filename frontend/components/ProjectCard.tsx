@@ -7,8 +7,8 @@ type ProjectCardProps = {
 }
 
 function valueOrDash(v: string | number | null | undefined) {
-  if (v === null || v === undefined) return '—'
-  if (typeof v === 'string' && v.trim() === '') return '—'
+  if (v === null || v === undefined) return ''
+  if (typeof v === 'string' && v.trim() === '') return ''
   return String(v)
 }
 
@@ -36,7 +36,6 @@ export default function ProjectCard({ project, onProjectClick }: ProjectCardProp
     >
       <div className="project-card__header">
         <div className="project-card__lead">
-          <span className="project-card__icon" aria-hidden="true">{statusIcon(project.status)}</span>
           <div className="project-card__title-group">
             <span className="project-card__eyebrow">{valueOrDash(project.organization)}</span>
             <h3 className="project-card__title">{project.title}</h3>

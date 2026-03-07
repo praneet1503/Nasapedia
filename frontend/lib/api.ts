@@ -166,7 +166,7 @@ function getApiProjectClickUrl(projectId: number): string {
   return `${projectsBase}/${projectId}/click`
 }
 
-function buildSearchParams(params: Record<string, string | number | undefined>): string {
+function buildSearchParams(params: Record<string, string | number | boolean | undefined>): string {
   const sp = new URLSearchParams()
   for (const [key, value] of Object.entries(params)) {
     if (value === undefined) continue
@@ -177,7 +177,7 @@ function buildSearchParams(params: Record<string, string | number | undefined>):
   return qs ? `?${qs}` : ''
 }
 
-function getCacheKey(params: Record<string, string | number | undefined>): string {
+function getCacheKey(params: Record<string, string | number | boolean | undefined>): string {
   const sp = new URLSearchParams()
   const cacheableKeys = ['q', 'trl_min', 'trl_max', 'organization', 'technology_area', 'order', 'search_type', 'page', 'limit', 'include_empty_descriptions']
   for (const key of cacheableKeys) {
