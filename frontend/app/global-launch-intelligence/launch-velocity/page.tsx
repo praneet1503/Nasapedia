@@ -50,7 +50,7 @@ export default function LaunchVelocityPage() {
           <Metric label="Past 7 Days" value={data.launches_7d} size="lg" />
         </IntelCard>
 
-        <IntelCard title="30-Day Launches" status={data.surge_detected ? 'warning' : 'nominal'}>
+        <IntelCard title="30-Day Launches" status={data.surge_detected ? 'warning' : undefined}>
           <Metric
             label="Past 30 Days"
             value={data.launches_30d}
@@ -60,11 +60,11 @@ export default function LaunchVelocityPage() {
           />
         </IntelCard>
 
-        <IntelCard title="Success Rate" status={data.success_ratio >= 90 ? 'nominal' : data.success_ratio >= 70 ? 'warning' : 'critical'}>
+        <IntelCard title="Success Rate" status={data.success_ratio >= 90 ? undefined : data.success_ratio >= 70 ? 'warning' : 'critical'}>
           <Metric label={`Last ${data.total_last_50} launches`} value={`${data.success_ratio}%`} size="lg" />
         </IntelCard>
 
-        <IntelCard title="Growth Rate" status={data.growth_rate_percent > 0 ? 'nominal' : 'warning'}>
+        <IntelCard title="Growth Rate" status={data.growth_rate_percent > 0 ? undefined : 'warning'}>
           <Metric
             label="vs Previous Month"
             value={`${data.growth_rate_percent > 0 ? '+' : ''}${data.growth_rate_percent}%`}

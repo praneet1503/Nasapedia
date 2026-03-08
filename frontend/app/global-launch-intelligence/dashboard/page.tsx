@@ -68,25 +68,22 @@ export default function DashboardPage() {
           <h2 className="text-sm font-bold uppercase tracking-[0.2em] text-[var(--accent)]">
             Command Center
           </h2>
-          <StatusBadge label={indices.phase} variant={indices.surge_detected ? 'yellow' : 'green'} />
         </div>
-        <button onClick={() => refetch()} className="space-btn text-[10px] px-2 py-1">
-          ↻ REFRESH
-        </button>
+
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
         <IntelCard title="Space Activity">
-          <IndexGauge label="Composite Index" value={indices.space_activity_index} icon="◆" />
+          <IndexGauge label="Composite Index" value={indices.space_activity_index} icon="◉" />
         </IntelCard>
         <IntelCard title="Orbital Expansion">
-          <IndexGauge label="Expansion Rate" value={indices.orbital_expansion_index} icon="◎" />
+          <IndexGauge label="Expansion Rate" value={indices.orbital_expansion_index} icon="◉" />
         </IntelCard>
         <IntelCard title="Human Spaceflight">
-          <IndexGauge label="Crew Activity" value={indices.human_spaceflight_index} icon="☆" />
+          <IndexGauge label="Crew Activity" value={indices.human_spaceflight_index} icon="◉" />
         </IntelCard>
         <IntelCard title="Military Util.">
-          <IndexGauge label="Defense Share" value={indices.military_utilization_index} icon="▣" />
+          <IndexGauge label="Defense Share" value={indices.military_utilization_index} icon="◉" />
         </IntelCard>
         <IntelCard title="Commercial Exp.">
           <IndexGauge label="Private Sector" value={indices.commercial_expansion_index} icon="◉" />
@@ -95,7 +92,7 @@ export default function DashboardPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <Link href="/global-launch-intelligence/launch-velocity" className="group">
-          <IntelCard title="Launch Velocity" status={velocity.surge_detected ? 'warning' : 'nominal'}
+          <IntelCard title="Launch Velocity" status={velocity.surge_detected ? 'warning' : undefined}
             headerRight={<span className="text-[9px] text-[var(--text-muted)] group-hover:text-[var(--accent)] transition-colors">DRILL DOWN →</span>}>
             <div className="grid grid-cols-2 gap-3 mb-3">
               <Metric label="7-Day" value={velocity.launches_7d} size="sm" />
@@ -125,7 +122,7 @@ export default function DashboardPage() {
         </Link>
 
         <Link href="/global-launch-intelligence/agency-dominance" className="group">
-          <IntelCard title="Agency Dominance" status="nominal"
+          <IntelCard title="Agency Dominance"
             headerRight={<span className="text-[9px] text-[var(--text-muted)] group-hover:text-[var(--accent)] transition-colors">DRILL DOWN →</span>}>
             <div className="grid grid-cols-2 gap-3 mb-3">
               <Metric label="Total" value={agencies.total_launches} size="sm" />
@@ -145,7 +142,7 @@ export default function DashboardPage() {
         </Link>
 
         <Link href="/global-launch-intelligence/orbital-intelligence" className="group">
-          <IntelCard title="Orbital Intel" status={orbital.telecom_expansion_flag ? 'warning' : 'nominal'}
+          <IntelCard title="Orbital Intel" status={orbital.telecom_expansion_flag ? 'warning' : undefined}
             headerRight={<span className="text-[9px] text-[var(--text-muted)] group-hover:text-[var(--accent)] transition-colors">DRILL DOWN →</span>}>
             <div className="h-36 flex items-center justify-center">
               <ResponsiveContainer width="100%" height="100%">
@@ -161,7 +158,7 @@ export default function DashboardPage() {
         </Link>
 
         <Link href="/global-launch-intelligence/mission-classification" className="group">
-          <IntelCard title="Mission Classification" status={missions.military_escalation_flag ? 'critical' : 'nominal'}
+          <IntelCard title="Mission Classification" status={missions.military_escalation_flag ? 'critical' : undefined}
             headerRight={<span className="text-[9px] text-[var(--text-muted)] group-hover:text-[var(--accent)] transition-colors">DRILL DOWN →</span>}>
             <div className="grid grid-cols-2 gap-3 mb-2">
               <Metric label="Categories" value={missions.categories.length} size="sm" />
@@ -179,7 +176,7 @@ export default function DashboardPage() {
         </Link>
 
         <Link href="/global-launch-intelligence/astronaut-activity" className="group">
-          <IntelCard title="Astronaut Ops" status="nominal"
+          <IntelCard title="Astronaut Ops"
             headerRight={<span className="text-[9px] text-[var(--text-muted)] group-hover:text-[var(--accent)] transition-colors">DRILL DOWN →</span>}>
             <div className="grid grid-cols-2 gap-3 mb-2">
               <Metric label="Active" value={astronauts.total_active} size="sm" />
@@ -190,7 +187,7 @@ export default function DashboardPage() {
         </Link>
 
         <Link href="/global-launch-intelligence/station-traffic" className="group">
-          <IntelCard title="Station Traffic" status="nominal"
+          <IntelCard title="Station Traffic"
             headerRight={<span className="text-[9px] text-[var(--text-muted)] group-hover:text-[var(--accent)] transition-colors">DRILL DOWN →</span>}>
             <div className="grid grid-cols-2 gap-3 mb-2">
               <Metric label="Stations" value={stations.total_stations} size="sm" />

@@ -64,10 +64,9 @@ export default function OrbitalIntelligencePage() {
         <h2 className="text-sm font-bold uppercase tracking-[0.2em] text-[var(--accent)]">
           Orbital Intelligence Mapping
         </h2>
-        <StatusBadge
-          label={data.telecom_expansion_flag ? 'GEO SPIKE' : 'NOMINAL'}
-          variant={data.telecom_expansion_flag ? 'yellow' : 'green'}
-        />
+        {data.telecom_expansion_flag && (
+          <StatusBadge label="GEO SPIKE" variant="yellow" />
+        )}
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

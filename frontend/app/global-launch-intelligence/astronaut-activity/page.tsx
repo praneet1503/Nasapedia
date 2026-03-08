@@ -31,7 +31,7 @@ export default function AstronautActivityPage() {
       </h2>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <IntelCard title="Active Astronauts" status="nominal">
+        <IntelCard title="Active Astronauts">
           <Metric label="In active service" value={data.total_active} size="lg" />
         </IntelCard>
         <IntelCard title="Agencies Represented" status="info">

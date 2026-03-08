@@ -58,13 +58,13 @@ export default function AgencyDominancePage() {
         <IntelCard title="Total Launches" status="info">
           <Metric label={`Past ${data.period_days} days`} value={data.total_launches} size="lg" />
         </IntelCard>
-        <IntelCard title="Active Providers" status="nominal">
+        <IntelCard title="Active Providers">
           <Metric label="Unique agencies" value={data.full_leaderboard.length} size="lg" />
         </IntelCard>
         <IntelCard title="State Share" status="info">
           <Metric label="Government" value={`${data.state_share_percent}%`} size="lg" />
         </IntelCard>
-        <IntelCard title="Private Share" status="nominal">
+        <IntelCard title="Private Share">
           <Metric label="Commercial" value={`${data.private_share_percent}%`} size="lg" />
         </IntelCard>
       </div>

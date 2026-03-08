@@ -1,7 +1,7 @@
 # Nasapedia
 Nasapedia is a comprehensive website that provides space information that the public can understand in an easy way so yeah i try my best to interpret the infos from the data aquired from nasa and other space agencies and make it more understandable for the public so they can understand the space better and learn more about it.
 
-# note: 
+## note: 
 - to all those who think the website is ai slop, i just want to say say that i have put a lot of effort into this project and tried not to use ai for any work except for some minor code snippets and stuff but the overall project is done by me.
 -btw please vote nicely and fairly cause i want those rpi 5 pleaseeeeeeeeee
 

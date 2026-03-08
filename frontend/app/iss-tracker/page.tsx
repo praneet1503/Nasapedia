@@ -129,7 +129,7 @@ export default function IssTrackerPage() {
           ISS Live Tracker
         </h1>
         <p className="mt-2 text-sm font-mono" style={{ color: 'var(--text-secondary)' }}>
-          Real-time telemetry refreshed every 1 second via NASAPEDIA backend.
+          Real-time ISS tracker
         </p>
         <Link href="/" className="absolute right-0 top-0 space-btn" aria-label="Back to home">
           Back Home

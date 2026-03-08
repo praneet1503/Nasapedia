@@ -26,7 +26,7 @@ export default function StationTrafficPage() {
       </h2>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <IntelCard title="Active Stations" status="nominal">
+        <IntelCard title="Active Stations">
           <Metric label="Orbiting" value={data.active_stations.length} size="lg" />
         </IntelCard>
         <IntelCard title="Total Stations" status="info">
@@ -45,7 +45,7 @@ export default function StationTrafficPage() {
           <IntelCard
             key={station.name}
             title={station.name}
-            status={station.status.toLowerCase() === 'active' ? 'nominal' : 'warning'}
+            status={station.status.toLowerCase() === 'active' ? undefined : 'warning'}
             subtitle={station.status}
           >
             <div className="space-y-3 mt-2">

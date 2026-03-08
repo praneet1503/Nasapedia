@@ -44,7 +44,7 @@ export default function GeopoliticalMapPage() {
         <IntelCard title="Launch Sites" status="info">
           <Metric label="Unique facilities" value={data.total_sites} size="lg" />
         </IntelCard>
-        <IntelCard title="Top Country" status="nominal">
+        <IntelCard title="Top Country">
           <Metric
             label={data.country_leaderboard[0]?.country || 'N/A'}
             value={data.country_leaderboard[0]?.launches || 0}
@@ -52,7 +52,7 @@ export default function GeopoliticalMapPage() {
             size="md"
           />
         </IntelCard>
-        <IntelCard title="Regional Spikes" status={data.regional_spikes.length > 0 ? 'warning' : 'nominal'}>
+        <IntelCard title="Regional Spikes" status={data.regional_spikes.length > 0 ? 'warning' : undefined}>
           <Metric label="Detected" value={data.regional_spikes.length} size="lg" />
         </IntelCard>
       </div>

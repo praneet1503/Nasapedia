@@ -1351,7 +1351,6 @@ tr:hover .intel-td {
   border-radius: 50%;
 }
 
-.intel-status-nominal { background: #22c55e; box-shadow: 0 0 6px rgba(34, 197, 94, 0.4); }
 .intel-status-elevated { background: #f59e0b; box-shadow: 0 0 6px rgba(245, 158, 11, 0.4); }
 .intel-status-critical { background: #ef4444; box-shadow: 0 0 6px rgba(239, 68, 68, 0.4); }
 

@@ -48,23 +48,22 @@ export default function MissionClassificationPage() {
         <h2 className="text-sm font-bold uppercase tracking-[0.2em] text-[var(--accent)]">
           Mission Classification Intelligence
         </h2>
-        <StatusBadge
-          label={data.military_escalation_flag ? 'ESCALATION' : 'NOMINAL'}
-          variant={data.military_escalation_flag ? 'red' : 'green'}
-        />
+        {data.military_escalation_flag && (
+          <StatusBadge label="ESCALATION" variant="red" />
+        )}
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <IntelCard title="Total Classified" status="info">
           <Metric label="All missions" value={data.total_classified} size="lg" />
         </IntelCard>
-        <IntelCard title="Categories" status="nominal">
+        <IntelCard title="Categories">
           <Metric label="Unique types" value={data.categories.length} size="lg" />
         </IntelCard>
-        <IntelCard title="Military %" status={data.military_escalation_flag ? 'critical' : 'nominal'}>
+        <IntelCard title="Military %" status={data.military_escalation_flag ? 'critical' : undefined}>
           <Metric label="30-day share" value={`${data.military_percent_30d}%`} size="lg" />
         </IntelCard>
-        <IntelCard title="Emerging" status={data.emerging_categories.length > 0 ? 'warning' : 'nominal'}>
+        <IntelCard title="Emerging" status={data.emerging_categories.length > 0 ? 'warning' : undefined}>
           <Metric label="Trending categories" value={data.emerging_categories.length} size="lg" />
         </IntelCard>
       </div>

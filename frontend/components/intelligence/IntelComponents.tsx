@@ -3,14 +3,13 @@ import { type ReactNode } from 'react'
 type IntelCardProps = {
   title: string
   subtitle?: string
-  status?: 'nominal' | 'warning' | 'critical' | 'info'
+  status?: 'warning' | 'critical' | 'info'
   className?: string
   children: ReactNode
   headerRight?: ReactNode
 }
 
 const STATUS_COLORS = {
-  nominal: 'bg-emerald-500',
   warning: 'bg-amber-500',
   critical: 'bg-red-500',
   info: 'bg-amber-500',
@@ -22,7 +21,7 @@ export function IntelCard({ title, subtitle, status, className = '', children, h
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           {status && (
-            <span className={`w-2 h-2 rounded-full ${STATUS_COLORS[status]} shadow-[0_0_6px] ${status === 'nominal' ? 'shadow-emerald-500/50' : status === 'warning' ? 'shadow-amber-500/50' : status === 'critical' ? 'shadow-red-500/50' : 'shadow-amber-500/50'}`} />
+            <span className={`w-2 h-2 rounded-full ${STATUS_COLORS[status]} shadow-[0_0_6px] ${status === 'warning' ? 'shadow-amber-500/50' : status === 'critical' ? 'shadow-red-500/50' : 'shadow-amber-500/50'}`} />
           )}
           <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-[var(--text-secondary)]">
             {title}
@@ -91,6 +90,7 @@ const BADGE_STYLES = {
 }
 
 export function StatusBadge({ label, variant }: StatusBadgeProps) {
+  if (!label) return null
   return (
     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-[0.12em] border ${BADGE_STYLES[variant]}`}>
       {label}
