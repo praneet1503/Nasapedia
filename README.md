@@ -55,7 +55,7 @@ and thats literally it, you're all set!! if something breaks just check that the
 # note:
 - make sure to have the backend server running before accessing the frontend to ensure that the API endpoints are available for fetching data.
 - the backend files are not public right now but i will make them public soon so stay tuned for that and if you have any suggestions or feedback,lemme know ([msg me @!](https://hackclub.enterprise.slack.com/team/U07V12XBSF6))
-- the migrations are public but currently no documentation is avalible for it so kindly give me some time to write the docs for it 
+- the migrations are public but currently no documentation is available for it so kindly give me some time to write the docs for it 
 
 # Contributing
 - you can fork the repo > make your changes > create a pull request 
