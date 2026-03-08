@@ -13,6 +13,7 @@ from sqlalchemy import text
 from sqlalchemy.engine import Engine
 
 from app.db import create_db_engine, get_required_env
+from app.http_utils import get_shared_async_client, log_timing, timing_start
 from app.schemas import IssLocationOut, ErrorResponse
 
 # yes we are literally tracking a tin can hurtling at 28,000 km/h. beautiful no ?????
@@ -34,7 +35,6 @@ _iss_cache: Dict[str, Any] = {
 _ws_clients: Set[WebSocket] = set()
 _ws_poller_task: Optional[asyncio.Task] = None
 _iss_db_engine: Optional[Engine] = None
-_iss_http_client: Optional[httpx.AsyncClient] = None
 
 
 def _get_iss_db_engine() -> Optional[Engine]:
@@ -113,6 +113,7 @@ def _try_acquire_or_renew_leadership(instance_id: str) -> bool:
 
 
 def _write_latest_snapshot(payload: Dict[str, Any], upstream_ok: bool) -> None:
+    started = timing_start()
     engine = _get_iss_db_engine()
     if engine is None:
         return
@@ -137,6 +138,7 @@ def _write_latest_snapshot(payload: Dict[str, Any], upstream_ok: bool) -> None:
                 "id": ISS_STREAM_ROW_ID,
             },
         )
+    log_timing("iss.write_snapshot", started, f"upstream_ok={upstream_ok}")
 
 
 def _read_latest_snapshot() -> Optional[Dict[str, Any]]:
@@ -197,12 +199,11 @@ def _normalize_payload(payload: Dict[str, Any]) -> IssLocationOut:
 
 
 async def _fetch_iss_data() -> IssLocationOut:
-    global _iss_http_client
-    if _iss_http_client is None:
-        _iss_http_client = httpx.AsyncClient(timeout=5.0)
-
-    response = await _iss_http_client.get(ISS_URL)
+    started = timing_start()
+    client = get_shared_async_client("iss_tracker", 5.0)
+    response = await client.get(ISS_URL)
     response.raise_for_status()
+    log_timing("iss.fetch_upstream", started, f"status={response.status_code}")
     payload = response.json()
     if not isinstance(payload, dict):
         raise ValueError("Invalid ISS payload")
@@ -292,14 +293,17 @@ def _ensure_poller_running() -> None:
 
 @router.get("/location")
 async def get_iss_location() -> JSONResponse:
+    request_started = timing_start()
     shared_snapshot = _read_latest_snapshot()
     if isinstance(shared_snapshot, dict):
         _iss_cache["data"] = shared_snapshot
         _iss_cache["last_updated"] = time.time()
+        log_timing("iss.location", request_started, "source=shared_snapshot")
         return JSONResponse(shared_snapshot)
 
     if _is_cache_fresh():
         cached = _iss_cache["data"]
+        log_timing("iss.location", request_started, "source=local_cache")
         return JSONResponse(cached)
 
     try:
@@ -307,9 +311,11 @@ async def get_iss_location() -> JSONResponse:
         response_payload = normalized.model_dump(mode="json", exclude_none=True)
         _iss_cache["data"] = response_payload
         _iss_cache["last_updated"] = time.time()
+        log_timing("iss.location", request_started, "source=upstream")
         return JSONResponse(response_payload)
     except Exception:
         error_payload = ErrorResponse(error="ISS data unavailable").model_dump()
+        log_timing("iss.location", request_started, "source=error")
         return JSONResponse(error_payload, status_code=503)
 
 

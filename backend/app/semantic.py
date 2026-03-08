@@ -104,8 +104,6 @@ def _keyword_search(
         raise Exception("Database unavailable") from exc
     except SQLAlchemyError as exc:
         raise Exception("Database query failed") from exc
-    finally:
-        engine.dispose()
 
 
 def _semantic_search(
@@ -202,8 +200,6 @@ def _semantic_search(
     except SQLAlchemyError as exc:
         logger.error(f"Semantic search query failed: {exc}")
         raise Exception("Database query failed") from exc
-    finally:
-        engine.dispose()
 
 
 def _hybrid_search(
@@ -306,5 +302,3 @@ def _hybrid_search(
     except SQLAlchemyError as exc:
         logger.error(f"Hybrid search query failed: {exc}")
         raise Exception("Database query failed") from exc
-    finally:
-        engine.dispose()

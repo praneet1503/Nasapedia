@@ -8,6 +8,8 @@ from typing import Any, Dict, Literal, Optional, Tuple
 
 import httpx
 
+from app.http_utils import get_shared_async_client, log_timing, timing_start
+
 from app.schemas import (
     SpaceDevsEndpointLatency,
     SpaceDevsErrorType,
@@ -101,8 +103,14 @@ async def validate_spacedevs_api_key(auth_mode: AuthMode = "token") -> SpaceDevs
             if has_token:
                 headers["Authorization"] = f"Token {api_key}"
 
-            async with httpx.AsyncClient(timeout=REQUEST_TIMEOUT_SECONDS) as client:
-                response = await client.get(url, headers=headers)
+            req_started = timing_start()
+            client = get_shared_async_client("spacedevs", REQUEST_TIMEOUT_SECONDS)
+            response = await client.get(url, headers=headers)
+            log_timing(
+                "spacedevs.validate_http",
+                req_started,
+                f"status={response.status_code} attempt={attempt + 1} mode={'token' if has_token else 'anon'}",
+            )
 
             elapsed_ms = int((time.time() - started) * 1000)
             body_text = response.text
@@ -191,8 +199,14 @@ async def _measure_endpoint_latency(auth_mode: AuthMode, endpoint: str, samples:
             if has_token:
                 headers["Authorization"] = f"Token {api_key}"
 
-            async with httpx.AsyncClient(timeout=REQUEST_TIMEOUT_SECONDS) as client:
-                response = await client.get(f"{BASE_URL}{endpoint}", headers=headers)
+            req_started = timing_start()
+            client = get_shared_async_client("spacedevs", REQUEST_TIMEOUT_SECONDS)
+            response = await client.get(f"{BASE_URL}{endpoint}", headers=headers)
+            log_timing(
+                "spacedevs.probe_http",
+                req_started,
+                f"endpoint={endpoint} sample={sample} status={response.status_code}",
+            )
 
             latencies.append(
                 SpaceDevsLatencySample(

@@ -30,8 +30,6 @@ def db_health_check(database_url: str) -> None:
             conn.execute(text("SELECT 1"))
     except OperationalError as exc:
         raise DatabaseUnavailable("Database unavailable") from exc
-    finally:
-        engine.dispose()
 
 
 def _build_where(params: Dict[str, Optional[str]]) -> Tuple[str, Dict[str, object]]:
@@ -146,8 +144,6 @@ def search_projects(
         raise DatabaseUnavailable("Database unavailable") from exc
     except SQLAlchemyError as exc:
         raise DatabaseQueryFailed("Database query failed") from exc
-    finally:
-        engine.dispose()
 
 
 def get_project(database_url: str, project_id: int) -> Dict[str, object]:
@@ -166,8 +162,6 @@ def get_project(database_url: str, project_id: int) -> Dict[str, object]:
         raise DatabaseUnavailable("Database unavailable") from exc
     except SQLAlchemyError as exc:
         raise DatabaseQueryFailed("Database query failed") from exc
-    finally:
-        engine.dispose()
 
     if not result:
         raise ProjectNotFound("Project not found")

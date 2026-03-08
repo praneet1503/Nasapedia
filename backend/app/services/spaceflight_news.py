@@ -16,13 +16,15 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import httpx
 
+from app.http_utils import get_shared_async_client, log_timing, timing_start
+
 # ── Spaceflight News API Configuration ────────────────────────
 
 BASE_URL = "https://api.spaceflightnewsapi.net/v4"
 REQUEST_TIMEOUT = 15.0
 MAX_RETRIES = 2
 RETRY_DELAY = 0.5
-CACHE_TTL = 3600  # 1 hour
+CACHE_TTL = 120  # 2 minutes
 
 # ── In-Memory Cache ───────────────────────────────────────────
 
@@ -72,9 +74,11 @@ async def _fetch_spaceflight(
     On any failure the function returns EMPTY_RESPONSE instead of
     raising, so routers always have a safe payload.
     """
+    started = timing_start()
     cache_key = f"sfn:{endpoint}:{limit}:{offset}"
     cached = _get_cached(cache_key)
     if cached is not None:
+        log_timing("spaceflight.fetch", started, f"endpoint={endpoint} cache=hit")
         return cached
 
     url = f"{BASE_URL}/{endpoint}/"
@@ -86,34 +90,41 @@ async def _fetch_spaceflight(
 
     for attempt in range(MAX_RETRIES + 1):
         try:
-            async with httpx.AsyncClient(timeout=REQUEST_TIMEOUT) as client:
-                resp = await client.get(
-                    url,
-                    params=params,
-                    headers={"Accept": "application/json"},
-                )
+            request_started = timing_start()
+            client = get_shared_async_client("spaceflight_news", REQUEST_TIMEOUT)
+            resp = await client.get(
+                url,
+                params=params,
+                headers={"Accept": "application/json"},
+            )
+            log_timing(
+                "spaceflight.http",
+                request_started,
+                f"endpoint={endpoint} attempt={attempt + 1} status={resp.status_code}",
+            )
 
-                if resp.status_code == 429:
-                    # Rate-limited — return empty rather than partial data
-                    return dict(EMPTY_RESPONSE)
+            if resp.status_code == 429:
+                # Rate-limited — return empty rather than partial data
+                return dict(EMPTY_RESPONSE)
 
-                if 500 <= resp.status_code <= 599:
-                    if attempt < MAX_RETRIES:
-                        await asyncio.sleep(RETRY_DELAY * (2 ** attempt))
-                        continue
-                    return dict(EMPTY_RESPONSE)
+            if 500 <= resp.status_code <= 599:
+                if attempt < MAX_RETRIES:
+                    await asyncio.sleep(RETRY_DELAY * (2 ** attempt))
+                    continue
+                return dict(EMPTY_RESPONSE)
 
-                if resp.status_code != 200:
-                    return dict(EMPTY_RESPONSE)
+            if resp.status_code != 200:
+                return dict(EMPTY_RESPONSE)
 
-                data = resp.json()
-                result = {
-                    "items": [_normalize_item(r) for r in data.get("results", [])],
-                    "next": data.get("next"),
-                    "previous": data.get("previous"),
-                }
-                _set_cached(cache_key, result)
-                return result
+            data = resp.json()
+            result = {
+                "items": [_normalize_item(r) for r in data.get("results", [])],
+                "next": data.get("next"),
+                "previous": data.get("previous"),
+            }
+            _set_cached(cache_key, result)
+            log_timing("spaceflight.fetch", started, f"endpoint={endpoint} cache=miss items={len(result['items'])}")
+            return result
 
         except (httpx.TimeoutException, httpx.NetworkError):
             if attempt < MAX_RETRIES:
@@ -121,6 +132,7 @@ async def _fetch_spaceflight(
                 continue
             return dict(EMPTY_RESPONSE)
 
+    log_timing("spaceflight.fetch", started, f"endpoint={endpoint} cache=miss items=0 fallback=empty")
     return dict(EMPTY_RESPONSE)
 
 

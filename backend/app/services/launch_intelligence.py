@@ -20,6 +20,8 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import httpx
 
+from app.http_utils import get_shared_async_client, log_timing, timing_start
+
 # ── Space Devs API Configuration ──────────────────────────────
 
 BASE_URL = "https://ll.thespacedevs.com/2.2.0/"
@@ -55,9 +57,11 @@ async def _fetch_spacedevs(
     Fetch from Space Devs API with caching, retry, and rate-limit safety.
     Paginates automatically to collect up to `limit` results.
     """
+    started = timing_start()
     cache_key = f"sd:{endpoint}:{params}:{limit}"
     cached = _get_cached(cache_key)
     if cached is not None:
+        log_timing("launch_intel.fetch_spacedevs", started, f"endpoint={endpoint} cache=hit")
         return cached
 
     api_key = (os.environ.get("SPACEDEVS_API_KEY") or "").strip()
@@ -66,40 +70,48 @@ async def _fetch_spacedevs(
         headers["Authorization"] = f"Token {api_key}"
 
     all_results: List[Dict[str, Any]] = []
+    request_count = 0
     url = f"{BASE_URL}{endpoint}"
     query = {**(params or {}), "limit": min(limit, 100), "offset": 0}
 
     for attempt in range(MAX_RETRIES + 1):
         try:
-            async with httpx.AsyncClient(timeout=REQUEST_TIMEOUT) as client:
-                while len(all_results) < limit:
-                    resp = await client.get(url, headers=headers, params=query)
+            client = get_shared_async_client("spacedevs", REQUEST_TIMEOUT)
+            while len(all_results) < limit:
+                req_started = timing_start()
+                resp = await client.get(url, headers=headers, params=query)
+                request_count += 1
+                log_timing(
+                    "launch_intel.spacedevs_http",
+                    req_started,
+                    f"endpoint={endpoint} attempt={attempt + 1} status={resp.status_code} offset={query.get('offset', 0)}",
+                )
 
-                    if resp.status_code == 429:
-                        # Rate limited — return whatever we have
-                        break
+                if resp.status_code == 429:
+                    # Rate limited — return whatever we have
+                    break
 
-                    if 500 <= resp.status_code <= 599:
-                        if attempt < MAX_RETRIES:
-                            await asyncio.sleep(RETRY_DELAY * (2 ** attempt))
-                            break  # retry outer loop
-                        return all_results  # give up
+                if 500 <= resp.status_code <= 599:
+                    if attempt < MAX_RETRIES:
+                        await asyncio.sleep(RETRY_DELAY * (2 ** attempt))
+                        break  # retry outer loop
+                    return all_results  # give up
 
-                    if resp.status_code != 200:
-                        break
+                if resp.status_code != 200:
+                    break
 
-                    data = resp.json()
-                    results = data.get("results", [])
-                    all_results.extend(results)
+                data = resp.json()
+                results = data.get("results", [])
+                all_results.extend(results)
 
-                    if not data.get("next") or len(all_results) >= limit:
-                        break
+                if not data.get("next") or len(all_results) >= limit:
+                    break
 
-                    query["offset"] = len(all_results)
-                else:
-                    break  # collected enough
-                if resp.status_code == 200 or resp.status_code == 429:
-                    break  # don't retry on success or rate limit
+                query["offset"] = len(all_results)
+            else:
+                break  # collected enough
+            if resp.status_code == 200 or resp.status_code == 429:
+                break  # don't retry on success or rate limit
         except (httpx.TimeoutException, httpx.NetworkError):
             if attempt < MAX_RETRIES:
                 await asyncio.sleep(RETRY_DELAY * (2 ** attempt))
@@ -108,6 +120,11 @@ async def _fetch_spacedevs(
 
     trimmed = all_results[:limit]
     _set_cached(cache_key, trimmed)
+    log_timing(
+        "launch_intel.fetch_spacedevs",
+        started,
+        f"endpoint={endpoint} cache=miss requests={request_count} results={len(trimmed)}",
+    )
     return trimmed
 
 
@@ -131,9 +148,11 @@ async def fetch_space_stations() -> List[Dict]:
 
 async def fetch_all_launch_data() -> Dict[str, List[Dict]]:
     """Parallel fetch of upcoming + previous launches."""
+    started = timing_start()
     cache_key = "all_launch_data"
     cached = _get_cached(cache_key)
     if cached is not None:
+        log_timing("launch_intel.fetch_all", started, "cache=hit")
         return cached
 
     upcoming, previous = await asyncio.gather(
@@ -142,6 +161,11 @@ async def fetch_all_launch_data() -> Dict[str, List[Dict]]:
     )
     result = {"upcoming": upcoming, "previous": previous}
     _set_cached(cache_key, result)
+    log_timing(
+        "launch_intel.fetch_all",
+        started,
+        f"cache=miss upcoming={len(upcoming)} previous={len(previous)}",
+    )
     return result
 
 

@@ -5,7 +5,7 @@ from fastapi import APIRouter
 
 from app.core import DatabaseQueryFailed, DatabaseUnavailable
 from app.db import get_required_env
-from app.http_utils import build_response, json_error
+from app.http_utils import build_response, json_error, log_timing, timing_start
 from app.schemas import FeedParams, ProjectFeedOut
 from app.services.feed import get_adaptive_feed
 
@@ -14,6 +14,7 @@ router = APIRouter()
 
 @router.get("/feed")
 async def feed(request: Request) -> JSONResponse:
+    started = timing_start()
     request_id = request.headers.get("X-Request-Id")
     visitor_uuid = request.headers.get("X-Visitor-UUID")
 
@@ -49,4 +50,5 @@ async def feed(request: Request) -> JSONResponse:
         "totalCount": total,
         "totalPages": (total + page_size - 1) // page_size if page_size > 0 else 0,
     }
+    log_timing("router.feed", started, f"rows={len(rows)} total={total}")
     return build_response(payload, request_id=request_id)

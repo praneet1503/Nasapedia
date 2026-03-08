@@ -5,16 +5,18 @@ Lazy-loads the sentence-transformers model to avoid loading it multiple times.
 Uses a simple in-memory cache to keep the model loaded across requests.
 """
 
-from sentence_transformers import SentenceTransformer
-from typing import Optional
+from typing import TYPE_CHECKING, Any, Optional
+
+if TYPE_CHECKING:
+    from sentence_transformers import SentenceTransformer
 
 # Global model instance (lazy-loaded)
-_model_instance: Optional[SentenceTransformer] = None
+_model_instance: Optional[Any] = None
 MODEL_NAME = "all-MiniLM-L6-v2"
 EMBEDDING_DIMENSION = 384
 
 
-def get_embedding_model() -> SentenceTransformer:
+def get_embedding_model() -> "SentenceTransformer":
     """
     Get or create the embedding model singleton.
     
@@ -26,6 +28,8 @@ def get_embedding_model() -> SentenceTransformer:
     """
     global _model_instance
     if _model_instance is None:
+        from sentence_transformers import SentenceTransformer
+
         _model_instance = SentenceTransformer(MODEL_NAME)
     return _model_instance
 

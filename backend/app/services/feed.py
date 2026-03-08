@@ -6,6 +6,7 @@ from sqlalchemy.exc import OperationalError, SQLAlchemyError
 
 from app.core import DatabaseQueryFailed, DatabaseUnavailable
 from app.db import create_db_engine
+from app.http_utils import log_timing, timing_start
 
 # 70% popular + 30% fresh. like a trending tweet but make it space.
 POPULARITY_WEIGHT = 0.7
@@ -58,21 +59,22 @@ def record_project_click(database_url: str, visitor_uuid: str, project_id: int) 
         raise DatabaseUnavailable("Database unavailable") from exc
     except SQLAlchemyError as exc:
         raise DatabaseQueryFailed("Database query failed") from exc
-    finally:
-        engine.dispose()
 
 
 def _get_total_count(conn, include_empty_descriptions: bool) -> int:
+    started = timing_start()
     if include_empty_descriptions:
         total = conn.execute(text("SELECT COUNT(*) FROM projects")).scalar_one()
     else:
         total = conn.execute(
             text("SELECT COUNT(*) FROM projects WHERE description IS NOT NULL AND btrim(description) <> ''")
         ).scalar_one()
+    log_timing("feed.db_total_count", started, f"include_empty={include_empty_descriptions}")
     return int(total)
 
 
 def _ranked_page_rows(conn, page: int, per_page: int, include_empty_descriptions: bool) -> List[Dict[str, object]]:
+    started = timing_start()
     offset = max(page - 1, 0) * per_page
     score_sql = _adaptive_score_sql()
     where_clause = ""
@@ -98,10 +100,12 @@ def _ranked_page_rows(conn, page: int, per_page: int, include_empty_descriptions
             "recency_weight": RECENCY_WEIGHT,
         },
     ).mappings().all()
+    log_timing("feed.db_ranked_rows", started, f"page={page} per_page={per_page} rows={len(rows)}")
     return [dict(row) for row in rows]
 
 
 def _random_rows(conn, exclude_ids: List[int], desired_count: int, include_empty_descriptions: bool) -> List[Dict[str, object]]:
+    started = timing_start()
     if desired_count <= 0:
         return []
 
@@ -136,6 +140,11 @@ def _random_rows(conn, exclude_ids: List[int], desired_count: int, include_empty
 
     rows = conn.execute(sql, params).mappings().all()
     random_candidates = [dict(row) for row in rows]
+    log_timing(
+        "feed.db_random_rows",
+        started,
+        f"desired={desired_count} fetched={len(random_candidates)} excluded={len(exclude_ids)}",
+    )
     if len(random_candidates) <= desired_count:
         return random_candidates
     return random.sample(random_candidates, desired_count)
@@ -157,6 +166,7 @@ def get_adaptive_feed(
     visitor_uuid: Optional[str] = None,
     include_empty_descriptions: bool = False,
 ) -> Tuple[List[Dict[str, object]], int]:
+    started = timing_start()
     safe_page = max(page, 1)
     safe_per_page = max(per_page, 1)
 
@@ -187,10 +197,13 @@ def get_adaptive_feed(
             seed_basis = f"{visitor_uuid or 'anon'}:{safe_page}"
             seed = abs(hash(seed_basis)) % (2**32)
             final_rows = _light_shuffle(unique_rows, seed)
+            log_timing(
+                "feed.total",
+                started,
+                f"page={safe_page} per_page={safe_per_page} rows={len(final_rows)} total={total}",
+            )
             return final_rows, total
     except OperationalError as exc:
         raise DatabaseUnavailable("Database unavailable") from exc
     except SQLAlchemyError as exc:
         raise DatabaseQueryFailed("Database query failed") from exc
-    finally:
-        engine.dispose()
