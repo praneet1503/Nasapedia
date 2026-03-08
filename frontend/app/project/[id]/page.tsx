@@ -50,7 +50,7 @@ export default function ProjectDetailPage() {
             }}
             className="space-btn text-sm"
           >
-            ← Back
+            Back
           </button>
 
           <button

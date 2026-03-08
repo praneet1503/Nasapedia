@@ -248,8 +248,8 @@ export default function SearchBar({
             borderRadius: '4px',
           }}
         >
-          <option value="keyword">⚡ Fast (Keyword)</option>
-          <option value="semantic">🧠 Smart (Semantic)</option>
+          <option value="keyword">Keyword</option>
+          <option value="semantic">Semantic</option>
         </select>
         <button
           type="button"

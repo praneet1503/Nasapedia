@@ -1,3 +1,4 @@
+import React from 'react'
 import Link from 'next/link'
 import type { Project } from '../lib/types'
 
@@ -27,7 +28,7 @@ function statusIcon(status: string | null | undefined) {
   return '🔭'
 }
 
-export default function ProjectCard({ project, onProjectClick }: ProjectCardProps) {
+function ProjectCard({ project, onProjectClick }: ProjectCardProps) {
   return (
     <Link
       href={`/project/${project.id}`}
@@ -92,4 +93,6 @@ export default function ProjectCard({ project, onProjectClick }: ProjectCardProp
     </Link>
   )
 }
+
+export default React.memo(ProjectCard)
 

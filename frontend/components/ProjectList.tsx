@@ -1,3 +1,4 @@
+import React from 'react'
 import type { Project } from '../lib/types'
 import ProjectCard from './ProjectCard'
 
@@ -6,7 +7,7 @@ type ProjectListProps = {
   onProjectClick?: (projectId: number) => void
 }
 
-export default function ProjectList({ projects, onProjectClick }: ProjectListProps) {
+function ProjectList({ projects, onProjectClick }: ProjectListProps) {
   return (
     <div className="project-list">
       {projects.map((p) => (
@@ -15,4 +16,6 @@ export default function ProjectList({ projects, onProjectClick }: ProjectListPro
     </div>
   )
 }
+
+export default React.memo(ProjectList)
 

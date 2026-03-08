@@ -93,10 +93,12 @@ export type FetchFeedParams = {
 
 function getApiProjectUrl(): string {
   const url = process.env.NEXT_PUBLIC_API_PROJECTS_URL
-  if (typeof window !== 'undefined') {
-    console.debug('getApiProjectUrl:', { env: url, origin: window.location?.origin })
-  } else {
-    console.debug('getApiProjectUrl: server-side; env=', url)
+  if (process.env.NODE_ENV !== 'production') {
+    if (typeof window !== 'undefined') {
+      console.debug('getApiProjectUrl:', { env: url, origin: window.location?.origin })
+    } else {
+      console.debug('getApiProjectUrl: server-side; env=', url)
+    }
   }
 
   if (!url) {
