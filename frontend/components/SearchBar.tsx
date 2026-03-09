@@ -188,7 +188,7 @@ export default function SearchBar({
                     className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-sm"
                     style={{ backgroundColor: 'rgba(99,102,241,0.15)', color: 'var(--accent)' }}
                   >
-                    🚀
+                    ID
                   </span>
                   <div className="min-w-0 flex-1">
                     <p

@@ -87,7 +87,7 @@ export default function AstronautActivityPage() {
               {data.upcoming_crewed_missions.map((mission, i) => (
                 <div key={i} className="flex gap-3 items-start p-2 rounded-lg bg-[var(--space-deep)] border border-[var(--border)]/50">
                   <div className="w-8 h-8 rounded-full bg-[var(--accent)]/10 flex items-center justify-center flex-shrink-0">
-                    <span className="text-[var(--accent)] text-sm">🚀</span>
+                    <span className="text-[var(--accent)] text-[10px] font-semibold">LA</span>
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-xs font-medium text-[var(--text-primary)] truncate">{mission.name}</p>
@@ -113,7 +113,7 @@ export default function AstronautActivityPage() {
                 {astro.profile_image ? (
                   <img src={astro.profile_image} alt="" className="w-full h-full object-cover rounded-full" />
                 ) : (
-                  <span className="text-[10px] text-[var(--text-muted)]">👨‍🚀</span>
+                  <span className="text-[9px] text-[var(--text-muted)] font-semibold">AST</span>
                 )}
               </div>
               <div className="min-w-0">

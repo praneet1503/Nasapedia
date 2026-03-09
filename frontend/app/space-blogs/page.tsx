@@ -95,7 +95,6 @@ export default function SpaceBlogsPage() {
                 <SectionHeader
                   title="Latest Blogs"
                   subtitle={`Showing ${blogItems.length} blogs`}
-                  icon="📝"
                 />
                 <NewsGrid
                   items={blogItems}
@@ -117,7 +116,6 @@ export default function SpaceBlogsPage() {
                 <SectionHeader
                   title="Latest Articles"
                   subtitle={`Showing ${articleItems.length} articles`}
-                  icon="🛰️"
                 />
                 <NewsGrid
                   items={articleItems}

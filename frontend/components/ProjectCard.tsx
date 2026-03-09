@@ -22,10 +22,10 @@ function trlClass(trl: number | null | undefined): string {
 
 function statusIcon(status: string | null | undefined) {
   const s = (status ?? '').toLowerCase()
-  if (s.includes('active') || s.includes('ongoing')) return '🛰️'
-  if (s.includes('completed') || s.includes('closed')) return '✅'
-  if (s.includes('planned') || s.includes('proposed')) return '🚀'
-  return '🔭'
+  if (s.includes('active') || s.includes('ongoing')) return 'ACT'
+  if (s.includes('completed') || s.includes('closed')) return 'DONE'
+  if (s.includes('planned') || s.includes('proposed')) return 'PLAN'
+  return 'N/A'
 }
 
 function ProjectCard({ project, onProjectClick }: ProjectCardProps) {

@@ -12,7 +12,6 @@ export default function NewsGrid({ items, onItemClick, contentType = 'article', 
   if (items.length === 0) {
     return (
       <div className="surface-panel surface-panel--empty text-center">
-        <span className="text-3xl">🌌</span>
         <p className="mt-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
           No {contentType === 'blog' ? 'blogs' : 'articles'} found in this sector.
         </p>

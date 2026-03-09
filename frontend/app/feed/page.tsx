@@ -67,7 +67,7 @@ export default function FeedPage() {
             {projects.length > 0 ? (
               <div className="space-y-5">
                 <div className="section-heading-row">
-                  <h2 className="section-title">📡 Recommended Missions</h2>
+                  <h2 className="section-title">Recommended Missions</h2>
                   <p className="section-meta">
                     Showing {projects.length} of {totalCount} projects
                   </p>

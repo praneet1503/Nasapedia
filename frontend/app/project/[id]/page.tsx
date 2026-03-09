@@ -34,7 +34,6 @@ export default function ProjectDetailPage() {
     <main className="mx-auto w-full max-w-4xl px-4 py-10">
       <div className="mb-6 flex items-center justify-between gap-3 flex-wrap">
         <div className="flex items-center gap-2">
-          <span className="text-xl" aria-hidden="true">🛠️</span>
           <h1 className="text-xl font-bold tracking-tight" style={{ color: 'var(--text-primary)' }}>Mission Details</h1>
         </div>
 
@@ -58,7 +57,7 @@ export default function ProjectDetailPage() {
             onClick={() => router.push('/feed')}
             className="space-btn text-sm"
           >
-            📡 Feed
+            Feed
           </button>
 
           <button
@@ -81,7 +80,6 @@ export default function ProjectDetailPage() {
 
       {!isLoading && !isError && !project ? (
         <div className="space-glass p-6 text-center">
-          <span className="text-3xl">&#x1F30C;</span>
           <h2 className="mt-2 text-base font-semibold" style={{ color: 'var(--text-primary)' }}>Mission Not Found</h2>
           <p className="mt-1 text-sm" style={{ color: 'var(--text-secondary)' }}>This mission does not exist in the database (or is classified).</p>
         </div>
@@ -90,39 +88,38 @@ export default function ProjectDetailPage() {
       {!isLoading && project ? (
         <div className="space-glass p-6">
           <div className="flex items-center gap-2">
-            <span className="text-xl" aria-hidden="true">🚀</span>
             <h2 className="text-lg font-bold" style={{ color: 'var(--text-primary)' }}>{project.title}</h2>
           </div>
 
           <div className="mt-4 grid grid-cols-1 gap-3 text-sm md:grid-cols-2">
             <div className="space-card p-3">
-              <div className="text-xs font-medium" style={{ color: 'var(--text-muted)' }}>📡 Status</div>
+              <div className="text-xs font-medium" style={{ color: 'var(--text-muted)' }}>Status</div>
               <div className="mt-1" style={{ color: 'var(--text-primary)' }}>{valueOrDash(project.status)}</div>
             </div>
             <div className="space-card p-3">
-              <div className="text-xs font-medium" style={{ color: 'var(--text-muted)' }}>📊 TRL Level</div>
+              <div className="text-xs font-medium" style={{ color: 'var(--text-muted)' }}>TRL Level</div>
               <div className="mt-1" style={{ color: 'var(--text-primary)' }}>{valueOrDash(project.trl)}</div>
             </div>
             <div className="space-card p-3">
-              <div className="text-xs font-medium" style={{ color: 'var(--text-muted)' }}>🏢 Organization</div>
+              <div className="text-xs font-medium" style={{ color: 'var(--text-muted)' }}>Organization</div>
               <div className="mt-1" style={{ color: 'var(--text-primary)' }}>{valueOrDash(project.organization)}</div>
             </div>
             <div className="space-card p-3">
-              <div className="text-xs font-medium" style={{ color: 'var(--text-muted)' }}>🔬 Technology Area</div>
+              <div className="text-xs font-medium" style={{ color: 'var(--text-muted)' }}>Technology Area</div>
               <div className="mt-1" style={{ color: 'var(--text-primary)' }}>{valueOrDash(project.technology_area)}</div>
             </div>
             <div className="space-card p-3">
-              <div className="text-xs font-medium" style={{ color: 'var(--text-muted)' }}>🚀 Launch Date</div>
+              <div className="text-xs font-medium" style={{ color: 'var(--text-muted)' }}>Launch Date</div>
               <div className="mt-1" style={{ color: 'var(--text-primary)' }}>{formatDate(project.start_date)}</div>
             </div>
             <div className="space-card p-3">
-              <div className="text-xs font-medium" style={{ color: 'var(--text-muted)' }}>🏁 End Date</div>
+              <div className="text-xs font-medium" style={{ color: 'var(--text-muted)' }}>End Date</div>
               <div className="mt-1" style={{ color: 'var(--text-primary)' }}>{formatDate(project.end_date)}</div>
             </div>
           </div>
 
           <div className="mt-5">
-            <div className="text-xs font-medium" style={{ color: 'var(--text-muted)' }}>📄 Mission Brief</div>
+            <div className="text-xs font-medium" style={{ color: 'var(--text-muted)' }}>Mission Brief</div>
             {project.description ? (
               <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{project.description}</p>
             ) : (

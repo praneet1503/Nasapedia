@@ -44,7 +44,6 @@ export default function UnknownProjectsPage() {
           <>
             {projects.length === 0 && !errorMessage ? (
               <div className="surface-panel surface-panel--empty text-center">
-                <span className="text-3xl">📂</span>
                 <p className="mt-2 text-sm" style={{ color: 'var(--text-secondary)' }}>No uncatalogued projects found.</p>
               </div>
             ) : null}
@@ -52,7 +51,7 @@ export default function UnknownProjectsPage() {
             {projects.length > 0 ? (
               <div className="space-y-5">
                 <div className="section-heading-row">
-                  <h2 className="section-title">📁 Mission Data (No Descriptions)</h2>
+                  <h2 className="section-title">Mission Data (No Descriptions)</h2>
                   <p className="section-meta">Showing {projects.length} of {totalCount} projects</p>
                 </div>
 

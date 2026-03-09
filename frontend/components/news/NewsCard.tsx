@@ -43,7 +43,7 @@ export default function NewsCard({ item, onItemClick, contentType = 'article' }:
           />
         ) : (
           <div className="news-card__image-placeholder">
-            <span aria-hidden="true">🚀</span>
+            <span aria-hidden="true">IMG</span>
           </div>
         )}
         {item.news_site ? (

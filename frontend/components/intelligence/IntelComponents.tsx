@@ -147,10 +147,10 @@ const ALERT_STYLES = {
 }
 
 const ALERT_ICONS = {
-  surge: '⚡',
-  escalation: '🔴',
-  expansion: '📡',
-  info: 'ℹ️',
+  surge: '!',
+  escalation: '!!',
+  expansion: '+',
+  info: 'i',
 }
 
 export function AlertBanner({ message, type }: AlertBannerProps) {

@@ -67,7 +67,6 @@ export default function SpaceNewsPage() {
                 <SectionHeader
                   title="Latest Articles"
                   subtitle={`Showing ${items.length} articles`}
-                  icon="🛰️"
                 />
                 <NewsGrid
                   items={items}
@@ -85,7 +84,6 @@ export default function SpaceNewsPage() {
 
             {!isLoading && items.length === 0 && !isError ? (
               <div className="surface-panel surface-panel--empty text-center">
-                <span className="text-3xl">🌌</span>
                 <p className="mt-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
                   No space news available right now.
                 </p>
