@@ -8,6 +8,7 @@ const NAV_ITEMS = [
   { href: '/projects', label: 'MISSION DATABASE', match: (pathname: string) => pathname === '/projects' || pathname.startsWith('/project/') },
   { href: '/feed', label: 'ADAPTIVE FEED', match: (pathname: string) => pathname.startsWith('/feed') },
   { href: '/global-launch-intelligence/dashboard', label: 'COMMAND CENTER', match: (pathname: string) => pathname.startsWith('/global-launch-intelligence') },
+  { href: '/aurora-tracker', label: 'AURORA TRACKER', match: (pathname: string) => pathname.startsWith('/aurora-tracker') },
   { href: '/iss-tracker', label: 'ISS TRACKER', match: (pathname: string) => pathname.startsWith('/iss-tracker') },
   { href: '/space-news', label: 'NEWS', match: (pathname: string) => pathname.startsWith('/space-news') },
   { href: '/space-blogs', label: 'BLOGS', match: (pathname: string) => pathname.startsWith('/space-blogs') },
@@ -15,6 +16,7 @@ const NAV_ITEMS = [
 
 function getSectionLabel(pathname: string): string {
   if (pathname.startsWith('/global-launch-intelligence')) return 'GLOBAL LAUNCH INTELLIGENCE'
+  if (pathname.startsWith('/aurora-tracker')) return 'AURORA TRACKER'
   if (pathname === '/projects' || pathname.startsWith('/project/')) return 'MISSION DATABASE'
   if (pathname.startsWith('/feed')) return 'ADAPTIVE FEED'
   if (pathname.startsWith('/space-news')) return 'NEWS'

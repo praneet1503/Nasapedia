@@ -27,6 +27,7 @@ NEXT_PUBLIC_API_PROJECTS_ID_URL=<yourapi url here>
 NEXT_PUBLIC_API_FEED_URL=<yourapi url here>
 NEXT_PUBLIC_API_PROJECT_CLICK_URL=<yourapi url here>
 NEXT_PUBLIC_API_ISS_URL=<yourapi url here>
+NEXT_PUBLIC_API_AURORA_URL=<yourapi url here>
 ```
 
 3. Run the dev server:
@@ -46,6 +47,7 @@ Open `http://localhost:3000`.
   - Feed: `NEXT_PUBLIC_API_FEED_URL`
   - Project click tracking: `NEXT_PUBLIC_API_PROJECT_CLICK_URL`
   - ISS tracker: `NEXT_PUBLIC_API_ISS_URL` (fallback supported: `NEXT_PUBLIC_API_URL`)
+  - Aurora tracker: `NEXT_PUBLIC_API_AURORA_URL` (fallback: `${NEXT_PUBLIC_API_URL}/api/aurora`)
 
 API wrappers live in [lib/api.ts](lib/api.ts).
 

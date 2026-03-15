@@ -34,3 +34,17 @@ MODAL_MIN_CONTAINERS=1 MODAL_SCALEDOWN_WINDOW=3600 modal deploy modal_app.py
 - we basically have two main scripts in the backend one is for ingesting data from NASA's TechPort API and the other is for embedding the projects for semantic search which basically reduces time to search for projects by 200ms.
 - we first created a local database and then we migrated it to production/remote neon database  using `migrate_to_neon.sh` script the script is safe for me atleast but feel free to make changes and then we created a ingestion script which fetches nasa techport data and then we embed the words into vectors which reduced our time by 200ms and it is damn fast trust me bro.
 - then we basically connected some enpoints to the frontend and it is done for me.
+
+## Aurora Tracker API
+
+The backend now exposes two Aurora endpoints under `/api/aurora`:
+
+- `GET /api/aurora/oval`
+- `GET /api/aurora/kp`
+
+Notes:
+
+- Data source: NOAA SWPC (aurora oval + planetary Kp + solar wind plasma feed).
+- Solar wind values are bundled inside `/api/aurora/kp` as a `solar_wind` object.
+- Cache policy: in-memory `120s` TTL on backend and response header:
+	`Cache-Control: public, max-age=120, stale-while-revalidate=60`.

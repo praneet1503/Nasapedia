@@ -1,5 +1,5 @@
 from typing import Any, Dict, List, Literal, Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from datetime import date, datetime
 from uuid import UUID
 
@@ -247,6 +247,49 @@ class IntelligenceIndicesResponse(BaseModel):
     telecom_expansion: bool = False
     military_escalation: bool = False
     phase: str = "NOMINAL"
+
+
+# ── Aurora Schemas ───────────────────────────────────────────
+
+class AuroraBand(BaseModel):
+    equator_edge: List[List[float]] = Field(default_factory=list)
+    pole_edge: List[List[float]] = Field(default_factory=list)
+
+
+class SolarWindOut(BaseModel):
+    observed_at: Optional[str] = None
+    density_cm3: Optional[float] = None
+    speed_km_s: Optional[float] = None
+    speed_10m_avg_km_s: Optional[float] = None
+    density_10m_avg_cm3: Optional[float] = None
+    source_status: Literal["ok", "stale", "error"] = "ok"
+    stale: bool = False
+
+
+class AuroraOvalResponse(BaseModel):
+    updated_at: Optional[str] = None
+    forecast_at: Optional[str] = None
+    threshold: float = 3.0
+    north_band: AuroraBand = Field(default_factory=AuroraBand)
+    south_band: AuroraBand = Field(default_factory=AuroraBand)
+    north_peak: float = 0.0
+    south_peak: float = 0.0
+    source_status: Literal["ok", "stale", "error"] = "ok"
+    stale: bool = False
+
+
+class KpPoint(BaseModel):
+    time_tag: str
+    kp: float
+
+
+class AuroraKpResponse(BaseModel):
+    current_kp: float = 0.0
+    observed_at: Optional[str] = None
+    recent: List[KpPoint] = Field(default_factory=list)
+    solar_wind: SolarWindOut = Field(default_factory=SolarWindOut)
+    source_status: Literal["ok", "stale", "error"] = "ok"
+    stale: bool = False
 
 
 # ── Spaceflight News Schemas ─────────────────────────────────

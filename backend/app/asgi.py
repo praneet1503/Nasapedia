@@ -10,6 +10,7 @@ from starlette.responses import Response
 from app.db import close_all_db_engines
 from app.http_utils import close_shared_async_clients, log_timing, timing_ms, timing_start
 from routers.analytics import router as analytics_router
+from routers.aurora import router as aurora_router
 from routers.feed import router as feed_router
 from routers.global_launch_intelligence import router as global_launch_intelligence_router
 from routers.health import router as health_router
@@ -51,6 +52,7 @@ def create_app() -> FastAPI:
     fastapi_app.include_router(projects_router)
     fastapi_app.include_router(feed_router)
     fastapi_app.include_router(analytics_router)
+    fastapi_app.include_router(aurora_router)
     fastapi_app.include_router(global_launch_intelligence_router)
     fastapi_app.include_router(iss_router, prefix="/iss")
     fastapi_app.include_router(space_router)
@@ -65,7 +67,7 @@ def create_app() -> FastAPI:
             started = timing_start()
             semaphore = asyncio.Semaphore(warmup_concurrency)
 
-            async def _bounded(name: str, coro: object) -> None:
+            async def _bounded(name: str, coro: Awaitable[object]) -> None:
                 task_started = timing_start()
                 async with semaphore:
                     try:
@@ -77,6 +79,7 @@ def create_app() -> FastAPI:
             try:
                 # Import lazily to avoid module import overhead at startup path.
                 from app.services import launch_intelligence
+                from app.services import aurora
                 from app.services.spaceflight_news import get_space_articles, get_space_blogs
 
                 await asyncio.gather(
@@ -85,6 +88,8 @@ def create_app() -> FastAPI:
                     _bounded("launch_stations", launch_intelligence.fetch_space_stations()),
                     _bounded("space_articles", get_space_articles(limit=12, offset=0)),
                     _bounded("space_blogs", get_space_blogs(limit=12, offset=0)),
+                    _bounded("aurora_oval", aurora.fetch_aurora_oval()),
+                    _bounded("aurora_kp", aurora.fetch_planetary_kp()),
                     return_exceptions=True,
                 )
             finally:
